@@ -63,7 +63,7 @@ create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nom
             
             -- Tabella delle autorimesse collegate
             modGUI.apriIntestazione(3);
-                modGUI.inserisciTesto('AUTORIMESSE');
+                modGUI.inserisciTesto('Aree');
             modGUI.chiudiIntestazione(3);
             
             modGUI.apriTabella;
