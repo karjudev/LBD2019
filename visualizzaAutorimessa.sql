@@ -53,6 +53,14 @@ create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nom
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;
             
+            modGUI.ApriTabella;
+                modGUI.ApriRigaTabella;
+                    modGUI.ApriElementoTabella;
+                        modGUI.InserisciPenna('modificaAutorimessa', id_sessione, nome, ruolo, idRiga);
+                    modGUI.ChiudiElementoTabella;
+                modGUI.ChiudiRigaTabella;
+            modGUI.ChiudiTabella;
+            
             -- Tabella delle autorimesse collegate
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('AUTORIMESSE');
