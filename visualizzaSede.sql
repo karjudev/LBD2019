@@ -91,7 +91,7 @@ create or replace procedure visualizzaSede(id_sessione int default 0, nome varch
                             modGUI.ElementoTabella(autorimessa.coordinate);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.inserisciLente('visualizzaAutorimessa', id_sessione, nome, ruolo, idriga);
+                            modGUI.inserisciLente('visualizzaAutorimessa', id_sessione, nome, ruolo, autorimessa.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                 end loop;

@@ -1,19 +1,19 @@
-create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
-    -- Parametri della sede corrente
+create or replace procedure visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
+    -- Parametri dell'autorimessa corrente
     autorimessa Autorimesse%ROWTYPE;
-    -- Indirizzo della Sede competente
-    indirizzo_sede Sedi.indirizzo%TYPE;
+    -- Indirizzo della sede di riferimento
+    indirizzo_sede Sedi.Indirizzo%TYPE;
     begin
-        -- Trova l'autorimessa
+        -- Trova la sede
         select * into autorimessa
         from Autorimesse
         where Autorimesse.idAutorimessa = idRiga;
-        -- Trova il nome del dirigente
-        select Sedi.indirizzo into indirizzo_sede
+        -- Trova il'indirizzo della sede
+        select Sedi.Indirizzo into indirizzo_sede
         from Sedi
         where Sedi.idSede = autorimessa.idSede;
         -- Crea la pagina e l'intestazione
-        modGUI.apriPagina('HoC | ' || autorimessa.indirizzo, id_sessione, nome, ruolo);
+        modGUI.apriPagina('HoC | Autorimessa di ' || autorimessa.indirizzo, id_sessione, nome, ruolo);
             modGUI.aCapo;
 
             modGUI.apriIntestazione(2);
@@ -30,19 +30,19 @@ create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nom
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Indirizzo');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(autorimessa.indirizzo);
+                        modGUI.ElementoTabella(autorimessa.Indirizzo);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Telefono');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(autorimessa.telefono);
+                        modGUI.ElementoTabella(autorimessa.Telefono);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Coordinate');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(autorimessa.coordinate);
+                        modGUI.ElementoTabella(autorimessa.Coordinate);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
                 modGUI.ApriRigaTabella;
@@ -52,7 +52,7 @@ create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nom
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;
-            
+
             modGUI.ApriTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.ApriElementoTabella;
@@ -60,40 +60,40 @@ create or replace PROCEDURE visualizzaAutorimessa(id_sessione int default 0, nom
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;
-            
+
             -- Tabella delle autorimesse collegate
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('Aree');
             modGUI.chiudiIntestazione(3);
-            
+
             modGUI.apriTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.intestazioneTabella('ID Area');
-                    modGUI.intestazioneTabella('Posti Totali');
-                    modGUI.intestazioneTabella('Posti Liberi');
-                    modGUI.intestazioneTabella('Stato');
-                    modGUI.intestazioneTabella('GAS');
-                    modGUI.intestazioneTabella('Dettagli');
-                for area in (select * from Aree where Aree.idAutorimessa = autorimessa.idAutorimessa)
+                    modGUI.intestazioneTabella('Larghezza Massima');
+                    modGUI.intestazioneTabella('Lunghezza Massima');
+                    modGUI.intestazioneTabella('Altezza Massima');
+                    modGUI.intestazioneTabella('Peso Massimo');
+                    modGUI.intestazioneTabella('Dettaglio');
+                for area in (select * from Aree where Aree.idAutorimessa = idRiga)
                 loop
                     modGUI.ApriRigaTabella;
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.idArea);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(area.postitotali);
+                            modGUI.ElementoTabella(area.LarghezzaMax || ' mm');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(area.postiliberi);
+                            modGUI.ElementoTabella(area.LunghezzaMax || ' mm');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(area.stato);
+                            modGUI.ElementoTabella(area.AltezzaMax || ' mm');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(area.gas);
+                            modGUI.ElementoTabella(area.PesoMax || ' kg');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.InserisciLente('visualizzaArea', id_sessione, nome, ruolo, area.idArea);
+                            modGUI.inserisciLente('visualizzaArea', id_sessione, nome, ruolo, area.idArea);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                 end loop;
