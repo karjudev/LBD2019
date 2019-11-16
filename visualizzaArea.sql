@@ -24,7 +24,7 @@ create or replace procedure visualizzaArea(id_sessione int default 0, nome varch
             modGUI.aCapo;
 
             modGUI.apriIntestazione(2);
-                modGUI.inserisciTesto('Area ' || area.idArea || ' di ' || autorimessa.indirizzo);
+                modGUI.inserisciTesto('Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
             modGUI.chiudiIntestazione(2);
 
             modGUI.ApriTabella;
@@ -91,7 +91,7 @@ create or replace procedure visualizzaArea(id_sessione int default 0, nome varch
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Autorimessa');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(indirizzo_autorimessa);
+                        modGUI.Collegamento(indirizzo_autorimessa, Costanti.macchina2 || Costanti.radice || 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || area.idAutorimessa);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;

@@ -8,7 +8,7 @@ create or replace procedure visualizzaAutorimessa(id_sessione int default 0, nom
         select * into autorimessa
         from Autorimesse
         where Autorimesse.idAutorimessa = idRiga;
-        -- Trova il'indirizzo della sede
+        -- Trova l'indirizzo della sede
         select Sedi.Indirizzo into indirizzo_sede
         from Sedi
         where Sedi.idSede = autorimessa.idSede;
@@ -48,7 +48,7 @@ create or replace procedure visualizzaAutorimessa(id_sessione int default 0, nom
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Sede');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(indirizzo_sede);
+                        modGUI.Collegamento(indirizzo_sede, Costanti.macchina2 || Costanti.radice || 'visualizzaSede?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || autorimessa.idSede);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;

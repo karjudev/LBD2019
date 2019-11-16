@@ -6,13 +6,15 @@ create or replace procedure visualizzaBox(id_sessione int default 0, nome varcha
     -- ID e indirizzo dell'autorimessa di riferimento
     id_autorimessa Autorimesse.idAutorimessa%TYPE;
     indirizzo_autorimessa Autorimesse.Indirizzo%TYPE;
+    -- ID dell'area di riferimento
+    id_area Aree.idArea%TYPE;
     begin
         -- Trova la sede
         select * into var_box
         from Box
         where Box.idBox = idRiga;
         -- Trova ID della sede e indirizzo dell'autorimessa
-        select Autorimesse.idSede, Autorimesse.Indirizzo into id_autorimessa, indirizzo_autorimessa
+        select Autorimesse.idSede, Autorimesse.Indirizzo, Aree.idArea into id_autorimessa, indirizzo_autorimessa, id_area
         from Autorimesse
         join Aree on Aree.idAutorimessa = Autorimesse.idAutorimessa
         where Aree.idArea = var_box.idArea;
@@ -64,13 +66,13 @@ create or replace procedure visualizzaBox(id_sessione int default 0, nome varcha
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Area');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(var_box.idArea);
+                        modGUI.Collegamento(var_box.idArea, Costanti.macchina2 || Costanti.radice || 'visualizzaArea?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_area);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.IntestazioneTabella('Autorimessa');
                     modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(indirizzo_autorimessa);
+                        modGUI.Collegamento(indirizzo_autorimessa, Costanti.macchina2 || Costanti.radice || 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_autorimessa);
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;

@@ -54,7 +54,7 @@ create or replace procedure visualizzaSede(id_sessione int default 0, nome varch
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;
-            
+
             modGUI.ApriTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.ApriElementoTabella;
@@ -62,12 +62,12 @@ create or replace procedure visualizzaSede(id_sessione int default 0, nome varch
                     modGUI.ChiudiElementoTabella;
                 modGUI.ChiudiRigaTabella;
             modGUI.ChiudiTabella;
-            
+
             -- Tabella delle autorimesse collegate
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('Autorimesse');
             modGUI.chiudiIntestazione(3);
-            
+
             modGUI.apriTabella;
                 modGUI.ApriRigaTabella;
                     modGUI.intestazioneTabella('ID Autorimessa');
