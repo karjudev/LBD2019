@@ -1,7 +1,36 @@
 create or replace procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
     area Aree%ROWTYPE;
     indirizzo_autorimessa Autorimesse.Indirizzo%TYPE;
+    id_responsabile Dipendenti.idDipendente%TYPE;
+    id_dipendente Dipendenti.idDipendente%TYPE;
 BEGIN
+
+    -- ID del dipendente corrente
+    begin
+        select Dipendenti.idDipendente
+        into id_dipendente
+        from Dipendenti
+            join PersoneL on PersoneL.idPersona = Dipendenti.idPersona
+            join Sessioni on Sessioni.idPersona = PersoneL.idPersona
+        where Sessioni.idSessione = id_sessione;
+    exception
+        when NO_DATA_FOUND then
+            id_dipendente := null;
+    end;
+
+    -- ID del dipendente responsabile della sede
+    begin
+        select Sedi.idDipendente
+        into id_responsabile
+        from Sedi
+            join Autorimesse on Autorimesse.idSede = Sedi.idSede
+            join Aree on Aree.idAutorimessa = Autorimesse.idAutorimessa
+        where Aree.idArea = idRiga;
+    exception
+        when NO_DATA_FOUND then
+            id_responsabile := null;
+    end;
+
     select * into area
     from Aree
     where Aree.idArea = idRiga;
@@ -11,12 +40,12 @@ BEGIN
     where Autorimesse.idAutorimessa = area.idAutorimessa;
     
     modGUI.apriPagina('HoC | Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa, id_Sessione, nome, ruolo);
-        modGUI.aCapo;
         modGUI.apriDiv;
+        if ((ruolo = 'A') or ((ruolo = 'R') and (id_dipendente = id_responsabile))) then
             modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
             modGUI.chiudiIntestazione(2);
-           /* 
+            /* 
             * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
             * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
             */
@@ -99,8 +128,11 @@ BEGIN
                 );
 
                 modGUI.inserisciBottoneReset('RESET');
-                modGUI.inserisciBottoneForm('Submit','Submit','SUBMIT');
+                modGUI.inserisciBottoneForm();
             modgui.chiudiForm;
+        else
+            modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+        end if;
         modGUI.ChiudiDiv;
     modGUI.chiudiPagina;
 end modificaArea;
