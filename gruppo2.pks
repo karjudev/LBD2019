@@ -1,4 +1,5 @@
 create or replace package gruppo2 as
+    groupname constant varchar2 := 'gruppo2.';
     TYPE list_idaree is varray(2) of number(1);
     procedure autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2);
     procedure competentGarageSearch2 (id_Sessione varchar2, nome varchar2, ruolo varchar2, idSedeCorrente integer, idVeicoloCorrente integer);
