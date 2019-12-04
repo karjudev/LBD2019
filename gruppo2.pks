@@ -39,4 +39,5 @@ create or replace package gruppo2 as
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null);
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
+    procedure resRicercaVeicolo(id_Sessione int, nome varchar2, ruolo varchar2);
 end gruppo2;

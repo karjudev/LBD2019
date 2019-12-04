@@ -1655,4 +1655,129 @@ create or replace package body gruppo2 as
         modGUI.ChiudiPagina;
     end visualizzaSede;
 
+    procedure resRicercaVeicolo(id_Sessione int, nome varchar2, ruolo varchar2) is
+        var_idCliente Clienti.idCliente%TYPE;
+        var_check1 boolean := false;
+        var_check2 boolean := false;
+    begin
+        select Clienti.idCliente
+        into var_idCliente
+        from Clienti, Sessioni
+        where Sessioni.idSessione = id_Sessione and
+            Clienti.idPersona = Sessioni.idPersona;
+            
+        modGUI.apriPagina('HoC | Ricerca veicolo', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('RICERCA VEICOLO/I');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('PARCHEGGIO/I EFFETTUATO/I CON TICKET');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('TARGA');
+                    modGUI.intestazioneTabella('VEICOLO');
+                    modGUI.intestazioneTabella('SEDE');
+                    modGUI.intestazioneTabella('AUTORIMESSA');
+                    modGUI.intestazioneTabella('AREA');
+                    modGUI.intestazioneTabella('BOX');
+                modGUI.chiudiRigaTabella;
+                for curr_or in (
+                    select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, AR.Indirizzo ARI, S.Indirizzo SI, A.idArea AIA, B.idBox BIB
+                    from Veicoli
+                        join VeicoliClienti VC on VC.idCliente = var_idCliente
+                        join EffettuaIngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
+                        join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                        join Box B on B.idBox = IO.idBox
+                        join Aree A on A.idArea = B.idArea
+                        join Autorimesse AR on AR.idAutorimessa = A.idAutorimessa
+                        join Sedi S on S.idSede = AR.idSede
+                    where Veicoli.idVeicolo = VC.idVeicolo and
+                        IO.OraEntrata is not null and
+                        IO.OraUscita is null
+                ) loop
+                    var_check1 := true;
+                    modGUI.apriRigaTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.VT);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.VP || ' ' || curr_or.VM);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.SI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.ARI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.AIA);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_or.BIB);
+                        modGUI.chiudiElementoTabella;
+                    modGUI.chiudiRigaTabella;
+                end loop;
+            modGUI.chiudiTabella;
+            if(var_check1 = false) then 
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NON CI SONO VEICOLI ANCORA PARCHEGGIATI');
+                modGUI.chiudiDiv; 
+            end if;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('PARCHEGGIO/I EFFETTUATO/I CON ABBONAMENTO/I');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('TARGA');
+                    modGUI.intestazioneTabella('VEICOLO');
+                    modGUI.intestazioneTabella('SEDE');
+                    modGUI.intestazioneTabella('AUTORIMESSA');
+                    modGUI.intestazioneTabella('AREA');
+                    modGUI.intestazioneTabella('BOX');
+                modGUI.chiudiRigaTabella;
+                for curr_abb in (
+                    select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, AR.Indirizzo ARI, S.Indirizzo SI, A.idArea AIA, B.idBox BIB
+                    from Veicoli
+                        join VeicoliClienti VC on VC.idCliente = var_idCliente
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idVeicolo = Veicoli.idVeicolo
+                        join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                        join Box B on B.idBox = IA.idBox
+                        join Aree A on A.idArea = B.idArea
+                        join Autorimesse AR on AR.idAutorimessa = A.idAutorimessa
+                        join Sedi S on S.idSede = AR.idSede
+                    where Veicoli.idVeicolo = VC.idVeicolo and
+                        IA.OraEntrata is not null and
+                        IA.OraUscita is null
+                ) loop
+                    modGUI.apriRigaTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.VT);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.VP || ' ' || curr_abb.VM);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.SI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.ARI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.AIA);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(curr_abb.BIB);
+                        modGUI.chiudiElementoTabella;
+                    modGUI.chiudiRigaTabella;
+                end loop;
+            modGUI.chiudiTabella;
+            if(var_check2 = false) then 
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NON CI SONO VEICOLI ANCORA PARCHEGGIATI');
+                modGUI.chiudiDiv; 
+            end if;
+        modGUI.chiudiPagina;
+    end resRicercaVeicolo;
+
 end gruppo2;
