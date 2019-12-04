@@ -442,7 +442,7 @@ create or replace package body gruppo2 as
         
         modGUI.apriPagina('HoC | Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa, id_Sessione, nome, ruolo);
             modGUI.apriDiv;
-            if ((ruolo = 'A') or ((ruolo = 'R') and (id_dipendente = id_responsabile))) then
+            if ((ruolo = 'A') or (ruolo = 'R') or (ruolo = 'O')) then
                 modGUI.apriIntestazione(2);
                     modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
@@ -889,39 +889,44 @@ create or replace package body gruppo2 as
                 ruolo => ruolo
             );
             modGUI.aCapo;
-            modGUI.apriIntestazione(3);
-                modGUI.inserisciTesto('SEDI PIÙ REDDITIZIE');
-            modGUI.chiudiIntestazione(3);
 
-        modGUI.ApriTabella;
-            modGUI.ApriRigaTabella;
-                modGUI.intestazioneTabella('ID Sede');
-                modGUI.intestazioneTabella('Indirizzo');
-                modGUI.intestazioneTabella('Totale');
-                /*Viene aggiunta una nuova colonna per i bottoni che permetteranno l'eliminazione della riga*/
-                modGUI.intestazioneTabella('');
-            modGUI.ChiudiRigaTabella;
-            -- Apre il cursore
-            open sediCursor;
-            -- Scorre il cursore
-            loop
-                fetch sediCursor into idSede, indirizzo, totale;
-                exit when sediCursor%NOTFOUND;
+            if (ruolo <> 'A') then
+                modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere ')
+            else
+                modGUI.apriIntestazione(3);
+                    modGUI.inserisciTesto('SEDI PIÙ REDDITIZIE');
+                modGUI.chiudiIntestazione(3);
+
+                modGUI.ApriTabella;
                 modGUI.ApriRigaTabella;
-                    modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(idSede);
-                    modGUI.ChiudiElementoTabella;
-                    modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(indirizzo);
-                    modGUI.ChiudiElementoTabella;
-                    modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(totale);
-                    modGUI.ChiudiElementoTabella;
+                    modGUI.intestazioneTabella('ID Sede');
+                    modGUI.intestazioneTabella('Indirizzo');
+                    modGUI.intestazioneTabella('Totale');
+                    /*Viene aggiunta una nuova colonna per i bottoni che permetteranno l'eliminazione della riga*/
+                    modGUI.intestazioneTabella('');
                 modGUI.ChiudiRigaTabella;
-            end loop;
-            -- Chiude il cursore
-            close sediCursor;
-            modGUI.chiudiPagina;
+                -- Apre il cursore
+                open sediCursor;
+                -- Scorre il cursore
+                loop
+                    fetch sediCursor into idSede, indirizzo, totale;
+                    exit when sediCursor%NOTFOUND;
+                    modGUI.ApriRigaTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(idSede);
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(indirizzo);
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(totale);
+                        modGUI.ChiudiElementoTabella;
+                    modGUI.ChiudiRigaTabella;
+                end loop;
+                -- Chiude il cursore
+                close sediCursor;
+                modGUI.chiudiPagina;
+            end if;
         end classificaSediPiuRedditizie;
     
     procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2) is 
@@ -1654,23 +1659,38 @@ create or replace package body gruppo2 as
             end if;
         modGUI.ChiudiPagina;
     end visualizzaSede;
-                                                               
-                                                               
 
-    procedure resRicercaVeicolo(id_Sessione int, nome varchar2, ruolo varchar2) is
-        var_idCliente Clienti.idCliente%TYPE;
-        var_check1 boolean := false;
-        var_check2 boolean := false;
+    procedure ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
-        select Clienti.idCliente
-        into var_idCliente
-        from Clienti, Sessioni
-        where Sessioni.idSessione = id_Sessione and
-            Clienti.idPersona = Sessioni.idPersona;
-            
-        modGUI.apriPagina('HoC | Ricerca veicolo', id_Sessione, nome, ruolo);
+        modGUI.apriPagina('HoC | Ricerca auto', id_Sessione, nome, ruolo);
             modGUI.apriIntestazione(2);
-                modGUI.inserisciTesto('RICERCA VEICOLO/I');
+                modGUI.inserisciTesto('RICERCA AUTO');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriForm('resRicercaAuto');
+                modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+                modGUI.inserisciInputHidden('nome', nome);
+                modGUI.inserisciInputHidden('ruolo', ruolo);
+                modGUI.apriSelect('var_idCliente', 'CLIENTE', true);
+                for cur in (
+                    select Clienti.idCliente CIDC, Persone.Nome PN, Persone.Cognome PC
+                    from Clienti, Persone
+                    where Persone.idPersona = Clienti.idPersona
+                ) loop
+                    modGUI.inserisciOpzioneSelect(cur.CIDC, cur.CIDC || ' ' || cur.PN || ' ' || cur.PC);
+                end loop;
+                modGUI.chiudiSelect;
+                modGUI.inserisciBottoneReset;
+                modGUI.inserisciBottoneForm(testo=>'RICERCA AUTO');
+            modGUI.chiudiForm;
+        modGUI.chiudiPagina;
+    end ricercaAuto;
+
+    var_check1 boolean := false;
+    var_check2 boolean := false;
+    begin
+        modGUI.apriPagina('HoC | Ricerca auto', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('RICERCA AUTO');
             modGUI.chiudiIntestazione(2);
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('PARCHEGGIO/I EFFETTUATO/I CON TICKET');
@@ -1678,7 +1698,7 @@ create or replace package body gruppo2 as
             modGUI.apriTabella;
                 modGUI.apriRigaTabella;
                     modGUI.intestazioneTabella('TARGA');
-                    modGUI.intestazioneTabella('VEICOLO');
+                    modGUI.intestazioneTabella('AUTO');
                     modGUI.intestazioneTabella('SEDE');
                     modGUI.intestazioneTabella('AUTORIMESSA');
                     modGUI.intestazioneTabella('AREA');
@@ -1721,10 +1741,14 @@ create or replace package body gruppo2 as
                     modGUI.chiudiRigaTabella;
                 end loop;
             modGUI.chiudiTabella;
-            if(var_check1 = false) then 
+            if(var_check1 = false) then
                 modGUI.apriDiv(centrato=>true);
-                    modGUI.inserisciTesto('NON CI SONO VEICOLI ANCORA PARCHEGGIATI');
-                modGUI.chiudiDiv; 
+                    modGUI.inserisciTesto('NON CI SONO AUTO ANCORA PARCHEGGIATE');
+                modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
             end if;
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('PARCHEGGIO/I EFFETTUATO/I CON ABBONAMENTO/I');
@@ -1732,7 +1756,7 @@ create or replace package body gruppo2 as
             modGUI.apriTabella;
                 modGUI.apriRigaTabella;
                     modGUI.intestazioneTabella('TARGA');
-                    modGUI.intestazioneTabella('VEICOLO');
+                    modGUI.intestazioneTabella('AUTO');
                     modGUI.intestazioneTabella('SEDE');
                     modGUI.intestazioneTabella('AUTORIMESSA');
                     modGUI.intestazioneTabella('AREA');
@@ -1774,13 +1798,13 @@ create or replace package body gruppo2 as
                     modGUI.chiudiRigaTabella;
                 end loop;
             modGUI.chiudiTabella;
-            if(var_check2 = false) then 
+            if(var_check2 = false) then
                 modGUI.apriDiv(centrato=>true);
-                    modGUI.inserisciTesto('NON CI SONO VEICOLI ANCORA PARCHEGGIATI');
-                modGUI.chiudiDiv; 
+                    modGUI.inserisciTesto('NON CI SONO AUTO ANCORA PARCHEGGIATE');
+                modGUI.chiudiDiv;
             end if;
         modGUI.chiudiPagina;
-    end resRicercaVeicolo;
+    end resRicercaAuto;
                                                                
                                                                
                                                                
