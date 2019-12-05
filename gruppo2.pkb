@@ -672,7 +672,7 @@ create or replace package body gruppo2 as
                         modGUI.inserisciInput(
                             etichetta => 'Coordinate',
                             nome => 'var_coordinate',
-                            valore => sede.coordinate,'RESET'
+                            valore => sede.coordinate,
                             richiesto => true
                         );
                         modGUI.inserisciBottoneReset();
@@ -897,7 +897,7 @@ create or replace package body gruppo2 as
             modGUI.aCapo;
 
             if (ruolo <> 'A') then
-                modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere ')
+                modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere');
             else
                 modGUI.apriIntestazione(3);
                     modGUI.inserisciTesto('SEDI PIÙ REDDITIZIE');
@@ -1690,7 +1690,8 @@ create or replace package body gruppo2 as
             modGUI.chiudiForm;
         modGUI.chiudiPagina;
     end ricercaAuto;
-
+    
+    procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int) is
     var_check1 boolean := false;
     var_check2 boolean := false;
     begin
