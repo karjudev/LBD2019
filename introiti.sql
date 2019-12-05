@@ -5,10 +5,11 @@ begin
 
     modgui.acapo;
 
+        modgui.apriintestazione(2);
+        modgui.inseriscitesto('VISUALIZZA INTROITI TOTALI');
+        modgui.chiudiintestazione(2);
 modgui.apriForm('introitiparziali');
-        modgui.apriparagrafo('rela');
-        modgui.inseriscitesto('VISUALIZZA INTROITI ');
-        modgui.chiudiparagrafo;
+
         modgui.inserisciinputhidden('id_Sessione',id_Sessione);
         modgui.inserisciinputhidden('nome',nome);
         modgui.inserisciinputhidden('ruolo',ruolo);
@@ -22,13 +23,7 @@ modgui.apriForm('introitiparziali');
         end loop;
 
         modGUI.chiudiSelect;
-                    modgui.inserisciradiobutton('Ricerca totale','periodo','0',true);
-                    modgui.inserisciradiobutton('Ricerca per periodo','periodo','1',false);
-
-        modGUI.inserisciinput('Data inizio', 'date','datainiziale',false,'','defInput');
-
-
-        modGUI.inserisciinput('Data fine', 'date','datafinale',false,'','defInput');
+             
 
 
         modGUI.inserisciBottoneReset('RESET');
