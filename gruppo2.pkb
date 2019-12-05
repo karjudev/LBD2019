@@ -457,6 +457,7 @@ create or replace package body gruppo2 as
                     modGUI.inserisciInputHidden('idRiga', idRiga);
 
                     /* esempi di input testo del form*/
+                    modGUI.inserisciTesto('Posti Totali');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Posti Totali',
@@ -464,6 +465,7 @@ create or replace package body gruppo2 as
                         valore => area.PostiTotali,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Posti Liberi');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Posti Liberi',
@@ -471,6 +473,7 @@ create or replace package body gruppo2 as
                         valore => area.PostiLiberi,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Stato');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Stato',
@@ -478,6 +481,7 @@ create or replace package body gruppo2 as
                         valore => area.Stato,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Gas');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Gas',
@@ -485,6 +489,7 @@ create or replace package body gruppo2 as
                         valore => area.Gas,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Larghezza Massima');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Larghezza Massima',
@@ -492,6 +497,7 @@ create or replace package body gruppo2 as
                         valore => area.LarghezzaMax,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Lunghezza Massima');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Lunghezza Massima',
@@ -499,6 +505,7 @@ create or replace package body gruppo2 as
                         valore => area.LunghezzaMax,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Altezza Massima');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Altezza Massima',
@@ -506,6 +513,7 @@ create or replace package body gruppo2 as
                         valore => area.AltezzaMax,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Peso Massimo');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Peso Massimo',
@@ -513,18 +521,12 @@ create or replace package body gruppo2 as
                         valore => area.PesoMax,
                         richiesto => true
                     );
+                    modGUI.inserisciTesto('Costo Abbonamento');
                     modGUI.inserisciInput(
                         tipo => 'number',
                         etichetta => 'Costo Abbonamento',
                         nome => 'var_costo_abbonamento',
                         valore => area.CostoAbbonamento,
-                        richiesto => true
-                    );
-                    modGUI.inserisciInput(
-                        tipo => 'number',
-                        etichetta => 'Peso Massimo',
-                        nome => 'var_peso_max',
-                        valore => area.Stato,
                         richiesto => true
                     );
 
@@ -590,13 +592,14 @@ create or replace package body gruppo2 as
                         modGUI.inserisciInputHidden('ruolo', ruolo);
                         modGUI.inserisciInputHidden('idRiga', idRiga);
 
-                        /* esempi di input testo del form*/
+                        modGUI.inserisciTesto('Indirizzo');
                         modGUI.inserisciInput(
                             etichetta => 'Indirizzo',
                             nome => 'var_indirizzo',
                             valore => autorimessa.indirizzo,
                             richiesto => true
                         );
+                        modGUI.inserisciTesto('Telefono');
                         modGUI.inserisciInput(
                             tipo => 'number',
                             etichetta => 'Telefono',
@@ -604,6 +607,7 @@ create or replace package body gruppo2 as
                             valore => autorimessa.telefono,
                             richiesto => true
                         );
+                        modGUI.inserisciTesto('Coordinate');
                         modGUI.inserisciInput(
                             etichetta => 'Coordinate',
                             nome => 'var_coordinate',
@@ -649,13 +653,14 @@ create or replace package body gruppo2 as
                         modGUI.inserisciInputHidden('ruolo', ruolo);
                         modGUI.inserisciInputHidden('idRiga', idRiga);
 
-                        /* esempi di input testo del form*/
+                        modGUI.inserisciTesto('Indirizzo');
                         modGUI.inserisciInput(
                             etichetta => 'Indirizzo',
                             nome => 'var_indirizzo',
                             valore => sede.indirizzo,
                             richiesto => true
                         );
+                        modGUI.inserisciTesto('Telefono');
                         modGUI.inserisciInput(
                             tipo => 'number',
                             etichetta => 'Telefono',
@@ -663,13 +668,14 @@ create or replace package body gruppo2 as
                             valore => sede.telefono,
                             richiesto => true
                         );
+                        modGUI.inserisciTesto('Coordinate');
                         modGUI.inserisciInput(
                             etichetta => 'Coordinate',
                             nome => 'var_coordinate',
-                            valore => sede.coordinate,
+                            valore => sede.coordinate,'RESET'
                             richiesto => true
                         );
-                        modGUI.inserisciBottoneReset('RESET');
+                        modGUI.inserisciBottoneReset();
                         modGUI.inserisciBottoneForm();
                     modgui.chiudiForm;
                 end if;
