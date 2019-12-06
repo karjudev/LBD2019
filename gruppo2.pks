@@ -54,5 +54,5 @@ PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo var
     procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
-    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente Clienti.idCliente%TYPE);
+    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
 end gruppo2;

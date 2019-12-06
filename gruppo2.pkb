@@ -2641,7 +2641,7 @@ begin
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
-                    modGUI.apriForm('resVeicoloMenoParcheggiato');
+                    modGUI.apriForm(groupname || 'resVeicoloMenoParcheggiato');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -2665,7 +2665,7 @@ begin
         modGUI.chiudiPagina;
     end veicoloMenoParcheggiato;
 
-    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente Clienti.idCliente%TYPE) is
+    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int) is
         cursor cursore is
             with
                 TotOrari as (
@@ -2676,7 +2676,7 @@ begin
                         join IngressiOrari IO on IO.idBox = B.idBox
                         join EffettuaIngressiOrari EIO on EIO.idIngressoOrario = IO.idIngressoOrario
                         join Veicoli V on V.idVeicolo = EIO.idVeicolo
-                    where EIO.idCliente = 13
+                    where EIO.idCliente = id_cliente
                     group by AU.idAutorimessa, V.Alimentazione
                 ),
                 TotAbbonamenti as (
@@ -2687,7 +2687,7 @@ begin
                         join IngressiAbbonamenti IA on IA.idBox = B.idBox
                         join EffettuaIngressiAbbonamenti EIA on EIA.idIngressoAbbonamento = IA.idIngressoAbbonamento
                         join Veicoli V on V.idVeicolo = EIA.idVeicolo
-                    where EIA.idCliente = 13
+                    where EIA.idCliente = id_cliente
                     group by AU.idAutorimessa, V.Alimentazione
                 ),
                 Totale as (
@@ -2733,6 +2733,7 @@ begin
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
                             modGUI.intestazioneTabella('ID Autorimessa');
+                            modGUI.intestazioneTabella('Indirizzo');
                             modGUI.intestazioneTabella('Alimentazione');
                             modGUI.intestazioneTabella('Ingressi');
                             modGUI.intestazioneTabella('Dettagli');
@@ -2755,7 +2756,7 @@ begin
                                     modGUI.inserisciTesto(ingressi);
                                 modGUI.chiudiElementoTabella;
                                 modGUI.apriElementoTabella;
-                                    modGUI.inserisciLente('visualizzaAutorimessa', id_sessione, nome, ruolo, id_autorimessa);
+                                    modGUI.inserisciLente(groupname || 'visualizzaAutorimessa', id_sessione, nome, ruolo, id_autorimessa);
                                 modGUI.chiudiElementoTabella;
                             modGUI.chiudiRigaTabella;
                         end loop;
