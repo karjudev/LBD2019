@@ -171,7 +171,7 @@ create or replace package body gruppo2 as
                                 modGUI.ElementoTabella(totalebigl);
                                 modGUI.ChiudiElementoTabella;
                                 modGUI.ApriElementoTabella;
-                                modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
+                                modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
                                 modgui.chiudielementotabella;
                                 modgui.chiudirigatabella;
 
@@ -202,7 +202,7 @@ create or replace package body gruppo2 as
                             modGUI.ElementoTabella(totalebigl);
                             modGUI.ChiudiElementoTabella;
                             modGUI.ApriElementoTabella;
-                            modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo,idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
+                            modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo,idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
                             modgui.chiudielementotabella;
                             modgui.chiudirigatabella;        
                             modgui.chiuditabella;
@@ -241,7 +241,7 @@ create or replace package body gruppo2 as
                                 modGUI.ElementoTabella(totalebigl);
                                 modGUI.ChiudiElementoTabella;
                                 modGUI.ApriElementoTabella;
-                                modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
+                                modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
                                 modgui.chiudielementotabella;
                                 modgui.chiudirigatabella;---------
                             end loop;         
@@ -269,7 +269,7 @@ create or replace package body gruppo2 as
                         modGUI.ElementoTabella(totalebigl);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                        modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
+                        modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
                         modgui.chiudielementotabella;
                         modgui.chiudirigatabella;        
                         modgui.chiuditabella;
@@ -871,21 +871,41 @@ create or replace package body gruppo2 as
     
     procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2) is
         -- ID della sede corrente
-        idSede number;
-        indirizzo varchar2(100);
-        totale number;
+        id_sede Sedi.idSede%TYPE;
+        indirizzo Sedi.Indirizzo%TYPE;
+        costo number;
         -- Cursore che scorre nella query delle sedi ordinate per guadagno
         cursor sediCursor is
-            select sedi.idsede, sedi.indirizzo, (sum(ingressiorari.costo) + sum(abbonamenti.costoeffettivo)) as totale
-            from sedi
-                join autorimesse on sedi.idsede = autorimesse.idsede
-                join aree on autorimesse.idautorimessa = aree.idautorimessa
-                join box on aree.idarea = box.idarea
-                join ingressiorari on box.idbox = ingressiorari.idbox
-                join ingressiabbonamenti on box.idbox = ingressiabbonamenti.idbox
-                join abbonamenti on ingressiabbonamenti.idabbonamento = abbonamenti.idabbonamento
-            group by sedi.idsede, sedi.indirizzo
-            order by totale;
+            with
+                TotOrari as (
+                    select S.idSede as idSede, sum(IO.Costo) as Costo
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                    where IO.Costo is not null
+                    group by S.idSede, IO.Costo
+                ),
+                TotAbbonamenti as (
+                    select S.idSede as idSede, sum(A.CostoEffettivo) as Costo
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiAbbonamenti IA on IA.idBox = B.idBox
+                        join Abbonamenti A on IA.idAbbonamento = A.idAbbonamento
+                    group by S.idSede
+                ),
+                Totale as (
+                    select coalesce(TotOrari.idSede, TotAbbonamenti.idSede) as idSede, coalesce(TotOrari.Costo, 0) + coalesce(TotAbbonamenti.Costo, 0) as Costo
+                    from TotOrari
+                        full outer join TotAbbonamenti on TotAbbonamenti.idSede = TotOrari.idSede
+                )
+            select S.idSede, S.Indirizzo, T.Costo
+            from Sedi S
+                join Totale T on T.idSede = S.idSede
+            order by T.Costo desc;
         begin
             -- Crea la pagina e l'intestazione
             modGUI.apriPagina(
@@ -900,7 +920,7 @@ create or replace package body gruppo2 as
                 modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere');
             else
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('SEDI PIÙ REDDITIZIE');
+                    modGUI.inserisciTesto('SEDI PIU` REDDITIZIE');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.ApriTabella;
@@ -908,24 +928,26 @@ create or replace package body gruppo2 as
                     modGUI.intestazioneTabella('ID Sede');
                     modGUI.intestazioneTabella('Indirizzo');
                     modGUI.intestazioneTabella('Totale');
-                    /*Viene aggiunta una nuova colonna per i bottoni che permetteranno l'eliminazione della riga*/
-                    modGUI.intestazioneTabella('');
+                    modGUI.intestazioneTabella('Dettagli');
                 modGUI.ChiudiRigaTabella;
                 -- Apre il cursore
                 open sediCursor;
                 -- Scorre il cursore
                 loop
-                    fetch sediCursor into idSede, indirizzo, totale;
+                    fetch sediCursor into id_sede, indirizzo, costo;
                     exit when sediCursor%NOTFOUND;
                     modGUI.ApriRigaTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(idSede);
+                            modGUI.ElementoTabella(id_sede);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(indirizzo);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(totale);
+                            modGUI.ElementoTabella(costo);
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.inserisciLente(groupname || 'visualizzaSede', id_sessione, nome, ruolo, id_sede);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                 end loop;
@@ -1226,7 +1248,7 @@ create or replace package body gruppo2 as
                                 modGUI.ElementoTabella(box.NumeroColonna);
                             modGUI.ChiudiElementoTabella;
                             modGUI.ApriElementoTabella;
-                                modGUI.inserisciLente('visualizzaBox', id_sessione, nome, ruolo, box.idBox);
+                                modGUI.inserisciLente(groupname || 'visualizzaBox', id_sessione, nome, ruolo, box.idBox);
                             modGUI.ChiudiElementoTabella;
                         modGUI.ChiudiRigaTabella;
                     end loop;
@@ -1474,7 +1496,7 @@ create or replace package body gruppo2 as
                             modGUI.ElementoTabella(veicolo.Colore);
                         modGUI.chiudiElementoTabella;
                         modGUI.apriElementoTabella;
-                            modGUI.InserisciLente('visualizzaVeicolo', id_sessione, nome, ruolo, veicolo.idVeicolo);
+                            modGUI.InserisciLente(groupname || 'visualizzaVeicolo', id_sessione, nome, ruolo, veicolo.idVeicolo);
                         modGUI.chiudiElementoTabella;
                     modGUI.chiudiTabella;
                 end if;
@@ -2355,8 +2377,259 @@ begin
 
     end MaxTipoVeicolo;
     
-    
-                                                               
-                                                               
+    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('DETTAGLI VEICOLI DI UN CLIENTE');
+        modGUI.chiudiIntestazione(2);
+        modGUI.apriForm('resSecondaComune');
+            modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+            modGUI.inserisciInputHidden('nome', nome);
+            modGUI.inserisciInputHidden('ruolo', ruolo);
+            modGUI.apriSelect('var_idCliente', 'CLIENTE', true);
+            for cur_cli in (
+                select Clienti.idCliente CIDC, Persone.Nome PN, Persone.Cognome PC
+                from Clienti, Persone
+                where Persone.idPersona = Clienti.idPersona
+            ) loop
+                modGUI.inserisciOpzioneSelect(cur_cli.CIDC, cur_cli.PN || ' ' || cur_cli.PC);
+            end loop;
+            modGUI.chiudiSelect;
+            modGUI.apriSelect('var_autorimessa', 'AUTORIMESSA', true);
+            for cur_aut in (
+                select Autorimesse.idAutorimessa AIA, Autorimesse.Indirizzo AI
+                from Autorimesse
+            ) loop
+                modGUI.inserisciOpzioneSelect(cur_aut.AIA, cur_aut.AI);
+            end loop;
+            modGUI.chiudiSelect;
+            modGUI.inserisciInput('var_inizio', 'INIZIO PERIODO', 'date', true);
+            modGUI.inserisciInput('var_fine', 'FINE PERIODO', 'date', true);
+            modGUI.inserisciBottoneReset;
+            modGUI.inserisciBottoneForm(testo=>'RICERCA DETTAGLI');
+        modGUI.chiudiForm;
+        modGUI.chiudiPagina;
+    end secondaComune;
 
+    procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2) is
+        var_nomePersona Persone.Nome%TYPE;
+        var_cognomePersona Persone.Cognome%TYPE;
+        var_nomeAutorimessa Autorimesse.Indirizzo%TYPE;
+        var_check1 boolean := false;
+        var_check2 boolean := false;
+    begin
+        select Persone.Nome, Persone.Cognome
+        into var_nomePersona, var_cognomePersona
+        from Clienti, Persone
+        where Clienti.idCliente = var_idCliente and
+            Persone.idPersona = Clienti.idPersona;
+        select Autorimesse.Indirizzo
+        into var_nomeAutorimessa
+        from Autorimesse
+        where Autorimesse.idAutorimessa = var_autorimessa;
+        
+        modGUI.apriPagina('HoC | Visualizza dettagli cliente', id_Sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('DETTAGLI VEICOLI DI: ' || var_nomePersona || ' ' || var_cognomePersona);
+            modGUI.aCapo;
+            modGUI.inserisciTesto('PERIODO DA: ' || to_date(var_inizio, 'yyyy-mm-dd') || ' A ' || to_date(var_fine, 'yyyy-mm-dd'));
+            modGUI.aCapo;
+            modGUI.inserisciTesto('NELL''AUTORIMESSA DI: ' || var_nomeAutorimessa);
+        modGUI.chiudiIntestazione(2);
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('AUTO PARCHEGGIATA/E CON TIKET');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriTabella;
+            modGUI.apriRigaTabella;
+                modGUI.intestazioneTabella('TARGA');
+                modGUI.intestazioneTabella('PRODUTTORE');
+                modGUI.intestazioneTabella('MODELLO');
+                modGUI.intestazioneTabella('DETTAGLI');
+            modGUI.chiudiRigaTabella;
+            for cur_or in (
+                select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, Veicoli.idVeicolo VIV
+                    from Veicoli
+                        join VeicoliClienti VC on VC.idCliente = var_idCliente
+                        join EffettuaIngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
+                        join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                        join Autorimesse AR on AR.idAutorimessa = var_autorimessa
+                    where Veicoli.idVeicolo = VC.idVeicolo and
+                        IO.OraEntrata between to_timestamp(var_inizio, 'yyyy-mm-dd') and to_timestamp(var_fine, 'yyyy-mm-dd')
+            ) loop
+                var_check1 := true;
+                modGUI.apriRigaTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_or.VT);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_or.VP);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_or.VM);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.inserisciLente(groupname || 'dettagliVeicoloSecondaComune', id_Sessione, nome, ruolo, cur_or.VIV);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            end loop;
+        modGUI.chiudiTabella;
+        if(var_check1 = false) then
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciTesto('NESSUN RISULTATO');
+            modGUI.chiudiDiv;
+            modGUI.aCapo;
+            modGUI.aCapo;
+            modGUI.aCapo;
+            modGUI.aCapo;
+        end if;
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('AUTO PARCHEGGIATA/E CON ABBONAMENTO/I');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriTabella;
+            modGUI.apriRigaTabella;
+                modGUI.intestazioneTabella('TARGA');
+                modGUI.intestazioneTabella('PRODUTTORE');
+                modGUI.intestazioneTabella('MODELLO');
+                modGUI.intestazioneTabella('DETTAGLI');
+            modGUI.chiudiRigaTabella;
+            for cur_abb in (
+                select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, Veicoli.idVeicolo VIV
+                    from Veicoli
+                        join VeicoliClienti VC on VC.idCliente = var_idCliente
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idVeicolo = Veicoli.idVeicolo
+                        join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                        join Autorimesse AR on AR.idAutorimessa = var_autorimessa
+                    where Veicoli.idVeicolo = VC.idVeicolo and
+                        IA.OraEntrata between to_timestamp(var_inizio, 'yyyy-mm-dd') and to_timestamp(var_fine, 'yyyy-mm-dd')
+            ) loop
+                var_check2 := true;
+                modGUI.apriRigaTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_abb.VT);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_abb.VP);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(cur_abb.VM);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                        modGUI.inserisciLente(groupname || 'dettagliVeicoloSecondaComune', id_Sessione, nome, ruolo, cur_abb.VIV);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            end loop;
+        modGUI.chiudiTabella;
+        if(var_checK2 = false) then
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciTesto('NESSUN RISULTATO');
+            modGUI.chiudiDiv;
+        end if;
+        modGUI.chiudiPagina;
+    end resSecondaComune;
+
+    procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
+    var_idVeicolo Veicoli.idVeicolo%TYPE;
+    var_targa Veicoli.Targa%TYPE;
+    var_produttore Veicoli.Produttore%TYPE;
+    var_modello Veicoli.Modello%TYPE;
+    var_colore Veicoli.Colore%TYPE;
+    var_altezza Veicoli.Altezza%TYPE;
+    var_larghezza Veicoli.Larghezza%TYPE;
+    var_lunghezza Veicoli.Lunghezza%TYPE;
+    var_peso Veicoli.Peso%TYPE;
+    var_alimentazione Veicoli.Alimentazione%TYPE;
+    var_annotazione Veicoli.Annotazione%TYPE;
+    begin
+        modGUI.apriPagina('HoC | Dettagli veicolo', id_Sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('DETTAGLI VEICOLO');
+        modGUI.chiudiIntestazione(2);
+
+        select Veicoli.idVeicolo, Veicoli.Targa, Veicoli.Produttore, Veicoli.Modello, Veicoli.Colore, Veicoli.Altezza, Veicoli.Larghezza, Veicoli.Lunghezza, Veicoli.Peso, Veicoli.Alimentazione, Veicoli.Annotazione
+        into var_idVeicolo, var_targa, var_produttore, var_modello, var_colore, var_altezza, var_larghezza, var_lunghezza, var_peso, var_alimentazione, var_annotazione
+        from Veicoli
+        where Veicoli.idVeicolo = idRiga;
+        modGUI.apriTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('ID VEICOLO');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_idVeicolo);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('TARGA');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_targa);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('PRODUTTORE');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_produttore);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('MODELLO');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_modello);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('COLORE');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_colore);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('ALTEZZA');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_altezza);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('LARGHEZZA');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_larghezza);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('LUNGHEZZA');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_lunghezza);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('PESO');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_peso);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('ALIMENTAZIONE');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_alimentazione);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+            modGUI.apriRigaTabella;
+            modGUI.intestazioneTabella('ANNOTAZIONE');
+            modGUI.apriElementoTabella;
+                modGUI.elementoTabella(var_annotazione);
+            modGUI.chiudiElementoTabella;
+            modGUI.chiudiRigaTabella;
+
+        modGUI.chiudiTabella;
+        modGUI.chiudiPagina;
+    end dettagliVeicoloSecondaComune;
 end gruppo2;

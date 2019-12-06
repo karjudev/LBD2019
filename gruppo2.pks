@@ -1,5 +1,5 @@
 create or replace package gruppo2 as
-    groupname constant varchar2 := 'gruppo2.';
+    groupname constant varchar2(8) := 'gruppo2.';
     TYPE list_idaree is varray(2) of number(1);
     procedure autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2);
     procedure competentGarageSearch2 (id_Sessione varchar2, nome varchar2, ruolo varchar2, idSedeCorrente integer, idVeicoloCorrente integer);
@@ -40,18 +40,16 @@ create or replace package gruppo2 as
     procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null);
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure resRicercaVeicolo(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int);
     
     
     procedure AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure PercentualiPostiLiberi2 (id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);
-    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    
-    
-    
-    
-    
+
+    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
+    procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
 end gruppo2;
