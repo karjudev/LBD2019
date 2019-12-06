@@ -2632,4 +2632,137 @@ begin
         modGUI.chiudiTabella;
         modGUI.chiudiPagina;
     end dettagliVeicoloSecondaComune;
+
+    procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Veicolo meno parcheggiato', id_sessione, nome, ruolo);
+            modGUI.aCapo;
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriForm('resVeicoloMenoParcheggiato');
+                        modGUI.inserisciInputHidden('id_sessione', id_sessione);
+                        modGUI.inserisciInputHidden('nome', nome);
+                        modGUI.inserisciInputHidden('ruolo', ruolo);
+
+                        modGUI.apriSelect('id_cliente', 'Cliente');
+                            for cursore in (
+                                select C.idCliente, P.Nome || ' ' || P.Cognome as Nome
+                                from Clienti C
+                                    join Persone P on P.idPersona = C.idPersona
+                            )
+                            loop
+                                modGUI.inserisciOpzioneSelect(cursore.idCliente, cursore.Nome);
+                            end loop;
+                        modGUI.chiudiSelect;
+
+                        modGUI.inserisciBottoneReset;
+                        modGUI.inserisciBottoneForm;
+                    modGUI.chiudiForm;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end veicoloMenoParcheggiato;
+
+    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente Clienti.idCliente%TYPE) is
+        cursor cursore is
+            with
+                TotOrari as (
+                    select AU.idAutorimessa as idAutorimessa, V.Alimentazione as Alimentazione, count(*) as Ingressi
+                    from Autorimesse AU
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                        join EffettuaIngressiOrari EIO on EIO.idIngressoOrario = IO.idIngressoOrario
+                        join Veicoli V on V.idVeicolo = EIO.idVeicolo
+                    where EIO.idCliente = 13
+                    group by AU.idAutorimessa, V.Alimentazione
+                ),
+                TotAbbonamenti as (
+                    select AU.idAutorimessa as idAutorimessa, V.Alimentazione as Alimentazione, count(*) as Ingressi
+                    from Autorimesse AU
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiAbbonamenti IA on IA.idBox = B.idBox
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idIngressoAbbonamento = IA.idIngressoAbbonamento
+                        join Veicoli V on V.idVeicolo = EIA.idVeicolo
+                    where EIA.idCliente = 13
+                    group by AU.idAutorimessa, V.Alimentazione
+                ),
+                Totale as (
+                    select
+                        coalesce(TotOrari.idAutorimessa, TotAbbonamenti.idAutorimessa) as idAutorimessa,
+                        coalesce(TotOrari.Alimentazione, TotAbbonamenti.Alimentazione) as Alimentazione,
+                        coalesce(TotOrari.Ingressi, 0) + coalesce(TotAbbonamenti.Ingressi, 0) as Ingressi
+                    from TotOrari
+                        full outer join TotAbbonamenti on TotAbbonamenti.idAutorimessa = TotOrari.idAutorimessa
+                )
+            select T.idAutorimessa, A.Indirizzo, T.Alimentazione, T.Ingressi
+            from Totale T
+                join Autorimesse A on A.idAutorimessa = T.idAutorimessa
+            where T.Ingressi = (
+                select min(Ingressi)
+                from Totale
+                where Totale.idAutorimessa = T.idAutorimessa
+        );
+
+        id_autorimessa Autorimesse.idAutorimessa%TYPE;
+        indirizzo Autorimesse.Indirizzo%TYPE;
+        alimentazione Veicoli.Alimentazione%TYPE;
+        ingressi number;
+        nome_cliente Persone.Nome%TYPE;
+        cognome_cliente Persone.Cognome%TYPE;
+    begin
+        modGUI.apriPagina('HoC | Veicolo meno parcheggiato', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    
+                    select P.Nome, P.Cognome
+                    into nome_cliente, cognome_cliente
+                    from Clienti C
+                        join Persone P on P.idPersona = C.idPersona
+                    where C.idCliente = id_cliente;
+                
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Carburante del veicolo meno parcheggiato da ' || nome_cliente || ' ' || cognome_cliente || ' per ogni autorimessa');
+                    modGUI.chiudiIntestazione(2);
+
+                    modGUI.apriTabella;
+                        modGUI.apriRigaTabella;
+                            modGUI.intestazioneTabella('ID Autorimessa');
+                            modGUI.intestazioneTabella('Alimentazione');
+                            modGUI.intestazioneTabella('Ingressi');
+                            modGUI.intestazioneTabella('Dettagli');
+                        modGUI.chiudiRigaTabella;
+                        open cursore;
+                        loop
+                            fetch cursore into id_autorimessa, indirizzo, alimentazione, ingressi;
+                            exit when cursore%NOTFOUND;
+                            modGUI.apriRigaTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(id_autorimessa);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(indirizzo);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(alimentazione);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(ingressi);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciLente('visualizzaAutorimessa', id_sessione, nome, ruolo, id_autorimessa);
+                                modGUI.chiudiElementoTabella;
+                            modGUI.chiudiRigaTabella;
+                        end loop;
+                        close cursore;
+                    modGUI.chiudiTabella;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end resVeicoloMenoParcheggiato;
 end gruppo2;
