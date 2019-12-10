@@ -647,7 +647,7 @@ create or replace package body gruppo2 as
                     * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
                     * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                     */
-                    modGUI.apriForm('updateSede');
+                    modGUI.apriForm(groupname || 'updateSede');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -1210,21 +1210,25 @@ create or replace package body gruppo2 as
                             modGUI.Collegamento(indirizzo_autorimessa, 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || area.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
-                modGUI.ChiudiTabella;
-
-                if (ruolo <> 'O' and ruolo <> 'C') then
-                    modGUI.ApriTabella;
+                    if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.ApriRigaTabella;
+                            modGUI.IntestazioneTabella('Dettagli');
                             modGUI.ApriElementoTabella;
                                 modGUI.InserisciPenna('modificaArea', id_sessione, nome, ruolo, idRiga);
                             modGUI.ChiudiElementoTabella;
                         modGUI.ChiudiRigaTabella;
+                    end if;
+                modGUI.ChiudiTabella;
+
+                
+                    modGUI.ApriTabella;
+                        
                     modGUI.ChiudiTabella;
-                end if;
+                
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Aree');
+                    modGUI.inserisciTesto('Box');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
