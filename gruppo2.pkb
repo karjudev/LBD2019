@@ -351,7 +351,7 @@ create or replace package body gruppo2 as
                 end loop;
                 modGUI.chiudiTabella;
                 if(headertab) then
-                    modGUI.esitoOperazione('KO', 'Non è stata trovata nessun''area disponibile per il tuo veicolo!');
+                    modGUI.esitoOperazione('KO', 'Non Ã¨ stata trovata nessun''area disponibile per il tuo veicolo!');
                 else
                     modGUI.chiudiDiv;
                 end if;
@@ -636,7 +636,7 @@ create or replace package body gruppo2 as
         modGUI.apriPagina('HoC | Modifica Sede di ' || sede.indirizzo, id_Sessione, nome, ruolo);
             modGUI.aCapo;
                 modGUI.apriDiv;
-                -- Se il ruolo dell'utente non è amministratore esce
+                -- Se il ruolo dell'utente non Ã¨ amministratore esce
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei un amministratore');
                 else
@@ -863,7 +863,7 @@ create or replace package body gruppo2 as
                 modgui.chiudiForm;
             else
             modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
-            modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per i clienti');
+            modGUI.esitoOperazione('KO', 'Questa operazione Ã¨ disponibile soltanto per i clienti');
             end if;
 
             modGUI.chiudiPagina;
@@ -909,7 +909,7 @@ create or replace package body gruppo2 as
         begin
             -- Crea la pagina e l'intestazione
             modGUI.apriPagina(
-                'HoC | Sedi più Redditizie',
+                'HoC | Sedi piÃ¹ Redditizie',
                 id_sessione => id_sessione,
                 nome => nome,
                 ruolo => ruolo
@@ -975,7 +975,7 @@ create or replace package body gruppo2 as
     select count(box.idbox) as count_box,ar.indirizzo,aree.gas from box, aree,autorimesse ar where box.idarea=aree.idarea and aree.idautorimessa=ar.idautorimessa and box.occupato='T' group by ar.indirizzo,aree.gas order by count_box desc) tmp
     where rownum=1;
         --if(var_gas='T') then var_risp:='a gas'; else var_risp:='a benzina'; end if;
-        select DECODE(var_gas, 'T','a gas','a benzina'), DECODE(maxbox, '1','C''è ','Ci sono ') ,DECODE(maxbox, '1',' veicolo ', ' veicoli ') into var_risp, var_1, var_2 from dual;
+        select DECODE(var_gas, 'T','a gas','a benzina'), DECODE(maxbox, '1','C''Ã¨ ','Ci sono ') ,DECODE(maxbox, '1',' veicolo ', ' veicoli ') into var_risp, var_1, var_2 from dual;
 
         modgui.inseriscitesto(var_1|| maxbox|| var_2 || 'con alimentazione '||var_risp || ' nel parcheggio di '||var_indirizzo );
     modgui.chiudiintestazione(2);
@@ -2766,4 +2766,223 @@ begin
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resVeicoloMenoParcheggiato;
+
+    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Ingressi sopra media', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Ingressi con costo sopra la media');
+                    modGUI.chiudiIntestazione(2);
+                    
+                    modGUI.apriForm(groupname || 'resIngressiSopraMedia');
+                        modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+                        modGUI.inserisciInputHidden('nome', nome);
+                        modGUI.inserisciInputHidden('ruolo', ruolo);
+                        
+                        modGUI.inserisciInput('Data inizio', 'date', 'var_inizio', true);
+                        modGUI.inserisciInput('Data fine', 'date', 'var_fine', false);
+                        
+                        modGUI.inserisciBottoneReset;
+                        modGUI.inserisciBottoneForm;
+                    modGUI.chiudiForm;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end ingressiSopraMedia;
+
+    procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2) is
+        
+        entrata_prevista IngressiOrari.EntrataPrevista%TYPE;
+        ora_entrata IngressiOrari.OraEntrata%TYPE;
+        ora_uscita IngressiOrari.OraUscita%TYPE;
+        var_costo IngressiOrari.Costo%TYPE;
+        id_sede Sedi.idSede%TYPE;
+        cursor cursore is
+            with
+                IngressiPerSede as (
+                    select IO.EntrataPrevista as EntrataPrevista, IO.OraEntrata as OraEntrata, IO.OraUscita as OraUscita, IO.Costo as Costo, S.idSede as idSede
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                    where least(IO.OraUscita, to_date(var_fine, 'yyyy-mm-dd')) >= greatest(IO.OraEntrata, to_date(var_inizio, 'yyyy-mm-dd'))
+                ),
+                MediaPerSede as (
+                    select S.idSede as idSede, avg(IO.Costo) as MediaCosto
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                    where least(IO.OraUscita, to_date(var_fine, 'yyyy-mm-dd')) >= greatest(IO.OraEntrata, to_date(var_inizio, 'yyyy-mm-dd'))
+                    group by S.idSede
+                )
+            select IPS.*
+            from IngressiPerSede IPS
+                join MediaPerSede MPS on MPS.idSede = IPS.idSede
+            where IPS.Costo > MPS.MediaCosto;
+    begin
+        modGUI.apriPagina('HoC | Ingressi sopra la media', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Ingressi con costo sopra alla media del periodo ' || var_inizio || ' - ' || var_fine);
+                    modGUI.chiudiIntestazione(2);
+
+                    modGUI.apriTabella;
+                        modGUI.apriRigaTabella;
+                            modGUI.intestazioneTabella('Entrata Prevista');
+                            modGUI.intestazioneTabella('Ora Entrata');
+                            modGUI.intestazioneTabella('Ora Uscita');
+                            modGUI.intestazioneTabella('Costo');
+                            modGUI.intestazioneTabella('Sede');
+                        modGUI.chiudiRigaTabella;
+
+                        open cursore;
+                        loop
+                            fetch cursore into entrata_prevista, ora_entrata, ora_uscita, var_costo, id_sede;
+                            exit when cursore%NOTFOUND;
+                            modGUI.apriRigaTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(entrata_prevista);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(ora_entrata);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(ora_uscita);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(var_costo);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(id_sede);
+                                modGUI.chiudiElementoTabella;
+                            modGUI.chiudiRigaTabella;
+                        end loop;
+                        close cursore;
+                    modGUI.chiudiTabella;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end resIngressiSopraMedia;
+
+    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Classifica Clienti per Tempo Medio di Permanenza', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                    modGUI.chiudiIntestazione(2);
+                    
+                    modGUI.apriForm(groupname || 'resClassificaMediaPermanenza');
+                        modGUI.inserisciInputHidden('id_sessione', id_sessione);
+                        modGUI.inserisciInputHidden('nome', nome);
+                        modGUI.inserisciInputHidden('ruolo', ruolo);
+                        modGUI.inserisciInput(
+                          tipo => 'number',
+                          etichetta => 'Soglia',
+                          nome => 'var_soglia',
+                          richiesto => true
+                        );
+                        modGUI.inserisciBottoneReset;
+                        modGUI.inserisciBottoneForm;
+                    modGUI.chiudiForm;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end classificaMediaPermanenza;
+
+    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int) is
+        cursor riga is
+            with
+                TotOrari as (
+                    select C.idCliente as idCliente, sum(trunc((cast(IO.OraUscita as date) - cast(IO.OraEntrata as date)) * 24)) as Somma, count(*) as NumIngressi
+                        from Clienti C
+                        join EffettuaIngressiOrari EIO on EIO.idCliente = C.idCliente
+                        join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                    where IO.OraEntrata is not null
+                    and IO.OraUscita is not null
+                    group by C.idCliente
+                ),
+                TotAbbonamenti as (
+                    select C.idCliente as idCliente, sum(trunc((cast(IA.OraUscita as date) - cast(IA.OraEntrata as date)) * 24)) as Somma, count(*) as NumIngressi
+                        from Clienti C
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idCliente = C.idCliente
+                        join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                    where IA.OraEntrata is not null
+                    and IA.OraUscita is not null
+                    group by C.idCliente
+                ),
+                Total as (
+                    select idCliente, sum(Somma) as Somma, sum(NumIngressi) as NumIngressi
+                    from (
+                        select * from TotOrari
+                        union all
+                        select * from TotAbbonamenti
+                    )
+                    group by idCliente
+                )
+            select C.idCliente as idCliente, P.Nome as Nome, P.Cognome as Cognome, (T.Somma / T.NumIngressi) as Media
+            from Total T
+                join Clienti C on C.idCliente = T.idCliente
+                join Persone P on P.idPersona = C.idPersona
+            order by Media desc;
+        id_cliente Clienti.idCliente%TYPE;
+        nome_cliente Persone.Nome%TYPE;
+        cognome_cliente Persone.Cognome%TYPE;
+        media number;
+    begin
+        modGUI.apriPagina('HoC | Classifica Clienti per Tempo Medio di Permanenza', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                    modGUI.chiudiIntestazione(2);
+
+                    modGUI.apriTabella;
+                        modGUI.apriRigaTabella;
+                            modGUI.intestazioneTabella('ID Cliente');
+                            modGUI.intestazioneTabella('Nome');
+                            modGUI.intestazioneTabella('Tempo Medio');
+                            modGUI.intestazioneTabella('Dettagli');
+                        modGUI.chiudiRigaTabella;
+                        open riga;
+                        loop
+                            fetch riga into id_cliente, nome_cliente, cognome_cliente, media;
+                            exit when riga%NOTFOUND;
+                            modGUI.apriRigaTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(id_cliente);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(nome_cliente || ' ' || cognome_cliente);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(media);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciLente('visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
+                                modGUI.chiudiElementoTabella;
+                            modGUI.chiudiRigaTabella;
+                        end loop;
+                        close riga;
+                    modGUI.chiudiTabella;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end resClassificaMediaPermanenza;
 end gruppo2;
