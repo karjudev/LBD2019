@@ -46,7 +46,7 @@ create or replace package gruppo2 as
     procedure AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
 
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
@@ -55,4 +55,10 @@ PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo var
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
+    
+    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2);
+    procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2);
+    
+    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
+    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
 end gruppo2;
