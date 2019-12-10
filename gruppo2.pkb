@@ -1903,6 +1903,18 @@ posti number:=0;
 
     modGUI.chiudiPagina;
 
+                --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;                                                               
 
     END MaggiorPostiRiservati;
                                                                
@@ -2116,7 +2128,18 @@ begin
 
     modGUI.chiudiPagina;
 
+                --pulsante torna indietro
+        modGui.apriForm('AlimentazioneVeicolo');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
 
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
 
     END AlimentazioneVeicolo2;                                                           
                                                                
@@ -2237,7 +2260,25 @@ BEGIN
     
     end loop;
     end if;
+
+            modgui.chiuditabella;
+        modgui.chiudidiv;
+  
+  
+            --pulsante torna indietro
+        modGui.apriForm('percentualiPostiliberi');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
     
+        modgui.chiudipagina;
 
     END PercentualePostiLiberi2;                                                           
                                                                
@@ -2372,10 +2413,159 @@ begin
 
     modGUI.ChiudiTabella;
     modGUI.chiudiDiv;
+    
+                --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;    
 
     modGUI.chiudiPagina;
 
     end MaxTipoVeicolo;
+    
+   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+BEGIN
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('VISUALIZZAZIONE CLIENTI SENZA ABBONAMENTO RINNOVATO');
+    modGUI.chiudiIntestazione(3);
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    
+    
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Nome');
+    modGUI.intestazioneTabella('Cognome');
+    modGUI.ChiudiRigaTabella;
+    
+ for scorriCursore in (
+    SELECT  
+      (((abbonamenti.dataFine-
+        abbonamenti.datainizio)-1)/TipiAbbonamenti.durata) as Rinnovato,
+        persone.Nome, persone.cognome
+    FROM TipiAbbonamenti, abbonamenti, Clienti, Persone
+    where TipiAbbonamenti.idTipoabbonamento=abbonamenti.idTipoabbonamento and
+      Clienti.idcliente=abbonamenti.idcliente and
+      Clienti.idpersona=Persone.idpersona      
+ )
+ 
+ loop
+  IF(scorricursore.rinnovato<=1)then
+  
+    modGUI.ApriRigaTabella;
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.nome);
+    modGUI.ChiudiElementoTabella;
+    
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.Cognome);
+    modGUI.ChiudiElementoTabella;
+    
+  end if;
+ 
+ 
+ end loop;
+ 
+    modGUI.ChiudiTabella;
+    modGUI.chiudiDiv; 
+    
+        --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
+    
+ 
+END ClientiSenzaAbbonamentoRinnovato;
+
+FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as 
+
+--PARAMETRI DEL VEICOLO RICEVUTO, DI CUI DEVO TROVARE UN BOX VALIDO
+AltezzaScelta veicoli.altezza%TYPE;
+LarghezzaScelta veicoli.Larghezza%TYPE;
+LunghezzaScelta veicoli.Lunghezza%TYPE;
+PesoScelto veicoli.Peso%TYPE;
+--VARIABILI
+idBoxOttenuto box.idbox%type:=-1;
+idAreaOttenuta aree.idarea%type;
+trovato boolean:=false;
+
+--ECCEZIONE NEL CASO NON SIA DISPONIBILE NESSUN BOX
+boxnontrovatoexception EXCEPTION; 
+  PRAGMA EXCEPTION_INIT(boxnontrovatoexception, -1466);
+
+
+BEGIN
+  --OTTENGO PARAMETRI DEL VEICOLO RICEVUTO
+  select veicoli.altezza into altezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.larghezza into larghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.lunghezza into lunghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.peso into pesoScelto from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  
+  --CERCO UN'AREA ADATTA PER DIMENSIONI
+ for scorriCursoreAree in (
+    select autorimesse.idautorimessa,aree.idarea,aree.altezzaMax as altezzaCalcolata, aree.larghezzaMax as larghezzaCalcolata, aree.lunghezzaMax as lunghezzaCalcolata, aree.pesoMax as pesoCalcolato
+    from aree,autorimesse
+    where aree.idautorimessa=autorimesse.idautorimessa and autorimesse.idautorimessa=idautorimessaScelta
+
+  )
+  loop --VERIFICO SE AREA E'ADATTA
+    
+  --PER OGNI AREA ADATTA, CERCO BOX DI QUESTE DIMENSIONI  
+  if(altezzaScelta<scorriCursoreAree.altezzaCalcolata and larghezzaScelta< scorriCursoreAree.larghezzaCalcolata and lunghezzaScelta< scorriCursoreAree.lunghezzaCalcolata and pesoScelto<scorriCursoreAree.PesoCalcolato and trovato=false)then
+     idAreaOttenuta:=scorriCursoreAree.idarea;
+    --HO TROVATO UN'AREA, VERIFICO SE C'E' UN BOX VUOTO
+     for scorriCursoreBox in(
+       select box.idbox 
+       from box,aree
+       where box.idarea=aree.idarea
+            and aree.idarea=idAreaOttenuta
+            and box.occupato='F'
+            and box.riservato='F'
+      )
+      loop 
+      if(trovato=false)then 
+        idboxOttenuto:=scorriCursoreBox.idbox;
+        
+        if(idboxOttenuto!=-1)then--BOX TROVATO, SE VALIDO SETTO TROVATO A TRUE
+          trovato:=true;
+        end if;
+        
+      end if; --if trovato
+
+      end loop; --fine loop genera box
+  end if;
+  end loop; --fine loop genera aree
+  
+  --SE NON CI SONO BOX DISPONIBILI
+  if(idboxOttenuto=-1)then 
+    raise boxnontrovatoexception;
+  end if;
+  
+  return idboxOttenuto;
+  
+END RICERCAPOSTO;
+
+
+    
+    
     
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
