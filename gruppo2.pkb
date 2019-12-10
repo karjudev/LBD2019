@@ -873,43 +873,45 @@ create or replace package body gruppo2 as
         -- ID della sede corrente
         id_sede Sedi.idSede%TYPE;
         indirizzo Sedi.Indirizzo%TYPE;
-        costo number;
+        num_ingressi int;
         -- Cursore che scorre nella query delle sedi ordinate per guadagno
         cursor sediCursor is
             with
                 TotOrari as (
-                    select S.idSede as idSede, sum(IO.Costo) as Costo
+                    select S.idSede as idSede, count(*) as NumIngressi
                     from Sedi S
                         join Autorimesse AU on AU.idSede = S.idSede
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiOrari IO on IO.idBox = B.idBox
-                    where IO.Costo is not null
-                    group by S.idSede, IO.Costo
+                    group by S.idSede
                 ),
                 TotAbbonamenti as (
-                    select S.idSede as idSede, sum(A.CostoEffettivo) as Costo
+                    select S.idSede as idSede, count(*) as NumIngressi
                     from Sedi S
                         join Autorimesse AU on AU.idSede = S.idSede
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiAbbonamenti IA on IA.idBox = B.idBox
-                        join Abbonamenti A on IA.idAbbonamento = A.idAbbonamento
                     group by S.idSede
                 ),
                 Totale as (
-                    select coalesce(TotOrari.idSede, TotAbbonamenti.idSede) as idSede, coalesce(TotOrari.Costo, 0) + coalesce(TotAbbonamenti.Costo, 0) as Costo
-                    from TotOrari
-                        full outer join TotAbbonamenti on TotAbbonamenti.idSede = TotOrari.idSede
+                    select idSede, sum(NumIngressi) as NumIngressi
+                    from (
+                        select * from TotOrari
+                        union all
+                        select * from TotAbbonamenti
+                    )
+                    group by idSede
                 )
-            select S.idSede, S.Indirizzo, T.Costo
+            select S.idSede, S.Indirizzo, T.NumIngressi
             from Sedi S
                 join Totale T on T.idSede = S.idSede
-            order by T.Costo desc;
+            order by T.NumIngressi desc;
         begin
             -- Crea la pagina e l'intestazione
             modGUI.apriPagina(
-                'HoC | Sedi piÃ¹ Redditizie',
+                'HoC | Sedi piu` Redditizie',
                 id_sessione => id_sessione,
                 nome => nome,
                 ruolo => ruolo
@@ -917,7 +919,7 @@ create or replace package body gruppo2 as
             modGUI.aCapo;
 
             if (ruolo <> 'A') then
-                modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere');
+                modGUI.esitoOperazione('KO', 'Non sei autorizzato');
             else
                 modGUI.apriIntestazione(3);
                     modGUI.inserisciTesto('SEDI PIU` REDDITIZIE');
@@ -927,14 +929,14 @@ create or replace package body gruppo2 as
                 modGUI.ApriRigaTabella;
                     modGUI.intestazioneTabella('ID Sede');
                     modGUI.intestazioneTabella('Indirizzo');
-                    modGUI.intestazioneTabella('Totale');
+                    modGUI.intestazioneTabella('Numero Ingressi');
                     modGUI.intestazioneTabella('Dettagli');
                 modGUI.ChiudiRigaTabella;
                 -- Apre il cursore
                 open sediCursor;
                 -- Scorre il cursore
                 loop
-                    fetch sediCursor into id_sede, indirizzo, costo;
+                    fetch sediCursor into id_sede, indirizzo, num_ingressi;
                     exit when sediCursor%NOTFOUND;
                     modGUI.ApriRigaTabella;
                         modGUI.ApriElementoTabella;
@@ -944,7 +946,7 @@ create or replace package body gruppo2 as
                             modGUI.ElementoTabella(indirizzo);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(costo);
+                            modGUI.ElementoTabella(num_ingressi);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                             modGUI.inserisciLente(groupname || 'visualizzaSede', id_sessione, nome, ruolo, id_sede);
