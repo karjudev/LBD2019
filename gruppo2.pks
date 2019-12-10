@@ -46,8 +46,11 @@ create or replace package gruppo2 as
     procedure AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);
+    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    function RicercaPosto( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type);
 
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
