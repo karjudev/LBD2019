@@ -53,6 +53,8 @@ create or replace package gruppo2 as
     function RicercaPosto( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type)return box.idbox%type;
     procedure VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
+    procedure PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2);   
+    procedure PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number);   
 
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
