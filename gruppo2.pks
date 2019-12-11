@@ -70,4 +70,11 @@ create or replace package gruppo2 as
     procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int);
     procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
+
+    procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure autorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2);
+
+    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2);
+    procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2);
 end gruppo2;
