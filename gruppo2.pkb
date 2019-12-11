@@ -128,156 +128,69 @@ create or replace package body gruppo2 as
         modGUI.chiudiPagina;
     end formRicercaArea;
 
-    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is 
-        totaleabb integer :=0;
-        totalebigl integer :=0;
-        indirizzo varchar2 (100);
-        idsededapassare integer :=0;
-        --datafinevar varchar2(100);
-        --datafinets timestamp;
+procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2) is 
+totaleabb integer :=0;
+totalebigl integer :=0;
+indirizzo varchar2 (100);
+idsededapassare integer :=0;
+--datafinevar varchar2(100);
+--datafinets timestamp;
 
-        begin
+begin
 
-            modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
-            modgui.acapo;
+    modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
+    modgui.acapo;
 
-            if(datainiziale is not null and datafinale is not null and periodo=1)
-                then
-                    if(idsedecorrente=0) --tutte le sedi con il periodo
-                        then
-                        --datafinevar:=datafinale||' 23:59:00';
-                        --datafinets:=TO_TIMESTAMP(datafinevar, 'yyyy-mm-dd hh24:mi:ss');
-                        modGUI.apriTabella;
-                        modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('Sede');
-                        modGUI.intestazioneTabella('Introiti Abbonamenti');
-                        modGUI.intestazioneTabella('Introiti Biglietti');
-                        modGUI.intestazioneTabella('Dettagli');
-                        modgui.chiudirigatabella;
-                        for i in (select * from sedi)
-                            loop
-                                select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ((abb.datainizio<to_date('2019-12-19','yyyy-mm-dd') and abb.datafine>to_date('2019-12-19','yyyy-mm-dd')) or (abb.datainizio>to_date('2019-12-19','yyyy-mm-dd') and abb.datainizio<to_date('2021-12-19','yyyy-mm-dd')));
-                                select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede  and ((ingora.oraentrata<to_timestamp(datainiziale,'yyyy-mm-dd') and ingora.orauscita>to_timestamp(datainiziale,'yyyy-mm-dd')) or (ingora.oraentrata>to_timestamp(datainiziale,'yyyy-mm-dd') and ingora.oraentrata<to_timestamp(datafinale||' 23:59:00','yyyy-mm-dd hh24:mi:ss'))) and ingora.orauscita is not null;
-                                select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
-                                if(totaleabb is null) then totaleabb:=0; end if;
-                                if(totalebigl is null) then totalebigl:=0; end if;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(indirizzo);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(totaleabb);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(totalebigl);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
-                                modgui.chiudielementotabella;
-                                modgui.chiudirigatabella;
-
-                                end loop;         
-                            modgui.chiuditabella;
-
-                        else --sede specifica con periodo
-
-                            select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsededapassare and ((abb.datainizio<to_date('2019-12-19','yyyy-mm-dd') and abb.datafine>to_date('2019-12-19','yyyy-mm-dd')) or (abb.datainizio>to_date('2019-12-19','yyyy-mm-dd') and abb.datainizio<to_date('2021-12-19','yyyy-mm-dd')));
-                            select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente  and ((ingora.oraentrata<to_timestamp(datainiziale,'yyyy-mm-dd') and ingora.orauscita>to_timestamp(datainiziale,'yyyy-mm-dd')) or (ingora.oraentrata>to_timestamp(datainiziale,'yyyy-mm-dd') and ingora.oraentrata<to_timestamp(datafinale||' 23:59:00','yyyy-mm-dd hh24:mi:ss'))) and ingora.orauscita is not null;
-                            select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
-                            if(totaleabb is null) then totaleabb:=0; end if;
-                            if(totalebigl is null) then totalebigl:=0; end if;
-                            modGUI.apriTabella;
-                            modGUI.ApriRigaTabella;
-                            modGUI.intestazioneTabella('Sede');
-                            modGUI.intestazioneTabella('Introiti Abbonamenti');
-                            modGUI.intestazioneTabella('Introiti Biglietti');
-                            modGUI.intestazioneTabella('Dettagli');
-                            modgui.chiudirigatabella;
-                            modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(indirizzo);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(totaleabb);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(totalebigl);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                            modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo,idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
-                            modgui.chiudielementotabella;
-                            modgui.chiudirigatabella;        
-                            modgui.chiuditabella;
-                        end if;                
-                else
-                
-                if((datainiziale is null or datafinale is null) and periodo=1) then
-                    modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Periodo non valido. Introiti totali');
-                    modGUI.chiudiIntestazione(2);
-                end if;
-
-                if(idsedecorrente=0) 
-                    then --tutte le sedi senza periodo
-                        modgui.apritabella;
-                        modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('Sede');
-                        modGUI.intestazioneTabella('Introiti Abbonamenti');
-                        modGUI.intestazioneTabella('Introiti Biglietti');
-                        modGUI.intestazioneTabella('Dettagli');
-                        modgui.chiudirigatabella;
-                        for i in (select * from sedi)
-                            loop
-                                select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede;
-                                select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null; 
-                                select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
-                                if(totaleabb is null) then totaleabb:=0; end if;
-                                if(totalebigl is null) then totalebigl:=0; end if;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(indirizzo);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(totaleabb);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(totalebigl);
-                                modGUI.ChiudiElementoTabella;
-                                modGUI.ApriElementoTabella;
-                                modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
-                                modgui.chiudielementotabella;
-                                modgui.chiudirigatabella;---------
-                            end loop;         
-                        modgui.chiuditabella;
-                    else --sede specifica senza periodo
-                        select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente;
-                        select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null; 
-                        select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
+        if(idsedecorrente=0) 
+            then --tutte le sedi senza periodo
+                modgui.apritabella;
+                modGUI.ApriRigaTabella;
+                modGUI.intestazioneTabella('Sede');
+                modGUI.intestazioneTabella('Introiti Biglietti');
+                modGUI.intestazioneTabella('Dettagli');
+                modgui.chiudirigatabella;
+                for i in (select * from sedi)
+                    loop
+                        select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null; 
+                        select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
                         if(totaleabb is null) then totaleabb:=0; end if;
                         if(totalebigl is null) then totalebigl:=0; end if;
-                        modGUI.apriTabella;
-                        modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('Sede');
-                        modGUI.intestazioneTabella('Introiti Abbonamenti');
-                        modGUI.intestazioneTabella('Introiti Biglietti');
-                        modGUI.intestazioneTabella('Dettagli');
-                        modgui.chiudirigatabella;
-                        modGUI.ApriElementoTabella; 
-                        modGUI.ElementoTabella(indirizzo);
-                        modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(totaleabb);
+                        modGUI.ElementoTabella(indirizzo);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                         modGUI.ElementoTabella(totalebigl);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                        modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
+                        modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                         modgui.chiudielementotabella;
-                        modgui.chiudirigatabella;        
-                        modgui.chiuditabella;
-                    end if;                
-
-                end if;
-
-        end introitiparziali;
+                        modgui.chiudirigatabella;---------
+                    end loop;         
+                modgui.chiuditabella;
+            else --sede specifica senza periodo
+                select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null; 
+                select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
+                if(totaleabb is null) then totaleabb:=0; end if;
+                if(totalebigl is null) then totalebigl:=0; end if;
+                modGUI.apriTabella;
+                modGUI.ApriRigaTabella;
+                modGUI.intestazioneTabella('Sede');
+                modGUI.intestazioneTabella('Introiti Biglietti');
+                modGUI.intestazioneTabella('Dettagli');
+                modgui.chiudirigatabella;
+                modGUI.ApriElementoTabella; 
+                modGUI.ElementoTabella(indirizzo);
+                modGUI.ChiudiElementoTabella;
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(totalebigl);
+                modGUI.ChiudiElementoTabella;
+                modGUI.ApriElementoTabella;
+                modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
+                modgui.chiudielementotabella;
+                modgui.chiudirigatabella;        
+                modgui.chiuditabella;
+            end if;                
+end introitiparziali;
 
         procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2) is
             altezza_veicolo Veicoli.Altezza%TYPE;
@@ -351,7 +264,7 @@ create or replace package body gruppo2 as
                 end loop;
                 modGUI.chiudiTabella;
                 if(headertab) then
-                    modGUI.esitoOperazione('KO', 'Non è stata trovata nessun''area disponibile per il tuo veicolo!');
+                    modGUI.esitoOperazione('KO', 'Non Ã¨ stata trovata nessun''area disponibile per il tuo veicolo!');
                 else
                     modGUI.chiudiDiv;
                 end if;
@@ -360,44 +273,42 @@ create or replace package body gruppo2 as
 
     procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 
-    begin
-        modGUI.apriPagina('HoC | Visualizza Introiti', id_Sessione, nome, ruolo);
+begin
+    modGUI.apriPagina('HoC | Visualizza Introiti', id_Sessione, nome, ruolo);
 
-        modgui.acapo;
+    modgui.acapo;
 
-    modgui.apriForm('introitiparziali');
-            modgui.apriparagrafo('rela');
-            modgui.inseriscitesto('VISUALIZZA INTROITI ');
-            modgui.chiudiparagrafo;
-            modgui.inserisciinputhidden('id_Sessione',id_Sessione);
-            modgui.inserisciinputhidden('nome',nome);
-            modgui.inserisciinputhidden('ruolo',ruolo);
+        modgui.apriintestazione(2);
+        modgui.inseriscitesto('VISUALIZZA INTROITI TOTALI INGRESSI ORARI');
+        modgui.chiudiintestazione(2);
+modgui.apriForm('gruppo2.introitiparziali');
 
-                    modGUI.apriSelect('idSedeCorrente', 'Seleziona Sede: ', false, 'defSelect');
-            modGUI.inserisciOpzioneSelect('0','Tutte le Sedi',false);
+        modgui.inserisciinputhidden('id_Sessione',id_Sessione);
+        modgui.inserisciinputhidden('nome',nome);
+        modgui.inserisciinputhidden('ruolo',ruolo);
 
-            for sede in (select * from sedi)
-            loop
-            modGUI.inserisciOpzioneSelect(sede.idsede,sede.indirizzo,false);
-            end loop;
+                modGUI.apriSelect('idSedeCorrente', 'Seleziona Sede: ', false, 'defSelect');
+        modGUI.inserisciOpzioneSelect('0','Tutte le Sedi',false);
 
-            modGUI.chiudiSelect;
-                        modgui.inserisciradiobutton('Ricerca totale','periodo','0',true);
-                        modgui.inserisciradiobutton('Ricerca per periodo','periodo','1',false);
+        for sede in (select * from sedi)
+        loop
+        modGUI.inserisciOpzioneSelect(sede.idsede,sede.indirizzo,false);
+        end loop;
 
-            modGUI.inserisciinput('Data inizio', 'date','datainiziale',false,'','defInput');
+        modGUI.chiudiSelect;
+             
 
 
-            modGUI.inserisciinput('Data fine', 'date','datafinale',false,'','defInput');
+        modGUI.inserisciBottoneReset('RESET');
+        modGUI.inserisciBottoneForm('Submit','defFormButton');
+
+        modgui.chiudiForm;
+
+        modGUI.chiudiPagina;
 
 
-            modGUI.inserisciBottoneReset('RESET');
-            modGUI.inserisciBottoneForm('Submit','defFormButton');
-
-            modgui.chiudiForm;
-
-            modGUI.chiudiPagina;
-    end introiti;
+null;
+end introiti;
 
     procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         area Aree%ROWTYPE;
@@ -594,7 +505,7 @@ create or replace package body gruppo2 as
         modGUI.apriPagina('HoC | Modifica Sede di ' || sede.indirizzo, id_Sessione, nome, ruolo);
             modGUI.aCapo;
                 modGUI.apriDiv;
-                -- Se il ruolo dell'utente non è amministratore esce
+                -- Se il ruolo dell'utente non Ã¨ amministratore esce
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei un amministratore');
                 elsif (sede.idSede is null) then
@@ -607,7 +518,7 @@ create or replace package body gruppo2 as
                     * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
                     * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                     */
-                    modGUI.apriForm('updateSede');
+                    modGUI.apriForm(groupname || 'updateSede');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -766,7 +677,7 @@ create or replace package body gruppo2 as
         tmp integer;
         idses integer;
         begin
-            if(ruolo='C') then
+            if(ruolo='O' or ruolo='R') then
                 modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
                 modGUI.aCapo;
                 modGUI.apriDiv;
@@ -779,7 +690,7 @@ create or replace package body gruppo2 as
                 * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                 */
                 /*modgui.apriForm(visualizzaautorimessa,idSessione,nome,ruolo,idSessione,nome,ruolo,'sede','veicolo'); */
-                modgui.apriForm('competentGarageSearch2');
+                modgui.apriForm('gruppo2.competentGarageSearch2');
                 modgui.inserisciinputhidden('id_Sessione',id_Sessione);
                 modgui.inserisciinputhidden('nome',nome);
                 modgui.inserisciinputhidden('ruolo',ruolo);
@@ -804,11 +715,11 @@ create or replace package body gruppo2 as
                 modGUI.aCapo;
                 modGUI.apriSelect('idVeicoloCorrente', 'Seleziona Veicolo: ', true, 'defSelect');
 
-                select distinct count(*) into tmp from veicoli vec, veicoliclienti clive, clienti cli, persone pers, sessioni ses where vec.idveicolo=clive.idveicolo and clive.idcliente= cli.idcliente and cli.idpersona=pers.idpersona and pers.idpersona=ses.idpersona and ses.idsessione=idses; /*vec  where exists (select* from sessioni ses, persone pers, clienti cli, veicoliclienti clive where idSessione=ses.idsessione and ses.idpersona=pers.idpersona and cli.idpersona=pers.idpersona and clive.idveicolo=vec.idveicolo and clive.idcliente=cli.idcliente);*/
+                select distinct count(*) into tmp from veicoli vec;
                 if(tmp=0) then 
                                 modGUI.inserisciOpzioneSelect('','Nessun veicolo disponibile',false);
                 else
-                    for veicolo in (select distinct vec.* from veicoli vec, veicoliclienti clive, clienti cli, persone pers, sessioni ses where vec.idveicolo=clive.idveicolo and clive.idcliente= cli.idcliente and cli.idpersona=pers.idpersona and pers.idpersona=ses.idpersona and ses.idsessione=idses)
+                    for veicolo in (select distinct vec.* from veicoli vec)
                     loop
                         modGUI.inserisciOpzioneSelect(veicolo.idveicolo,'Veicolo: ' ||veicolo.produttore ||' '|| veicolo.modello || '     Targa: ' ||veicolo.targa,false);
                     end loop;
@@ -823,7 +734,7 @@ create or replace package body gruppo2 as
                 modgui.chiudiForm;
             else
             modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
-            modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per i clienti');
+            modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per gli operatori e i responsabili');
             end if;
 
             modGUI.chiudiPagina;
@@ -833,43 +744,45 @@ create or replace package body gruppo2 as
         -- ID della sede corrente
         id_sede Sedi.idSede%TYPE;
         indirizzo Sedi.Indirizzo%TYPE;
-        costo number;
+        num_ingressi int;
         -- Cursore che scorre nella query delle sedi ordinate per guadagno
         cursor sediCursor is
             with
                 TotOrari as (
-                    select S.idSede as idSede, sum(IO.Costo) as Costo
+                    select S.idSede as idSede, count(*) as NumIngressi
                     from Sedi S
                         join Autorimesse AU on AU.idSede = S.idSede
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiOrari IO on IO.idBox = B.idBox
-                    where IO.Costo is not null
-                    group by S.idSede, IO.Costo
+                    group by S.idSede
                 ),
                 TotAbbonamenti as (
-                    select S.idSede as idSede, sum(A.CostoEffettivo) as Costo
+                    select S.idSede as idSede, count(*) as NumIngressi
                     from Sedi S
                         join Autorimesse AU on AU.idSede = S.idSede
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiAbbonamenti IA on IA.idBox = B.idBox
-                        join Abbonamenti A on IA.idAbbonamento = A.idAbbonamento
                     group by S.idSede
                 ),
                 Totale as (
-                    select coalesce(TotOrari.idSede, TotAbbonamenti.idSede) as idSede, coalesce(TotOrari.Costo, 0) + coalesce(TotAbbonamenti.Costo, 0) as Costo
-                    from TotOrari
-                        full outer join TotAbbonamenti on TotAbbonamenti.idSede = TotOrari.idSede
+                    select idSede, sum(NumIngressi) as NumIngressi
+                    from (
+                        select * from TotOrari
+                        union all
+                        select * from TotAbbonamenti
+                    )
+                    group by idSede
                 )
-            select S.idSede, S.Indirizzo, T.Costo
+            select S.idSede, S.Indirizzo, T.NumIngressi
             from Sedi S
                 join Totale T on T.idSede = S.idSede
-            order by T.Costo desc;
+            order by T.NumIngressi desc;
         begin
             -- Crea la pagina e l'intestazione
             modGUI.apriPagina(
-                'HoC | Sedi più Redditizie',
+                'HoC | Sedi piu` Redditizie',
                 id_sessione => id_sessione,
                 nome => nome,
                 ruolo => ruolo
@@ -877,7 +790,7 @@ create or replace package body gruppo2 as
             modGUI.aCapo;
 
             if (ruolo <> 'A') then
-                modGUI.esitoOperazione('KO', 'Non sei autorizzato a vedere');
+                modGUI.esitoOperazione('KO', 'Non sei autorizzato');
             else
                 modGUI.apriIntestazione(3);
                     modGUI.inserisciTesto('SEDI PIU` REDDITIZIE');
@@ -887,14 +800,14 @@ create or replace package body gruppo2 as
                 modGUI.ApriRigaTabella;
                     modGUI.intestazioneTabella('ID Sede');
                     modGUI.intestazioneTabella('Indirizzo');
-                    modGUI.intestazioneTabella('Totale');
+                    modGUI.intestazioneTabella('Numero Ingressi');
                     modGUI.intestazioneTabella('Dettagli');
                 modGUI.ChiudiRigaTabella;
                 -- Apre il cursore
                 open sediCursor;
                 -- Scorre il cursore
                 loop
-                    fetch sediCursor into id_sede, indirizzo, costo;
+                    fetch sediCursor into id_sede, indirizzo, num_ingressi;
                     exit when sediCursor%NOTFOUND;
                     modGUI.ApriRigaTabella;
                         modGUI.ApriElementoTabella;
@@ -904,7 +817,7 @@ create or replace package body gruppo2 as
                             modGUI.ElementoTabella(indirizzo);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(costo);
+                            modGUI.ElementoTabella(num_ingressi);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                             modGUI.inserisciLente(groupname || 'visualizzaSede', id_sessione, nome, ruolo, id_sede);
@@ -1173,21 +1086,25 @@ create or replace package body gruppo2 as
                             modGUI.Collegamento(indirizzo_autorimessa, 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || area.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
-                modGUI.ChiudiTabella;
-
-                if (ruolo <> 'O' and ruolo <> 'C') then
-                    modGUI.ApriTabella;
+                    if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.ApriRigaTabella;
+                            modGUI.IntestazioneTabella('Dettagli');
                             modGUI.ApriElementoTabella;
                                 modGUI.InserisciPenna('modificaArea', id_sessione, nome, ruolo, idRiga);
                             modGUI.ChiudiElementoTabella;
                         modGUI.ChiudiRigaTabella;
+                    end if;
+                modGUI.ChiudiTabella;
+
+                
+                    modGUI.ApriTabella;
+                        
                     modGUI.ChiudiTabella;
-                end if;
+                
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Aree');
+                    modGUI.inserisciTesto('Box');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
@@ -1469,79 +1386,51 @@ create or replace package body gruppo2 as
         modGUI.ChiudiPagina;
     end visualizzaBox;
 
-    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null) as 
-        x_datainiziale varchar2(100) :=NVL(datainiziale, '1900-01-01');
-        y_datafinale varchar2(100) := NVL(datafinale, to_char(sysdate+interval '10' year,'yyyy-mm-dd'));
-    begin 
-        modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
+procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as 
+begin 
+    modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
 
-        for i in (select * from autorimesse aut where aut.idsede=idriga)
-        loop
-        modGUI.apriIntestazione(2);
-            modGUI.inserisciTesto('Autorimessa ' || i.indirizzo);
-        modGUI.chiudiIntestazione(2);
+    for i in (select * from autorimesse aut where aut.idsede=idriga)
+    loop
+    modGUI.apriIntestazione(2);
+        modGUI.inserisciTesto('Autorimessa ' || i.indirizzo);
+    modGUI.chiudiIntestazione(2);
 
-        modGUI.apriTabella;
+   
+    
+    modGUI.apriTabella;
 
-                    modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Abbonamento');
-                        modGUI.intestazioneTabella('Costo effettivo');
-                        modGUI.intestazioneTabella('Data inizio');
-                        modGUI.intestazioneTabella('Data fine');
-                        modGUI.ChiudiRigaTabella;
-        
-        for n in (select abb.* from box, abbonamenti abb, aree where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and ((abb.datainizio<to_date(x_datainiziale,'yyyy-mm-dd') and abb.datafine>to_date(x_datainiziale,'yyyy-mm-dd')) or (abb.datainizio>to_date(x_datainiziale,'yyyy-mm-dd') and abb.datainizio<to_date(y_datafinale,'yyyy-mm-dd'))) order by abb.idabbonamento)
-        --for n in (select abb.* from box, abbonamenti abb, aree where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa order by abb.idabbonamento)
-        loop
-                            modGUI.ApriRigaTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.idabbonamento);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.costoeffettivo);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.datainizio);
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.datafine);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ChiudiRigaTabella;           
-        end loop;
-        modGUI.ChiudiTabella;
-        
-        modGUI.apriTabella;
+                modGUI.ApriRigaTabella;
+                    modGUI.intestazioneTabella('ID Ingresso Orario');
+                    modGUI.intestazioneTabella('Costo effettivo');
+                    modGUI.intestazioneTabella('Data inizio');
+                    modGUI.intestazioneTabella('Data fine');
+                    modGUI.ChiudiRigaTabella;
 
-                    modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Ingresso Orario');
-                        modGUI.intestazioneTabella('Costo effettivo');
-                        modGUI.intestazioneTabella('Data inizio');
-                        modGUI.intestazioneTabella('Data fine');
-                        modGUI.ChiudiRigaTabella;
+    for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and (io.oraentrata is not null or io.orauscita is not null) and io.costo is not null order by io.idingressoorario)
+    --for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and io.oraentrata is not null order by io.idingressoorario)
+    loop
+                        modGUI.ApriRigaTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(n.idingressoorario);
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(n.costo);
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(to_char(n.oraentrata,'dd-MON-yy hh24:mi:ss'));
+                        modGUI.ApriElementoTabella;
+                            modGUI.ElementoTabella(to_char(n.orauscita,'dd-MON-yy hh24:mi:ss'));
+                        modGUI.ChiudiElementoTabella;
+                        modGUI.ChiudiRigaTabella;           
+    end loop;
+    modGUI.ChiudiTabella;
 
-        for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and ((io.oraentrata<to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.orauscita>to_timestamp(x_datainiziale,'yyyy-mm-dd')) or (io.oraentrata>to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.oraentrata<to_timestamp(y_datafinale||' 23:59:00','yyyy-mm-dd hh24:mi:ss'))) order by io.idingressoorario)
-        --for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and io.oraentrata is not null order by io.idingressoorario)
-        loop
-                            modGUI.ApriRigaTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.idingressoorario);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.costo);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(to_char(n.oraentrata,'dd-MON-yy hh24:mi:ss'));
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(to_char(n.orauscita,'dd-MON-yy hh24:mi:ss'));
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ChiudiRigaTabella;           
-        end loop;
-        modGUI.ChiudiTabella;
-
-        end loop;
+    end loop;
 
 
-        modgui.chiudipagina;
-    end visualizzaintroitiparzialiabb;
+    modgui.chiudipagina;
+end visualizzaintroitiparzialiabb;
 
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri della sede corrente
@@ -2732,7 +2621,35 @@ begin
         modGUI.chiudiPagina;
     end resVeicoloMenoParcheggiato;
 
-    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio date, var_fine date) is
+    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Ingressi sopra media', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Ingressi con costo sopra la media');
+                    modGUI.chiudiIntestazione(2);
+                    
+                    modGUI.apriForm(groupname || 'resIngressiSopraMedia');
+                        modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+                        modGUI.inserisciInputHidden('nome', nome);
+                        modGUI.inserisciInputHidden('ruolo', ruolo);
+                        
+                        modGUI.inserisciInput('Data inizio', 'date', 'var_inizio', true);
+                        modGUI.inserisciInput('Data fine', 'date', 'var_fine', false);
+                        
+                        modGUI.inserisciBottoneReset;
+                        modGUI.inserisciBottoneForm;
+                    modGUI.chiudiForm;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end ingressiSopraMedia;
+
+    procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2) is
+        
         entrata_prevista IngressiOrari.EntrataPrevista%TYPE;
         ora_entrata IngressiOrari.OraEntrata%TYPE;
         ora_uscita IngressiOrari.OraUscita%TYPE;
@@ -2747,7 +2664,7 @@ begin
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiOrari IO on IO.idBox = B.idBox
-                    where least(IO.OraUscita, TO_DATE('31/12/2020', 'dd/mm/yyyy')) >= greatest(IO.OraEntrata, TO_DATE('01/10/2019', 'dd/mm/yyyy'))
+                    where least(IO.OraUscita, to_date(var_fine, 'yyyy-mm-dd')) >= greatest(IO.OraEntrata, to_date(var_inizio, 'yyyy-mm-dd'))
                 ),
                 MediaPerSede as (
                     select S.idSede as idSede, avg(IO.Costo) as MediaCosto
@@ -2756,7 +2673,7 @@ begin
                         join Aree AR on AR.idAutorimessa = AU.idAutorimessa
                         join Box B on B.idArea = AR.idArea
                         join IngressiOrari IO on IO.idBox = B.idBox
-                    where least(IO.OraUscita, TO_DATE('31/12/2020', 'dd/mm/yyyy')) >= greatest(IO.OraEntrata, TO_DATE('01/10/2019', 'dd/mm/yyyy'))
+                    where least(IO.OraUscita, to_date(var_fine, 'yyyy-mm-dd')) >= greatest(IO.OraEntrata, to_date(var_inizio, 'yyyy-mm-dd'))
                     group by S.idSede
                 )
             select IPS.*
@@ -2809,9 +2726,38 @@ begin
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end ingressiSopraMedia;
+    end resIngressiSopraMedia;
 
     procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Classifica Clienti per Tempo Medio di Permanenza', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                    modGUI.chiudiIntestazione(2);
+                    
+                    modGUI.apriForm(groupname || 'resClassificaMediaPermanenza');
+                        modGUI.inserisciInputHidden('id_sessione', id_sessione);
+                        modGUI.inserisciInputHidden('nome', nome);
+                        modGUI.inserisciInputHidden('ruolo', ruolo);
+                        modGUI.inserisciInput(
+                          tipo => 'number',
+                          etichetta => 'Soglia',
+                          nome => 'var_soglia',
+                          richiesto => true
+                        );
+                        modGUI.inserisciBottoneReset;
+                        modGUI.inserisciBottoneForm;
+                    modGUI.chiudiForm;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end classificaMediaPermanenza;
+
+    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int) is
         cursor riga is
             with
                 TotOrari as (
@@ -2892,5 +2838,5 @@ begin
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end;
+    end resClassificaMediaPermanenza;
 end gruppo2;
