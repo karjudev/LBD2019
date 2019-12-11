@@ -1,5 +1,5 @@
 create or replace package body gruppo2 as
-    procedure gruppo2.autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2) is
+    procedure autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2) is
     -- Parametri della sede corrente
     begin
 
@@ -12,9 +12,9 @@ create or replace package body gruppo2 as
 
 
         modGUI.ChiudiPagina;
-    end gruppo2.autorimessanontrovata;
+    end autorimessanontrovata;
 
-    procedure gruppo2.competentGarageSearch2 (
+    procedure competentGarageSearch2 (
         id_Sessione varchar2, 
         nome varchar2, 
         ruolo varchar2,
@@ -88,9 +88,9 @@ create or replace package body gruppo2 as
                     end if;
             end if;
 
-    end gruppo2.competentGarageSearch2;
+    end competentGarageSearch2;
 
-    procedure gruppo2.formRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure formRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Ricerca Area', id_Sessione, nome, ruolo);
         modGUI.aCapo;
@@ -126,9 +126,9 @@ create or replace package body gruppo2 as
             modGUI.inserisciBottoneForm(testo=>'RICERCA AREA');
         modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end gruppo2.formRicercaArea;
+    end formRicercaArea;
 
-    procedure gruppo2.introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is 
+    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is 
         totaleabb integer :=0;
         totalebigl integer :=0;
         indirizzo varchar2 (100);
@@ -277,9 +277,9 @@ create or replace package body gruppo2 as
 
                 end if;
 
-        end gruppo2.introitiparziali;
+        end introitiparziali;
 
-        procedure gruppo2.graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2) is
+        procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2) is
             altezza_veicolo Veicoli.Altezza%TYPE;
             larghezza_veicolo Veicoli.Larghezza%TYPE;
             lunghezza_veicolo Veicoli.Lunghezza%TYPE;
@@ -356,9 +356,9 @@ create or replace package body gruppo2 as
                     modGUI.chiudiDiv;
                 end if;
             modGUI.chiudiPagina;
-        end gruppo2.graphicResultRicercaArea;
+        end graphicResultRicercaArea;
 
-    procedure gruppo2.introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+    procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 
     begin
         modGUI.apriPagina('HoC | Visualizza Introiti', id_Sessione, nome, ruolo);
@@ -397,9 +397,9 @@ create or replace package body gruppo2 as
             modgui.chiudiForm;
 
             modGUI.chiudiPagina;
-    end gruppo2.introiti;
+    end introiti;
 
-    procedure gruppo2.modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
+    procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         area Aree%ROWTYPE;
         indirizzo_autorimessa Autorimesse.Indirizzo%TYPE;
         id_responsabile Dipendenti.idDipendente%TYPE;
@@ -538,9 +538,9 @@ create or replace package body gruppo2 as
             end if;
             modGUI.ChiudiDiv;
         modGUI.chiudiPagina;
-    end gruppo2.modificaArea;
+    end modificaArea;
 
-    procedure gruppo2.modificaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
+    procedure modificaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         autorimessa Autorimesse%ROWTYPE;
         id_dipendente_sede Dipendenti.idDipendente%TYPE;
         id_dipendente_corrente Dipendenti.idDipendente%TYPE;
@@ -623,9 +623,9 @@ create or replace package body gruppo2 as
                 end if;
             modGUI.ChiudiDiv;
         modGUI.chiudiPagina;
-    end gruppo2.modificaAutorimessa;
+    end modificaAutorimessa;
 
-    procedure gruppo2.modificaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
+    procedure modificaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         sede Sedi%ROWTYPE;
     BEGIN
 
@@ -681,9 +681,9 @@ create or replace package body gruppo2 as
                 end if;
             modGUI.ChiudiDiv;
         modGUI.chiudiPagina;
-    end gruppo2.modificaSede;
+    end modificaSede;
 
-    function gruppo2.queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2) 
+    function queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2) 
         return list_idaree is
 
 
@@ -728,9 +728,9 @@ create or replace package body gruppo2 as
         end loop;
 
         return p;
-    end gruppo2.queryRicercaArea;
+    end queryRicercaArea;
 
-    procedure gruppo2.resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number) AS
+    procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number) AS
 
         Sede number:=0;
         NumeroAttuale number:=0;
@@ -800,9 +800,9 @@ create or replace package body gruppo2 as
 
 
 
-        END gruppo2.resSediSovrappopolate;
+        END resSediSovrappopolate;
     
-    procedure gruppo2.ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
         tmp integer;
         idses integer;
         begin
@@ -867,9 +867,9 @@ create or replace package body gruppo2 as
             end if;
 
             modGUI.chiudiPagina;
-        end gruppo2.ricercaAutorimessa;
+        end ricercaAutorimessa;
     
-    procedure gruppo2.classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2) is
+    procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2) is
         -- ID della sede corrente
         id_sede Sedi.idSede%TYPE;
         indirizzo Sedi.Indirizzo%TYPE;
@@ -955,9 +955,9 @@ create or replace package body gruppo2 as
                 close sediCursor;
                 modGUI.chiudiPagina;
             end if;
-        end gruppo2.classificaSediPiuRedditizie;
+        end classificaSediPiuRedditizie;
     
-    procedure gruppo2.statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2) is 
+    procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2) is 
         maxbox integer :=0;
         var_indirizzo varchar2(100);
         var_gas varchar2(1);
@@ -988,9 +988,9 @@ create or replace package body gruppo2 as
         modgui.chiudiform;
 
 
-    end gruppo2.statisticaalimentazione;
+    end statisticaalimentazione;
 
-    procedure gruppo2.updateArea(
+    procedure updateArea(
         id_sessione int default 0,
         nome varchar2,
         ruolo varchar2,
@@ -1019,9 +1019,9 @@ create or replace package body gruppo2 as
         commit;
         -- Richiama la visualizzazione
         visualizzaArea(id_sessione, nome, ruolo, idRiga);
-    end gruppo2.updateArea;
+    end updateArea;
     
-    procedure gruppo2.updateAutorimessa(
+    procedure updateAutorimessa(
         id_sessione int default 0,
         nome varchar2,
         ruolo varchar2,
@@ -1072,9 +1072,9 @@ create or replace package body gruppo2 as
 
         -- Richiama la visualizzazione
         visualizzaAutorimessa(id_sessione, nome, ruolo, idRiga);
-    end gruppo2.updateAutorimessa;
+    end updateAutorimessa;
 
-    procedure gruppo2.updateSede(
+    procedure updateSede(
         id_sessione int default 0,
         nome varchar2,
         ruolo varchar2,
@@ -1101,9 +1101,9 @@ create or replace package body gruppo2 as
             -- Richiama la visualizzazione
             visualizzaSede(id_sessione, nome, ruolo, idRiga);
         end if;
-    end gruppo2.updateSede;
+    end updateSede;
 
-    procedure gruppo2.visualizzaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure visualizzaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri dell'autorimessa corrente
         area Aree%ROWTYPE;
         -- Indirizzo dell'autorimessa di riferimento
@@ -1255,9 +1255,9 @@ create or replace package body gruppo2 as
                 modGUI.chiudiTabella;
             end if;
         modGUI.ChiudiPagina;
-    end gruppo2.visualizzaArea;
+    end visualizzaArea;
 
-    procedure gruppo2.visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri dell'autorimessa corrente
         autorimessa Autorimesse%ROWTYPE;
         -- Indirizzo della sede di riferimento
@@ -1367,9 +1367,9 @@ create or replace package body gruppo2 as
                 modGUI.chiudiTabella;
             end if;
         modGUI.ChiudiPagina;
-    end gruppo2.visualizzaAutorimessa;
+    end visualizzaAutorimessa;
     
-    procedure gruppo2.visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri del box corrente
         var_box Box%ROWTYPE;
         -- Parametri di un eventuale veicolo
@@ -1502,9 +1502,9 @@ create or replace package body gruppo2 as
                 end if;
             end if;
         modGUI.ChiudiPagina;
-    end gruppo2.visualizzaBox;
+    end visualizzaBox;
 
-    procedure gruppo2.visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null) as 
+    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null) as 
         x_datainiziale varchar2(100) :=NVL(datainiziale, '1900-01-01');
         y_datafinale varchar2(100) := NVL(datafinale, to_char(sysdate+interval '10' year,'yyyy-mm-dd'));
     begin 
@@ -1576,9 +1576,9 @@ create or replace package body gruppo2 as
 
 
         modgui.chiudipagina;
-    end gruppo2.visualizzaintroitiparzialiabb;
+    end visualizzaintroitiparzialiabb;
 
-    procedure gruppo2.visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri della sede corrente
         sede Sedi%ROWTYPE;
         -- Nome del dipendente dirigente
@@ -1686,9 +1686,9 @@ create or replace package body gruppo2 as
 
             end if;
         modGUI.ChiudiPagina;
-    end gruppo2.visualizzaSede;
+    end visualizzaSede;
 
-    procedure gruppo2.ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Ricerca auto', id_Sessione, nome, ruolo);
             modGUI.apriIntestazione(2);
@@ -1711,9 +1711,9 @@ create or replace package body gruppo2 as
                 modGUI.inserisciBottoneForm(testo=>'RICERCA AUTO');
             modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end gruppo2.ricercaAuto;
+    end ricercaAuto;
     
-    procedure gruppo2.resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int) is
+    procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int) is
     var_check1 boolean := false;
     var_check2 boolean := false;
     begin
@@ -1833,11 +1833,11 @@ create or replace package body gruppo2 as
                 modGUI.chiudiDiv;
             end if;
         modGUI.chiudiPagina;
-    end gruppo2.resRicercaAuto;
+    end resRicercaAuto;
                                                                
                                                                
                                                                
-    procedure gruppo2.MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+    procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 --suppongo che l'oprazione sia "con il maggior numero di posti liberi", visto che per ora 
 --non esistono box riservati
 
@@ -1916,12 +1916,12 @@ posti number:=0;
         
         modgui.chiudiForm;                                                               
 
-    END gruppo2.MaggiorPostiRiservati;
+    END MaggiorPostiRiservati;
                                                                
                                                                
     
                                                                
-    PROCEDURE gruppo2.AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+    PROCEDURE AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     codiceAutorimessa autorimesse.idautorimessa%TYPE:=0;
@@ -1958,11 +1958,11 @@ begin
     modGUI.chiudiDiv;
     modGui.chiudiForm();
 
-    END gruppo2.AlimentazioneVeicolo;                                                              
+    END AlimentazioneVeicolo;                                                              
                         
                                                                
                                                                
-     PROCEDURE gruppo2.AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS 
+     PROCEDURE AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS 
     --variabili usate per controllare i veicoli acceduti in ingressi orari
    IdveicoloMaxIO number;
    PresenzeIO number:=0;
@@ -2141,12 +2141,12 @@ begin
         
         modgui.chiudiForm;
 
-    END gruppo2.AlimentazioneVeicolo2;                                                           
+    END AlimentazioneVeicolo2;                                                           
                                                                
                                                                
                                                                
                                                                
-    PROCEDURE gruppo2.PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS 
+    PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS 
       
       
 --DICHIARO VARIABILI PER STAMPARE
@@ -2280,12 +2280,12 @@ BEGIN
     
         modgui.chiudipagina;
 
-    END gruppo2.PercentualePostiLiberi2;                                                           
+    END PercentualePostiLiberi2;                                                           
                                                                
                                                                
                                                                
                                                                
-     procedure gruppo2.PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 
     --VARIABILE CONTENENTE AREA SCELTA
     codiceArea aree.idarea%TYPE;
@@ -2334,11 +2334,11 @@ begin
     modGUI.chiudiDiv;
     modGui.chiudiForm();
   
-    end gruppo2.PercentualiPostiLiberi;                                                          
+    end PercentualiPostiLiberi;                                                          
                                                                
                                                                
                                                                
-    procedure gruppo2.MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 
     --VARIABILI STAMPATE
     Lunghezza aree.lunghezzaMax%type;
@@ -2429,9 +2429,9 @@ begin
 
     modGUI.chiudiPagina;
 
-    end gruppo2.MaxTipoVeicolo;
+    end MaxTipoVeicolo;
     
-   PROCEDURE gruppo2.ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
 BEGIN
 
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
@@ -2493,9 +2493,9 @@ BEGIN
         modgui.chiudiForm;
     
  
-END gruppo2.ClientiSenzaAbbonamentoRinnovato;
+END ClientiSenzaAbbonamentoRinnovato;
 
-FUNCTION gruppo2.RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as 
+FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as 
 
 --PARAMETRI DEL VEICOLO RICEVUTO, DI CUI DEVO TROVARE UN BOX VALIDO
 AltezzaScelta veicoli.altezza%TYPE;
@@ -2561,13 +2561,163 @@ BEGIN
   
   return idboxOttenuto;
   
-END gruppo2.RICERCAPOSTO;
+END RICERCAPOSTO;
+
+     PROCEDURE VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+
+    --variabile che conterra l'autorimessa scelta per la visualizzazione
+    AlimentazioneScelta1 veicoli.alimentazione%TYPE;
+    AlimentazioneScelta2 veicoli.alimentazione%TYPE;
+    
+BEGIN
+   modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
+    modGUI.chiudiIntestazione(3);
+    
+    modGui.apriForm('VEICOLIPERTIPOCARBURANTE2');
+    modGui.inserisciInputHidden('id_Sessione',id_sessione);
+    modGui.inserisciInputHidden('nome',nome);
+    modGui.inserisciInputHidden('ruolo',ruolo);
+    
+    --PRIMA SELECT PER PRIMA ALIMENTAZIONE
+    modgui.apriSelect('tipoAlimentazione1', 'Tipologia 1');
+    --estraggo le autorimesse e le inserisco nella select
+    for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+    loop
+            AlimentazioneScelta1:=scorriCursore.alimentazione;
+            modgui.inserisciOpzioneSelect(AlimentazioneScelta1, AlimentazioneScelta1,true);
+    end loop;
+    modgui.chiudiSelect;
+    
+    
+        --SECONDA SELECT PER SECONDA ALIMENTAZIONE
+    modgui.apriSelect('tipoAlimentazione2', 'Tipologia 2');
+    --estraggo le autorimesse e le inserisco nella select
+    for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+    loop
+            AlimentazioneScelta2:=scorriCursore.alimentazione;
+            modgui.inserisciOpzioneSelect(AlimentazioneScelta2, AlimentazioneScelta2,true);
+    end loop;
+    modgui.chiudiSelect;
+    
+    
+    modgui.inserisciInput('dataInizioInserita', 'Scegli data inizio abbonamento', 'date', true);
+    modgui.inserisciInput('dataFineInserita', 'Scegli data fine abbonamento', 'date', true);
+    
+    modGUI.apriDiv;
+    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.chiudiDiv;
+    modGui.chiudiForm;
+  
+END VeicoliPerTipoCarburante;
+    
+    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS 
+
+   AlimentazionePiuNumerosa veicoli.alimentazione%type;
+   NumAbbonamenti number:=0;
+    
+
+BEGIN   
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    
+    if(TO_DATE(dataInizioInserita,'YYYY-MM-DD') > TO_DATE(dataFineInserita,'YYYY-MM-DD'))then
+      modgui.esitoOperazione('KO','Data inserita errata');
+    else
+    
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('VISUALIZZAZIONE');
+    modGUI.chiudiIntestazione(3);   
 
 
+    for scorriCursore in (
+  select veicoli.alimentazione, count(abbonamenti.idabbonamento) as codice
+        from veicoli,abbonamentiVeicoli,abbonamenti
+        where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                abbonamenti.dataInizio>= TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                abbonamenti.dataFine<= TO_DATE(dataFineInserita,'YYYY-MM-DD')
+        group by veicoli.alimentazione 
+
+    )
+    loop 
+        if(scorriCursore.codice > NumAbbonamenti)then
+            NumAbbonamenti:=scorriCursore.codice ;
+            AlimentazionePiuNumerosa:=scorriCursore.alimentazione;     
+            
+        end if;    
+
+        
+    end loop;
+
+ 
+     modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Targa');
+    modGUI.intestazioneTabella('Modello');
+    modGUI.intestazioneTabella('Alimentazione');
+    modGUI.ChiudiRigaTabella;
     
     
     
-    procedure gruppo2.secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    for scorriCursore in (
+            select veicoli.alimentazione, veicoli.targa, veicoli.modello
+            from veicoli,abbonamentiVeicoli,abbonamenti
+            where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                    abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                    abbonamenti.dataInizio>=TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                    abbonamenti.dataFine<=TO_DATE(dataFineInserita,'YYYY-MM-DD')  and
+                    veicoli.alimentazione=AlimentazionePiuNumerosa
+    )
+    loop 
+   
+    modGUI.ApriRigaTabella;
+
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.targa);
+    modGUI.ChiudiElementoTabella;
+   
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.modello);
+    modGUI.ChiudiElementoTabella;
+    
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.alimentazione);
+    modGUI.ChiudiElementoTabella;
+   
+   
+    modGUI.ChiudiRigaTabella;
+    end loop;    
+    
+    modGUI.chiudiTabella;
+    
+    IF(NumAbbonamenti=0)THEN
+      modgui.esitoOperazione('KO','Non ci sono veicoli disponibili per questo periodo');
+    end if;
+    
+end if;  
+            --pulsante torna indietro
+        modGui.apriForm('veicoliPerTipocarburante');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        modgui.chiudiForm;    
+
+
+END VeicoliPerTipoCarburante2;
+    
+    
+    
+    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
@@ -2600,9 +2750,9 @@ END gruppo2.RICERCAPOSTO;
             modGUI.inserisciBottoneForm(testo=>'RICERCA DETTAGLI');
         modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end gruppo2.secondaComune;
+    end secondaComune;
 
-    procedure gruppo2.resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2) is
+    procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2) is
         var_nomePersona Persone.Nome%TYPE;
         var_cognomePersona Persone.Cognome%TYPE;
         var_nomeAutorimessa Autorimesse.Indirizzo%TYPE;
@@ -2716,9 +2866,9 @@ END gruppo2.RICERCAPOSTO;
             modGUI.chiudiDiv;
         end if;
         modGUI.chiudiPagina;
-    end gruppo2.resSecondaComune;
+    end resSecondaComune;
 
-    procedure gruppo2.dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
     var_idVeicolo Veicoli.idVeicolo%TYPE;
     var_targa Veicoli.Targa%TYPE;
     var_produttore Veicoli.Produttore%TYPE;
@@ -2821,9 +2971,9 @@ END gruppo2.RICERCAPOSTO;
 
         modGUI.chiudiTabella;
         modGUI.chiudiPagina;
-    end gruppo2.dettagliVeicoloSecondaComune;
+    end dettagliVeicoloSecondaComune;
 
-    procedure gruppo2.veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2) is
+    procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Veicolo meno parcheggiato', id_sessione, nome, ruolo);
             modGUI.aCapo;
@@ -2853,9 +3003,9 @@ END gruppo2.RICERCAPOSTO;
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end gruppo2.veicoloMenoParcheggiato;
+    end veicoloMenoParcheggiato;
 
-    procedure gruppo2.resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente Clienti.idCliente%TYPE) is
+    procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente Clienti.idCliente%TYPE) is
         cursor cursore is
             with
                 TotOrari as (
@@ -2954,5 +3104,5 @@ END gruppo2.RICERCAPOSTO;
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end gruppo2.resVeicoloMenoParcheggiato;
+    end resVeicoloMenoParcheggiato;
 end gruppo2;
