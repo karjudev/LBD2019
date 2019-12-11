@@ -205,18 +205,18 @@ begin
                 modgui.chiudirigatabella;        
                 modgui.chiuditabella;
             end if;
-            modgui.apriintestazione(3);
+            
+            else 
+    modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
+    end if; 
+    modgui.apriintestazione(3);
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
             modgui.inseriscibottone(id_sessione,nome,ruolo,'TORNA INDIETRO','gruppo2.introiti');
             modgui.chiudidiv;
             modgui.chiudipagina;
-            else 
-    modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
-     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
-    modGUI.chiudiPagina;
-    end if; 
 end introitiparziali;
 
         procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2) is
@@ -1503,18 +1503,20 @@ begin
 
     end loop;
 
+ 
     else 
     modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
      modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
     modGUI.chiudiPagina;
     end if; 
-     modgui.apriintestazione(3);
+       modgui.apriintestazione(3);
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
             modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.introiti');
             modgui.chiudidiv;
     modgui.chiudipagina;
+     
 end visualizzaintroitiparzialiabb;
 
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
