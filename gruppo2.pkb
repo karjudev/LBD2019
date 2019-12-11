@@ -406,50 +406,26 @@ create or replace package body gruppo2 as
         id_dipendente Dipendenti.idDipendente%TYPE;
     BEGIN
 
-        -- ID del dipendente corrente
         begin
-            select Dipendenti.idDipendente
-            into id_dipendente
-            from Dipendenti
-                join PersoneL on PersoneL.idPersona = Dipendenti.idPersona
-                join Sessioni on Sessioni.idPersona = PersoneL.idPersona
-            where Sessioni.idSessione = id_sessione;
-        exception
-            when NO_DATA_FOUND then
-                id_dipendente := null;
-        end;
-
-        -- ID del dipendente responsabile della sede
-        begin
-            select Sedi.idDipendente
-            into id_responsabile
-            from Sedi
-                join Autorimesse on Autorimesse.idSede = Sedi.idSede
-                join Aree on Aree.idAutorimessa = Autorimesse.idAutorimessa
+            select * into area
+            from Aree
             where Aree.idArea = idRiga;
         exception
-            when NO_DATA_FOUND then
-                id_responsabile := null;
+            when no_data_found then
+                area := null;
         end;
-
-        select * into area
-        from Aree
-        where Aree.idArea = idRiga;
-
-        select Autorimesse.Indirizzo into indirizzo_autorimessa
-        from Autorimesse
-        where Autorimesse.idAutorimessa = area.idAutorimessa;
         
         modGUI.apriPagina('HoC | Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa, id_Sessione, nome, ruolo);
             modGUI.apriDiv;
-            if ((ruolo = 'A') or (ruolo = 'R') or (ruolo = 'O')) then
+            if (ruolo <> 'A' or ruolo <> 'R' or ruolo <> 'O') then
+                modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+            elsif (autorimesse.idAutorimessa is null) then
+                modGUI.esitoOperazione('KO', 'Nessuna area trovata');
+            else
                 modGUI.apriIntestazione(2);
                     modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
-                /* 
-                * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
-                * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
-                */
+
                 modGUI.apriForm('updateArea');
                     modGUI.inserisciInputHidden('id_sessione', id_sessione);
                     modGUI.inserisciInputHidden('nome', nome);
@@ -533,8 +509,6 @@ create or replace package body gruppo2 as
                     modGUI.inserisciBottoneReset('RESET');
                     modGUI.inserisciBottoneForm();
                 modgui.chiudiForm;
-            else
-                modGUI.esitoOperazione('KO', 'Non sei autorizzato');
             end if;
             modGUI.ChiudiDiv;
         modGUI.chiudiPagina;
@@ -546,46 +520,27 @@ create or replace package body gruppo2 as
         id_dipendente_corrente Dipendenti.idDipendente%TYPE;
     BEGIN
 
-        -- ID del dipendente corrente
         begin
-            select Dipendenti.idDipendente
-            into id_dipendente_corrente
-            from Dipendenti
-                join PersoneL on PersoneL.idPersona = Dipendenti.idPersona
-                join Sessioni on Sessioni.idPersona = PersoneL.idPersona
-            where Sessioni.idSessione = id_sessione;
+            select * into autorimessa
+            from Autorimesse
+            where Autorimesse.idAutorimessa = idRiga;
         exception
-            when NO_DATA_FOUND then
-                id_dipendente_corrente := null;
+            when no_data_found then
+                autorimessa := null;
         end;
-
-        -- ID del dipendente responsabile della sede
-        begin
-            select Sedi.idDipendente
-            into id_dipendente_sede
-            from Sedi
-                join Autorimesse on Autorimesse.idSede = Sedi.idSede
-            where Autorimesse.idAutorimessa = autorimessa.idAutorimessa;
-        exception
-            when NO_DATA_FOUND then
-                id_dipendente_sede := null;
-        end;
-
-        select * into autorimessa
-        from Autorimesse
-        where Autorimesse.idAutorimessa = idRiga;
 
         modGUI.apriPagina('HoC | Modifica Autorimessa di ' || autorimessa.indirizzo, id_Sessione, nome, ruolo);
             modGUI.aCapo;
             modGUI.apriDiv;
-                if (ruolo = 'A' or (ruolo = 'R' and (id_dipendente_corrente = id_dipendente_sede))) then
+                if (ruolo <> 'A' and ruolo <> 'R') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato a svolgere questa operazione');
+                elsif (autorimessa.idAutorimessa is null)
+                    modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
+                else
                     modGUI.apriIntestazione(2);
                         modGUI.inserisciTesto('Modifica Autorimessa di ' || autorimessa.indirizzo);
                     modGUI.chiudiIntestazione(2);
-                    /* 
-                    * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
-                    * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
-                    */
+
                     modGUI.apriForm('updateAutorimessa');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
@@ -618,8 +573,6 @@ create or replace package body gruppo2 as
                         modGUI.inserisciBottoneReset();
                         modGUI.inserisciBottoneForm();
                     modgui.chiudiForm;
-                else
-                    modGUI.esitoOperazione('KO', 'Non sei autorizzato a svolgere questa operazione');
                 end if;
             modGUI.ChiudiDiv;
         modGUI.chiudiPagina;
@@ -628,10 +581,15 @@ create or replace package body gruppo2 as
     procedure modificaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         sede Sedi%ROWTYPE;
     BEGIN
-
-        select * into sede
-        from Sedi
-        where Sedi.idSede = idRiga;
+        begin
+            select * into sede
+            from Sedi
+            where Sedi.idSede = idRiga;
+        exception
+          when no_data_found then
+            sede := null;
+        end;
+        
         
         modGUI.apriPagina('HoC | Modifica Sede di ' || sede.indirizzo, id_Sessione, nome, ruolo);
             modGUI.aCapo;
@@ -639,6 +597,8 @@ create or replace package body gruppo2 as
                 -- Se il ruolo dell'utente non è amministratore esce
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei un amministratore');
+                elsif (sede.idSede is null) then
+                    modGUI.esitoOperazione('KO', 'Autorimessa non trovata');
                 else
                     modGUI.apriIntestazione(2);
                         modGUI.inserisciTesto('Modifica Sede di ' || sede.indirizzo);
@@ -1092,14 +1052,19 @@ create or replace package body gruppo2 as
             modGUI.chiudiPagina;
         else
             -- Aggiorna la sede
-            update Sedi set
-                Sedi.Indirizzo = var_indirizzo,
-                Sedi.Telefono = var_telefono,
-                Sedi.Coordinate = var_coordinate
-            where Sedi.idSede = idRiga;
-            commit;
+            begin
+                update Sedi set
+                    Sedi.Indirizzo = var_indirizzo,
+                    Sedi.Telefono = var_telefono,
+                    Sedi.Coordinate = var_coordinate
+                where Sedi.idSede = idRiga;
+                commit;
+                visualizzaSede(id_sessione, nome, ruolo, idRiga);
+            exception
+                when others then
+                    modGUI.esitoOperazione('KO', 'Impossibile aggiornare la sede');
+            end;
             -- Richiama la visualizzazione
-            visualizzaSede(id_sessione, nome, ruolo, idRiga);
         end if;
     end updateSede;
 
@@ -2766,4 +2731,166 @@ begin
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resVeicoloMenoParcheggiato;
+
+    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio date, var_fine date) is
+        entrata_prevista IngressiOrari.EntrataPrevista%TYPE;
+        ora_entrata IngressiOrari.OraEntrata%TYPE;
+        ora_uscita IngressiOrari.OraUscita%TYPE;
+        var_costo IngressiOrari.Costo%TYPE;
+        id_sede Sedi.idSede%TYPE;
+        cursor cursore is
+            with
+                IngressiPerSede as (
+                    select IO.EntrataPrevista as EntrataPrevista, IO.OraEntrata as OraEntrata, IO.OraUscita as OraUscita, IO.Costo as Costo, S.idSede as idSede
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                    where least(IO.OraUscita, TO_DATE('31/12/2020', 'dd/mm/yyyy')) >= greatest(IO.OraEntrata, TO_DATE('01/10/2019', 'dd/mm/yyyy'))
+                ),
+                MediaPerSede as (
+                    select S.idSede as idSede, avg(IO.Costo) as MediaCosto
+                    from Sedi S
+                        join Autorimesse AU on AU.idSede = S.idSede
+                        join Aree AR on AR.idAutorimessa = AU.idAutorimessa
+                        join Box B on B.idArea = AR.idArea
+                        join IngressiOrari IO on IO.idBox = B.idBox
+                    where least(IO.OraUscita, TO_DATE('31/12/2020', 'dd/mm/yyyy')) >= greatest(IO.OraEntrata, TO_DATE('01/10/2019', 'dd/mm/yyyy'))
+                    group by S.idSede
+                )
+            select IPS.*
+            from IngressiPerSede IPS
+                join MediaPerSede MPS on MPS.idSede = IPS.idSede
+            where IPS.Costo > MPS.MediaCosto;
+    begin
+        modGUI.apriPagina('HoC | Ingressi sopra la media', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Ingressi con costo sopra alla media del periodo ' || var_inizio || ' - ' || var_fine);
+                    modGUI.chiudiIntestazione(2);
+
+                    modGUI.apriTabella;
+                        modGUI.apriRigaTabella;
+                            modGUI.intestazioneTabella('Entrata Prevista');
+                            modGUI.intestazioneTabella('Ora Entrata');
+                            modGUI.intestazioneTabella('Ora Uscita');
+                            modGUI.intestazioneTabella('Costo');
+                            modGUI.intestazioneTabella('Sede');
+                        modGUI.chiudiRigaTabella;
+
+                        open cursore;
+                        loop
+                            fetch cursore into entrata_prevista, ora_entrata, ora_uscita, var_costo, id_sede;
+                            exit when cursore%NOTFOUND;
+                            modGUI.apriRigaTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(entrata_prevista);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(ora_entrata);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(ora_uscita);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(var_costo);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(id_sede);
+                                modGUI.chiudiElementoTabella;
+                            modGUI.chiudiRigaTabella;
+                        end loop;
+                        close cursore;
+                    modGUI.chiudiTabella;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end ingressiSopraMedia;
+
+    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2) is
+        cursor riga is
+            with
+                TotOrari as (
+                    select C.idCliente as idCliente, sum(trunc((cast(IO.OraUscita as date) - cast(IO.OraEntrata as date)) * 24)) as Somma, count(*) as NumIngressi
+                        from Clienti C
+                        join EffettuaIngressiOrari EIO on EIO.idCliente = C.idCliente
+                        join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                    where IO.OraEntrata is not null
+                    and IO.OraUscita is not null
+                    group by C.idCliente
+                ),
+                TotAbbonamenti as (
+                    select C.idCliente as idCliente, sum(trunc((cast(IA.OraUscita as date) - cast(IA.OraEntrata as date)) * 24)) as Somma, count(*) as NumIngressi
+                        from Clienti C
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idCliente = C.idCliente
+                        join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                    where IA.OraEntrata is not null
+                    and IA.OraUscita is not null
+                    group by C.idCliente
+                ),
+                Total as (
+                    select idCliente, sum(Somma) as Somma, sum(NumIngressi) as NumIngressi
+                    from (
+                        select * from TotOrari
+                        union all
+                        select * from TotAbbonamenti
+                    )
+                    group by idCliente
+                )
+            select C.idCliente as idCliente, P.Nome as Nome, P.Cognome as Cognome, (T.Somma / T.NumIngressi) as Media
+            from Total T
+                join Clienti C on C.idCliente = T.idCliente
+                join Persone P on P.idPersona = C.idPersona
+            order by Media desc;
+        id_cliente Clienti.idCliente%TYPE;
+        nome_cliente Persone.Nome%TYPE;
+        cognome_cliente Persone.Cognome%TYPE;
+        media number;
+    begin
+        modGUI.apriPagina('HoC | Classifica Clienti per Tempo Medio di Permanenza', id_sessione, nome, ruolo);
+            modGUI.apriDiv;
+                if (ruolo <> 'A') then
+                    modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+                else
+
+                    modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                    modGUI.chiudiIntestazione(2);
+
+                    modGUI.apriTabella;
+                        modGUI.apriRigaTabella;
+                            modGUI.intestazioneTabella('ID Cliente');
+                            modGUI.intestazioneTabella('Nome');
+                            modGUI.intestazioneTabella('Tempo Medio');
+                            modGUI.intestazioneTabella('Dettagli');
+                        modGUI.chiudiRigaTabella;
+                        open riga;
+                        loop
+                            fetch riga into id_cliente, nome_cliente, cognome_cliente, media;
+                            exit when riga%NOTFOUND;
+                            modGUI.apriRigaTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(id_cliente);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(nome_cliente || ' ' || cognome_cliente);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciTesto(media);
+                                modGUI.chiudiElementoTabella;
+                                modGUI.apriElementoTabella;
+                                    modGUI.inserisciLente('visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
+                                modGUI.chiudiElementoTabella;
+                            modGUI.chiudiRigaTabella;
+                        end loop;
+                        close riga;
+                    modGUI.chiudiTabella;
+                end if;
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end;
 end gruppo2;

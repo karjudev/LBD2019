@@ -55,4 +55,5 @@ PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo var
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
+    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio date, var_fine date);
 end gruppo2;
