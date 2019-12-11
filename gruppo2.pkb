@@ -2714,7 +2714,288 @@ end if;
 
 
 END VeicoliPerTipoCarburante2;
+                                                          
+    PROCEDURE PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+    BEGIN
+   modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('SCEGLI SE VISUALIZZARE REPORT PER AUTORIMESSE O MENO');
+    modGUI.chiudiIntestazione(3);
     
+    modGui.apriForm('PostoAreaPiuUsato2');
+    modGui.inserisciInputHidden('id_Sessione',id_sessione);
+    modGui.inserisciInputHidden('nome',nome);
+    modGui.inserisciInputHidden('ruolo',ruolo);
+    
+    --RADIO1
+    modGUI.apriDiv;
+    modGui.inserisciRadioButton('Per autorimessa', 'PerAutorimessa', '1', true);
+    modGUI.chiudiDiv;
+    
+    modgui.acapo;
+    
+    --RADIO2
+    modGUI.apriDiv;
+    modGui.inserisciRadioButton('Totale', 'PerAutorimessa', '0');
+    modGUI.chiudiDiv;
+    modgui.acapo;
+    
+    modGUI.apriDiv;
+    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.chiudiDiv;
+    modGui.chiudiForm();
+    
+END PostoAreaPiuUsato;
+                                                          
+                                                         
+   PROCEDURE PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number) AS 
+
+  --variabili usate se visualizzo per autorimesse singole
+  IdBoxPiuPresente box.idbox%type;
+  IdAreaPiuPresente aree.idArea%type;
+  ParcheggioPiuPresente autorimesse.idautorimessa%type:=0;
+  Presenze integer:=0;
+  
+  --variabili usate se visualizzo per autorimesse totali
+  PresenzeAssolutoArea integer;
+  IdAreaPiuPresenteAssolutoArea aree.idArea%type;
+  ParcheggioPiuPresenteAssolutoArea autorimesse.idautorimessa%type:=0;
+  
+  PresenzeAssolutoBox integer;
+  IdBoxPiuPresenteAssolutoBox box.idbox%type;
+  ParcheggioPiuPresenteAssolutoBox autorimesse.idautorimessa%type:=0;
+  --contatori per stampare, usate se visualizzo per autorimesse totali
+  i number:=0;
+  j number:=0;
+  
+BEGIN
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('AREE PIU USATE');
+    modGUI.chiudiIntestazione(3);
+
+    --CREO TABELLA PER AREE
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Area');
+    modGUI.intestazioneTabella('Presenze');
+    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.ChiudiRigaTabella;
+    
+
+    --CALCOLO VALORI
+    for cursoreAree in (
+    with
+        TotOrari as (
+            select AU.idAutorimessa as idAutorimessa, AR.idArea as idArea, count(*) as NumIngressi
+                from IngressiOrari IO
+                join Box B on B.idBox = IO.idBox
+                join Aree AR on AR.idArea = B.idArea
+                join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+            group by AU.idAutorimessa, AR.idArea
+        ),
+        TotAbbonamenti as (
+            select AU.idAutorimessa as idAutorimessa, AR.idArea as idArea, count(*) as NumIngressi
+                from IngressiAbbonamenti IA
+                join Box B on B.idBox = IA.idBox
+                join Aree AR on AR.idArea = B.idArea
+                join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+            group by AU.idAutorimessa, AR.idArea
+        ),
+        Totale as (
+            select idAutorimessa, idArea, sum(NumIngressi) as NumIngressi
+            from (
+                select * from TotOrari
+                union all
+                select * from TotAbbonamenti
+            )
+            group by idArea, idAutorimessa
+        )
+    select distinct *
+    from Totale T
+    where T.NumIngressi = (
+        select max(NumIngressi)
+        from Totale
+        where idAutorimessa = T.idAutorimessa
+    )
+    order by idAutorimessa )
+    
+    loop 
+        
+    --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
+    if(PerAutorimessa=1)then
+        modGUI.ApriRigaTabella;
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.idarea);
+        modGUI.ChiudiElementoTabella;
+        
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.numingressi);
+        modGUI.ChiudiElementoTabella;
+    
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.idautorimessa);
+        modGUI.ChiudiElementoTabella;
+    
+        modGUI.ChiudiRigaTabella;
+    else  
+            --PER AUTORIMESSE TOTALI
+            if(i=0)then--PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
+                PresenzeAssolutoArea:=cursoreAree.numingressi;
+                IdAreaPiuPresenteAssolutoArea:=cursoreAree.idarea;
+                ParcheggioPiuPresenteAssolutoArea:=cursoreAree.idautorimessa;
+
+                modGUI.ApriRigaTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(IdAreaPiuPresenteAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(PresenzeAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ChiudiRigaTabella;
+                modgui.chiuditabella;
+                modgui.chiudiDiv;
+            end if;
+           
+    end if;
+    i:=i+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
+    end loop;
+    modgui.chiuditabella;
+    
+    --CREO TABELLA PER BOX 
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('BOX PIU USATI');
+    modGUI.CHIUDIIntestazione(3);
+    
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Box');
+    modGUI.intestazioneTabella('Presenze');
+    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.ChiudiRigaTabella;
+    
+    --CALCOLO VALORI
+    for cursoreBox in (
+      with
+    TotOrari as (
+        select AU.idAutorimessa as idAutorimessa, B.idBox as idBox, count(*) as NumIngressi
+            from Box B
+            join IngressiOrari IO on IO.idBox = B.idBox
+            join Aree AR on AR.idArea = B.idArea
+            join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+        group by B.idBox, AU.idAutorimessa
+    ),
+    TotAbbonamenti as (
+        select AU.idAutorimessa as idAutorimessa, B.idBox as idBox, count(*) as NumIngressi
+            from Box B
+            join IngressiAbbonamenti IA on IA.idBox = B.idBox
+            join Aree AR on AR.idArea = B.idArea
+            join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+        group by B.idBox, AU.idAutorimessa
+    ),
+    Totale as (
+        select idAutorimessa, idBox, sum(NumIngressi) as NumIngressi
+        from (
+            select * from TotOrari
+            union all
+            select * from TotAbbonamenti
+        )
+        group by idBox, idAutorimessa
+    )
+select distinct *
+from Totale T
+where T.NumIngressi = (
+    select max(NumIngressi)
+    from Totale
+    where idAutorimessa = T.idAutorimessa
+)
+order by idAutorimessa,numingressi
+    )
+    loop
+    
+    --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
+    if(PerAutorimessa=1)then --ParcheggioPiuPresente=0 di default
+    
+        if(ParcheggioPiuPresente!=cursoreBox.idautorimessa)then --TRICK PER STAMPARE IL MASSIMO DI OGNI AUTORIMESSA, DATO CHE CURSORE RESTITUISCE ORDER BY AUTORIMESSE. SE CAMBIA AUTORIMESSA, COME SCORRO, STAMPO
+            ParcheggioPiuPresente:=cursoreBox.idautorimessa;--assegno
+            
+            modGUI.ApriRigaTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.idbox);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.numingressi);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.idautorimessa);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ChiudiRigaTabella;
+        end if;
+        
+    else --PER AUTORIMESSE TOTALI
+            
+                if(j=0)then --PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
+                    PresenzeAssolutoBox:=cursoreBox.numingressi;
+                    IdBoxPiuPresenteAssolutoBox:=cursoreBox.idbox;
+                    ParcheggioPiuPresenteAssolutoBox:=cursoreBox.idautorimessa;
+        
+                    modGUI.ApriRigaTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(IdBoxPiuPresenteAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(PresenzeAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ChiudiRigaTabella;
+                    modgui.chiuditabella;
+                    modgui.chiudiDiv;        
+                end if;
+    end if;
+    j:=j+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
+    end loop;
+    modgui.chiuditabella;
+
+                --pulsante torna indietro
+        modGui.apriForm('PostoAreaPiuUsato');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
+    
+        modgui.chiudipagina;
+
+
+END PostoAreaPiuUsato2;    
+                                                          
     
     
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
