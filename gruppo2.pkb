@@ -2945,6 +2945,271 @@ begin
         modGUI.chiudiPagina;
     end sediSovrappopolate;
 
+    procedure primaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Prima comune', id_Sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('PRIMA COMUNE');
+        modGUI.chiudiIntestazione(2);
+        modGUI.apriForm(groupname || 'resPrimaComune');
+            modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+            modGUI.inserisciInputHidden('nome', nome);
+            modGUI.inserisciInputHidden('ruolo', ruolo);
+            modGUI.inserisciInput('var_inizio', 'INIZIO PERIODO', 'date', true);
+            modGUI.inserisciInput('var_fine', 'FINE PERIODO', 'date', true);
+            modGUI.inserisciInput('soglia', 'IMPORTO SOGLIA', 'number', true);
+            modGUI.inserisciBottoneReset;
+            modGUI.inserisciBottoneForm(testo=>'RICERCA');
+        modGUI.chiudiForm;
+        modGUI.chiudiPagina;
+    end primaComune;
+
+    procedure resPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int) is
+        var_check1 boolean := false;
+        begin
+        modGUI.apriPagina('HoC | Prima comune', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('PRIMA COMUNE');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriTabella;
+            modGUI.apriRigaTabella;
+                modGUI.intestazioneTabella('NOME');
+                modGUI.intestazioneTabella('COGNOME');
+                modGUI.intestazioneTabella('NUMERO INGRESSO');
+                modGUI.intestazioneTabella('NUMERO MULTE');
+                modGUI.intestazioneTabella('IMPORTO MULTE');
+                modGUI.intestazioneTabella('DETTAGLI');
+            modGUI.chiudiRigaTabella;
+            for cur in (
+                with
+            TotIngressiOrari as (
+                select
+                    C.idCliente as idCliente,
+                    count(*) as TotIngressi
+                from Clienti C
+                    join EffettuaIngressiOrari EIO on EIO.idCliente = C.idCliente
+                    join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                where IO.OraUscita between TO_DATE(var_inizio, 'yyyy-mm-dd') and TO_DATE(var_fine, 'yyyy-mm-dd')
+                group by C.idCliente
+            ),
+            MulteOrarie as (
+                select
+                    C.idCliente as idCliente,
+                    count(*) as TotMulte,
+                    sum(M.Importo) as Importo
+                from Clienti C
+                    join EffettuaIngressiOrari EIO on EIO.idCliente = C.idCliente
+                    join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                    join Multe M on M.idMulta = IO.idMulta
+                where IO.OraUscita between TO_DATE(var_inizio, 'yyyy-mm-dd') and TO_DATE(var_fine, 'yyyy-mm-dd')
+                group by C.idCliente
+            ),
+            TotIngressiAbbonamenti as (
+                select
+                    C.idCliente as idCliente,
+                    count(*) as TotIngressi
+                from Clienti C
+                    join EffettuaIngressiAbbonamenti EIA on EIA.idCliente = C.idCliente
+                    join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                where IA.OraUscita between TO_DATE(var_inizio, 'yyyy-mm-dd') and TO_DATE(var_fine, 'yyyy-mm-dd')
+                group by C.idCliente
+            ),
+            MulteAbbonamenti as (
+                select
+                    C.idCliente as idCliente,
+                    count(*) as TotMulte,
+                    sum(M.Importo) as Importo
+                from Clienti C
+                    join EffettuaIngressiAbbonamenti EIA on EIA.idCliente = C.idCliente
+                    join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                    join Multe M on M.idMulta = IA.idMulta
+                where IA.OraUscita between TO_DATE(var_inizio, 'yyyy-mm-dd') and TO_DATE(var_fine, 'yyyy-mm-dd')
+                group by C.idCliente
+            ),
+            TotOrari as (
+                select
+                    TIO.idCliente as idCliente,
+                    TIO.TotIngressi as TotIngressi,
+                    coalesce(MO.TotMulte, 0) as TotMulte,
+                    coalesce(MO.Importo, 0) as Importo
+                from TotIngressiOrari TIO
+                    full outer join MulteOrarie MO on MO.idCliente = TIO.idCliente
+            ),
+            TotAbbonamenti as (
+                select
+                    TIA.idCliente as idCliente,
+                    TIA.TotIngressi as TotIngressi,
+                    coalesce(MA.TotMulte, 0) as TotMulte,
+                    coalesce(MA.Importo, 0) as Importo
+                from TotIngressiAbbonamenti TIA
+                    full outer join MulteAbbonamenti MA on MA.idCliente = TIA.idCliente
+            ),
+            TotIngressi as (
+                select
+                    coalesce(TotOrari.idCliente, TotAbbonamenti.idCliente) as idCliente,
+                    coalesce(TotOrari.TotIngressi, 0) + coalesce(TotAbbonamenti.TotIngressi, 0) as TotIngressi,
+                    coalesce(TotOrari.TotMulte, 0) + coalesce(TotAbbonamenti.TotMulte, 0) as TotMulte,
+                    coalesce(TotOrari.Importo, 0) + coalesce(TotAbbonamenti.Importo, 0) as Importo
+                from TotOrari
+                    full outer join TotAbbonamenti on TotAbbonamenti.idCliente = TotOrari.idCliente 
+            )
+        select P.idPersona PIP, C.idCliente CIC, P.Nome PN, P.Cognome PC, P.Indirizzo PI, TI.TotIngressi TITI, TI.TotMulte TITM, TI.Importo TII
+        from Persone P
+            join Clienti C on C.idPersona = P.idPersona
+            join TotIngressi TI on TI.idCliente = C.idCliente
+        where
+            TI.Importo > 1
+            and TI.TotMulte > ((TI.TotIngressi / 2) + 1)
+                ) loop
+                var_check1 := true;
+                modGUI.apriRigaTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.elementoTabella(cur.PN);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.elementoTabella(cur.PC);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.elementoTabella(cur.TITI);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.elementoTabella(cur.TITM);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.elementoTabella(cur.TII);
+                    modGUI.chiudiElementoTabella;
+                    modGUI.apriElementoTabella;
+                    modGUI.inserisciLente(groupname || 'dettagliPrimaComune', id_Sessione, nome, ruolo, cur.PIP, '&' || 'var_ning=' || cur.TITI || '&' || 'var_nmul=' || cur.TITM || '&' || 'var_impmul=' || cur.TII);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                end loop;
+            modGUI.chiudiTabella;
+            if(var_check1 = false) then
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NESSUN RISULTATO');
+                modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+            end if;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('ALTRE OPERAZIONI');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'primaComune');
+            modGUI.chiudiDiv;
+            modGUI.chiudiPagina;
+        end resPrimaComune;
+
+    procedure dettagliPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2) is
+        var_IndirizzoAutorimessa Autorimesse.Indirizzo%TYPE;
+        var_TelefonoAutorimessa Autorimesse.Telefono%TYPE;
+        var_Coordinate Autorimesse.Coordinate%TYPE;
+        var_CF Persone.CodiceFiscale%TYPE;
+        var_Cognome Persone.Cognome%TYPE;
+        var_Nome Persone.Nome%TYPE;
+        var_IndirizzoCliente Persone.Indirizzo%TYPE;
+        var_Sesso Persone.Sesso%TYPE;
+        var_Email Persone.Email%TYPE;
+        var_TelefonoCliente Persone.Telefono%TYPE;
+        var_DataNascita Persone.DataNascita%TYPE;
+    begin
+        modGUI.apriPagina('HoC | Dettagli prima comune', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('DETTAGLI PRIMA COMUNE');
+            modGUI.chiudiIntestazione(2);
+
+            select CodiceFiscale, Cognome, Nome, Indirizzo, Sesso, Email, Telefono, DataNascita
+            into var_CF, var_Cognome, var_Nome, var_IndirizzoCliente, var_Sesso, var_Email, var_TelefonoCliente, var_DataNascita
+            from Persone
+            where idPersona = idRiga;
+
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('ID CLIENTE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(idRiga);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('CODICE FISCALE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_CF);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('COGNOME');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Cognome);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('NOME');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Nome);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('INDIRIZZO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_IndirizzoCliente);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('SESSO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Sesso);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('EMAIL');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Email);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('TELEFONO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_TelefonoCliente);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('DATA DI NASCITA');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_DataNascita);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            modGUI.chiudiTabella;
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('NUMERO TOTALE INGRESSI');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_ning);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                modGUI.intestazioneTabella('NUMERO TOTALE MULTE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_nmul);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                modGUI.intestazioneTabella('IMPORTO TOTALE MULTE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_impmul);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            modGUI.chiudiTabella;
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('ALTRE OPERAZIONI');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'primaComune');
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end dettagliPrimaComune;
+
     procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Quinta comune', id_Sessione, nome, ruolo);

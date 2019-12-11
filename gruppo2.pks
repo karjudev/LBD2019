@@ -63,6 +63,10 @@ create or replace package gruppo2 as
     procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
 
+    procedure primaComune(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int);
+    procedure dettagliPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2);
+    
     procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int);
     procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
