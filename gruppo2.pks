@@ -4,7 +4,7 @@ create or replace package gruppo2 as
     procedure autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2);
     procedure competentGarageSearch2 (id_Sessione varchar2, nome varchar2, ruolo varchar2, idSedeCorrente integer, idVeicoloCorrente integer);
     procedure formRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2);
+    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2);
     procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2);
     procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
@@ -37,7 +37,7 @@ create or replace package gruppo2 as
     procedure visualizzaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
-    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2, periodo varchar2, datainiziale varchar2 default null, datafinale varchar2 default null);
+    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2);
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int);
