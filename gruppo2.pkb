@@ -137,20 +137,24 @@ idsededapassare integer :=0;
 --datafinets timestamp;
 
 begin
-
+    if(ruolo='R') then
     modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
     modgui.acapo;
-
+        modgui.apriintestazione(2);
+        modgui.inseriscitesto('INTROITI TOTALI');
+        modgui.chiudiintestazione(2);
         if(idsedecorrente=0) 
             then --tutte le sedi senza periodo
                 modgui.apritabella;
                 modGUI.ApriRigaTabella;
-                modGUI.intestazioneTabella('Sede');
-                modGUI.intestazioneTabella('Introiti Biglietti');
-                modGUI.intestazioneTabella('Dettagli');
+                modGUI.intestazioneTabella('SEDE');
+                modGUI.intestazioneTabella('INTROITI INGRESSI ORARI');
+
+                modGUI.intestazioneTabella('DETTAGLI');
                 modgui.chiudirigatabella;
                 for i in (select * from sedi)
                     loop
+                        
                         select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null; 
                         select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
                         if(totaleabb is null) then totaleabb:=0; end if;
@@ -159,7 +163,7 @@ begin
                         modGUI.ElementoTabella(indirizzo);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                        modGUI.ElementoTabella(totalebigl);
+                        modGUI.ElementoTabella(totalebigl||'€');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                         modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
@@ -167,6 +171,17 @@ begin
                         modgui.chiudirigatabella;---------
                     end loop;         
                 modgui.chiuditabella;
+                
+                select sum(abb.costoeffettivo) into totaleabb from abbonamenti abb;
+                modgui.apritabella;
+                modGUI.ApriRigaTabella;
+                modGUI.intestazioneTabella('INTROITI TOTALI ABBONAMENTI');
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(totaleabb);
+                modGUI.ChiudiElementoTabella;
+                modgui.chiudirigatabella();
+                modgui.chiuditabella;
+                
             else --sede specifica senza periodo
                 select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null; 
                 select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
@@ -174,22 +189,34 @@ begin
                 if(totalebigl is null) then totalebigl:=0; end if;
                 modGUI.apriTabella;
                 modGUI.ApriRigaTabella;
-                modGUI.intestazioneTabella('Sede');
-                modGUI.intestazioneTabella('Introiti Biglietti');
-                modGUI.intestazioneTabella('Dettagli');
+                modGUI.intestazioneTabella('SEDE');
+                modGUI.intestazioneTabella('INTROITI BIGLIETTI');
+                modGUI.intestazioneTabella('DETTAGLI');
                 modgui.chiudirigatabella;
                 modGUI.ApriElementoTabella; 
                 modGUI.ElementoTabella(indirizzo);
                 modGUI.ChiudiElementoTabella;
                 modGUI.ApriElementoTabella;
-                modGUI.ElementoTabella(totalebigl);
+                modGUI.ElementoTabella(totalebigl||'€');
                 modGUI.ChiudiElementoTabella;
                 modGUI.ApriElementoTabella;
                 modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                 modgui.chiudielementotabella;
                 modgui.chiudirigatabella;        
                 modgui.chiuditabella;
-            end if;                
+            end if;
+            modgui.apriintestazione(3);
+            modgui.inseriscitesto('ALTRE OPERAZIONI');
+            modgui.chiudiintestazione(3);
+            modgui.apridiv(true);
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'TORNA INDIETRO','gruppo2.introiti');
+            modgui.chiudidiv;
+            modgui.chiudipagina;
+            else 
+    modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
+    modGUI.chiudiPagina;
+    end if; 
 end introitiparziali;
 
         procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2) is
@@ -271,15 +298,16 @@ end introitiparziali;
             modGUI.chiudiPagina;
         end graphicResultRicercaArea;
 
-    procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
 
 begin
+    if (ruolo='R') then
     modGUI.apriPagina('HoC | Visualizza Introiti', id_Sessione, nome, ruolo);
 
     modgui.acapo;
 
         modgui.apriintestazione(2);
-        modgui.inseriscitesto('VISUALIZZA INTROITI TOTALI INGRESSI ORARI');
+        modgui.inseriscitesto('VISUALIZZA INTROITI');
         modgui.chiudiintestazione(2);
 modgui.apriForm('gruppo2.introitiparziali');
 
@@ -296,7 +324,9 @@ modgui.apriForm('gruppo2.introitiparziali');
         end loop;
 
         modGUI.chiudiSelect;
-             
+    
+    
+
 
 
         modGUI.inserisciBottoneReset('RESET');
@@ -306,10 +336,12 @@ modgui.apriForm('gruppo2.introitiparziali');
 
         modGUI.chiudiPagina;
 
-
-null;
+    else 
+    modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
+    modGUI.chiudiPagina;
+    end if; 
 end introiti;
-
     procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         area Aree%ROWTYPE;
         indirizzo_autorimessa Autorimesse.Indirizzo%TYPE;
@@ -846,38 +878,64 @@ end introiti;
             end if;
         end classificaSediPiuRedditizie;
     
-    procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2) is 
-        maxbox integer :=0;
-        var_indirizzo varchar2(100);
-        var_gas varchar2(1);
-        var_risp varchar2(100);
-        var_1 varchar2 (100);
-        var_2 varchar2 (100);
+   procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2)is 
+maxbox integer :=0;
+var_indirizzo varchar2(100);
+var_gas varchar2(1);
+var_risp varchar2(100);
+var_1 varchar2 (100);
+var_2 varchar2 (100);
 
-    begin
-        modGUI.apriPagina('HoC |  Statistica alimentazione', id_Sessione, nome, ruolo);
-        modgui.acapo;
-        modgui.apriform('#');
-        modgui.apriintestazione(2);
-
-    select tmp.count_box,tmp.indirizzo,tmp.gas into maxbox,var_indirizzo,var_gas from(
-    select count(box.idbox) as count_box,ar.indirizzo,aree.gas from box, aree,autorimesse ar where box.idarea=aree.idarea and aree.idautorimessa=ar.idautorimessa and box.occupato='T' group by ar.indirizzo,aree.gas order by count_box desc) tmp
-    where rownum=1;
-        --if(var_gas='T') then var_risp:='a gas'; else var_risp:='a benzina'; end if;
-        select DECODE(var_gas, 'T','a gas','a benzina'), DECODE(maxbox, '1','C''è ','Ci sono ') ,DECODE(maxbox, '1',' veicolo ', ' veicoli ') into var_risp, var_1, var_2 from dual;
-
-        modgui.inseriscitesto(var_1|| maxbox|| var_2 || 'con alimentazione '||var_risp || ' nel parcheggio di '||var_indirizzo );
+begin
+    if(ruolo = 'A' or ruolo= 'S') then
+    modGUI.apriPagina('HoC |  Statistica alimentazione', id_Sessione, nome, ruolo);
+    modgui.acapo;
+    modgui.apriintestazione(2);
+    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
     modgui.chiudiintestazione(2);
-    modgui.chiudiform;
-    modgui.chiudipagina;
-    exception
-    when no_data_found then 
-        modgui.inseriscitesto('Non ci sono veicoli attualmente parcheggiati');
-        modgui.chiudiintestazione(2);
-        modgui.chiudiform;
+select tmp.count_box,tmp.indirizzo,tmp.gas into maxbox,var_indirizzo,var_gas from(
+select count(box.idbox) as count_box,ar.indirizzo,aree.gas from box, aree,autorimesse ar where box.idarea=aree.idarea and aree.idautorimessa=ar.idautorimessa and box.occupato='T' group by ar.indirizzo,aree.gas order by count_box desc) tmp
+where rownum=1;
+    --if(var_gas='T') then var_risp:='a gas'; else var_risp:='a benzina'; end if;
+    select DECODE(var_gas, 'T','Gas','Benzina')into var_risp from dual;
+    
+
+    modgui.apritabella;
+    modgui.apririgatabella;
+    modgui.intestazionetabella('NUMERO VEICOLI');
+    modgui.aprielementotabella;
+    modgui.elementotabella(maxbox);
+    modgui.chiudielementotabella;
+    modgui.chiudirigatabella;
+    modgui.apririgatabella;
+    modgui.intestazionetabella('ALIMENTAZIONE');
+    modgui.aprielementotabella;
+    modgui.elementotabella(var_risp);
+    modgui.chiudielementotabella;
+    modgui.chiudirigatabella;
+        modgui.apririgatabella;
+    modgui.intestazionetabella('PARCHEGGIO');
+    modgui.aprielementotabella;
+    modgui.elementotabella(var_indirizzo);
+    modgui.chiudielementotabella;
+    modgui.chiudirigatabella;
+    modgui.chiuditabella;
+    
+modgui.chiudipagina;
+
+else 
+modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Non hai i permessi necessari.');
+     modgui.chiudipagina;
+     end if;
+exception
+when no_data_found then 
+        modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Nessun veicolo parcheggiato');
 
 
-    end statisticaalimentazione;
+
+end statisticaalimentazione;
 
     procedure updateArea(
         id_sessione int default 0,
@@ -1402,8 +1460,9 @@ end introiti;
         modGUI.ChiudiPagina;
     end visualizzaBox;
 
-procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as 
+ procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as 
 begin 
+    if(ruolo='R') then
     modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
 
     for i in (select * from autorimesse aut where aut.idsede=idriga)
@@ -1417,10 +1476,10 @@ begin
     modGUI.apriTabella;
 
                 modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('ID Ingresso Orario');
-                    modGUI.intestazioneTabella('Costo effettivo');
-                    modGUI.intestazioneTabella('Data inizio');
-                    modGUI.intestazioneTabella('Data fine');
+                    modGUI.intestazioneTabella('ID INGRESSO ORARIO');
+                    modGUI.intestazioneTabella('COSTO EFFETTIVO');
+                    modGUI.intestazioneTabella('DATA INIZIO');
+                    modGUI.intestazioneTabella('DATA FINE');
                     modGUI.ChiudiRigaTabella;
 
     for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and (io.oraentrata is not null or io.orauscita is not null) and io.costo is not null order by io.idingressoorario)
@@ -1431,7 +1490,7 @@ begin
                             modGUI.ElementoTabella(n.idingressoorario);
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                            modGUI.ElementoTabella(n.costo);
+                            modGUI.ElementoTabella(n.costo||'€');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(to_char(n.oraentrata,'dd-MON-yy hh24:mi:ss'));
@@ -1444,7 +1503,17 @@ begin
 
     end loop;
 
-
+    else 
+    modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
+     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
+    modGUI.chiudiPagina;
+    end if; 
+     modgui.apriintestazione(3);
+            modgui.inseriscitesto('ALTRE OPERAZIONI');
+            modgui.chiudiintestazione(3);
+            modgui.apridiv(true);
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.introiti');
+            modgui.chiudidiv;
     modgui.chiudipagina;
 end visualizzaintroitiparzialiabb;
 
