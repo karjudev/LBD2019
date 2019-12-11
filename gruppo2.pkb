@@ -330,7 +330,7 @@ end introiti;
             modGUI.apriDiv;
             if (ruolo <> 'A' or ruolo <> 'R' or ruolo <> 'O') then
                 modGUI.esitoOperazione('KO', 'Non sei autorizzato');
-            elsif (autorimesse.idAutorimessa is null) then
+            elsif (area.idArea is null) then
                 modGUI.esitoOperazione('KO', 'Nessuna area trovata');
             else
                 modGUI.apriIntestazione(2);
@@ -445,7 +445,7 @@ end introiti;
             modGUI.apriDiv;
                 if (ruolo <> 'A' and ruolo <> 'R') then
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato a svolgere questa operazione');
-                elsif (autorimessa.idAutorimessa is null)
+                elsif (autorimessa.idAutorimessa is null) then
                     modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
                 else
                     modGUI.apriIntestazione(2);
@@ -602,7 +602,7 @@ end introiti;
     end queryRicercaArea;
 
     procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number) AS
-
+        var_check1 boolean := false;
         Sede number:=0;
         NumeroAttuale number:=0;
         NumeroNuovo number:=0;
@@ -658,6 +658,7 @@ end introiti;
             NumeroAttuale:=scorriCursoreAbbonamenti.TotIngressi;
             indirizzo:=scorriCursoreAbbonamenti.indirizzo;
             if(NumeroAttuale>var_soglia)then
+                var_check1 := true;
                 modGUI.apriRigaTabella;
                     modGUI.apriElementoTabella;
                         modGUI.elementoTabella(indirizzo);
@@ -668,7 +669,22 @@ end introiti;
                 modGUI.chiudiRigaTabella;
             end if;
             end loop;
-
+            modGUI.chiudiTabella;
+            if(var_check1 = false) then 
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NESSUN RISULTATO');
+                modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+            end if;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('ALTRE OPERAZIONI');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'sediSovrappopolate');
+            modGUI.chiudiDiv;
 
 
         END resSediSovrappopolate;
@@ -2839,4 +2855,280 @@ begin
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resClassificaMediaPermanenza;
+
+    procedure sediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Sedi sovrappopolate', id_sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('SEDI SOVRAPPOPOLATE');
+        modGUI.chiudiIntestazione(2);
+        modGUI.apriForm(groupname || 'resSediSovrappopolate');
+            modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+            modGUI.inserisciInputHidden('nome', nome);
+            modGUI.inserisciInputHidden('ruolo', ruolo);
+            modGUI.inserisciInput('var_giorno', 'GIORNO', 'date', true);
+            modGUI.inserisciInput('var_soglia', 'SOGLIA POSTI OCCUPATI', 'number', true);
+            modGUI.inserisciBottoneReset;
+            modGUI.inserisciBottoneForm(testo=>'RICERCA SEDI');
+        modGUI.chiudiForm;
+        modGUI.chiudiPagina;
+    end sediSovrappopolate;
+
+    procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    begin
+        modGUI.apriPagina('HoC | Quinta comune', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('QUINTA COMUNE');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriForm(groupname || 'resQuintaComune');
+                modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
+                modGUI.inserisciInputHidden('nome', nome);
+                modGUI.inserisciInputHidden('ruolo', ruolo);
+                modGUI.inserisciInput('x', 'DURATA DEL PARCHEGGIO IN GIORNI', 'number', true);
+                modGUI.inserisciBottoneReset;
+                modGUI.inserisciBottoneForm(testo=>'RICERCA');
+            modGUI.chiudiForm;
+        modGUI.chiudiPagina;
+    end quintaComune;
+
+    procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int) is
+    var_check1 boolean := false;
+    var_check2 boolean := false;
+    begin
+        modGUI.apriPagina('HoC | Quinta Comune', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('PARCHEGGI DURATI ALMENO ' || x || ' GIORNI');
+            modGUI.chiudiIntestazione(2);
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('PARCHEGGI CON ABBONAMENTI');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('NOME');
+                    modGUI.intestazioneTabella('COGNOME');
+                    modGUI.intestazioneTabella('AUTORIMESSA');
+                    modGUI.intestazioneTabella('DETTAGLI');
+                modGUI.chiudiRigaTabella;
+                for cur_abb in (
+                    select distinct Persone.Nome PN, Persone.Cognome PC, Persone.idPersona PIP, AR.Indirizzo ARI, AR.idAutorimessa ARIA
+                    from Persone
+                        join Clienti C on C.idPersona = Persone.idPersona
+                        join EffettuaIngressiAbbonamenti EIA on EIA.idCliente = C.idCliente
+                        join IngressiAbbonamenti IA on IA.idIngressoAbbonamento = EIA.idIngressoAbbonamento
+                        join Box B on B.idBox = IA.idBox
+                        join Aree A on A.idArea = B.idArea
+                        join Autorimesse AR on AR.idAutorimessa = A.idAutorimessa
+                        join Sedi S on S.idSede = AR.idSede
+                        where CAST(IA.OraUscita AS DATE) - CAST(IA.OraEntrata AS DATE) >= x
+                ) loop
+                    var_check1 := true;
+                    modGUI.apriRigaTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_abb.PN);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_abb.PC);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_abb.ARI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.inserisciLente(groupname || 'dettagliQuintaComune', id_Sessione, nome, ruolo, cur_ABB.PIP, '&' || 'id_Autorimessa=' || cur_ABB.ARIA);
+                        modGUI.chiudiElementoTabella;
+                    modGUI.chiudiRigaTabella;
+                end loop;
+            modGUI.chiudiTabella;
+            if(var_check1 = false) then
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NESSUN RISULTATO');
+                modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+            end if;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('PARCHEGGI CON TICKET');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('NOME');
+                    modGUI.intestazioneTabella('COGNOME');
+                    modGUI.intestazioneTabella('AUTORIMESSA');
+                    modGUI.intestazioneTabella('DETTAGLI');
+                modGUI.chiudiRigaTabella;
+                for cur_or in (
+                    select distinct Persone.Nome PN, Persone.Cognome PC, Persone.idPersona PIP, AR.Indirizzo ARI, AR.idAutorimessa ARIA
+                    from Persone
+                        join Clienti C on C.idPersona = Persone.idPersona
+                        join EffettuaIngressiOrari EIO on EIO.idCliente = C.idCliente
+                        join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
+                        join Box B on B.idBox = IO.idBox
+                        join Aree A on A.idArea = B.idArea
+                        join Autorimesse AR on AR.idAutorimessa = A.idAutorimessa
+                        join Sedi S on S.idSede = AR.idSede
+                        where CAST(IO.OraUscita AS DATE) - CAST(IO.OraEntrata AS DATE) >= x
+                ) loop
+                    var_check2 := true;
+                    modGUI.apriRigaTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_or.PN);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_or.PC);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.elementoTabella(cur_or.ARI);
+                        modGUI.chiudiElementoTabella;
+                        modGUI.apriElementoTabella;
+                            modGUI.inserisciLente(groupname || 'dettagliQuintaComune', id_Sessione, nome, ruolo, cur_or.PIP, '&' || 'id_Autorimessa=' || cur_or.ARIA);
+                        modGUI.chiudiElementoTabella;
+                    modGUI.chiudiRigaTabella;
+                end loop;
+            modGUI.chiudiTabella;
+            if(var_check2 = false) then
+                modGUI.apriDiv(centrato=>true);
+                    modGUI.inserisciTesto('NESSUN RISULTATO');
+                modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+            end if;
+        modGUI.chiudiPagina;
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('ALTRE OPERAZIONI');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriDiv(centrato=>true);
+            modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'quintaComune');
+        modGUI.chiudiDiv;
+    end resQuintaComune;
+
+procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2) is
+    var_IndirizzoAutorimessa Autorimesse.Indirizzo%TYPE;
+    var_TelefonoAutorimessa Autorimesse.Telefono%TYPE;
+    var_Coordinate Autorimesse.Coordinate%TYPE;
+    var_CF Persone.CodiceFiscale%TYPE;
+    var_Cognome Persone.Cognome%TYPE;
+    var_Nome Persone.Nome%TYPE;
+    var_IndirizzoCliente Persone.Indirizzo%TYPE;
+    var_Sesso Persone.Sesso%TYPE;
+    var_Email Persone.Email%TYPE;
+    var_TelefonoCliente Persone.Telefono%TYPE;
+    var_DataNascita Persone.DataNascita%TYPE;
+    begin
+        modGUI.apriPagina('HoC | Dettagli Quinta Comune', id_Sessione, nome, ruolo);
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('DETTAGLI QUINTA COMUNE');
+            modGUI.chiudiIntestazione(2);
+            
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('DETTAGLI CLIENTE');
+            modGUI.chiudiIntestazione(3);
+            
+            select CodiceFiscale, Cognome, Nome, Indirizzo, Sesso, Email, Telefono, DataNascita
+            into var_CF, var_Cognome, var_Nome, var_IndirizzoCliente, var_Sesso, var_Email, var_TelefonoCliente, var_DataNascita
+            from Persone
+            where idPersona = idRiga;
+            
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('ID CLIENTE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(idRiga);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('CODICE FISCALE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_CF);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('COGNOME');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Cognome);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('NOME');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Nome);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('INDIRIZZO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_IndirizzoCliente);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('SESSO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Sesso);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('EMAIL');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Email);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('TELEFONO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_TelefonoCliente);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('DATA DI NASCITA');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_DataNascita);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            modGUI.chiudiTabella;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('DETTAGLI AUTORIMESSA');
+            modGUI.chiudiIntestazione(3);
+            
+            select Indirizzo, Telefono, Coordinate
+            into var_IndirizzoAutorimessa, var_TelefonoAutorimessa, var_Coordinate
+            from Autorimesse
+            where idAutorimessa = id_Autorimessa;
+            
+            modGUI.apriTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('ID AUTORIMESSA');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(id_Autorimessa);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('INDIRIZZO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_IndirizzoAutorimessa);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('TELEFONO');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_TelefonoAutorimessa);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+                modGUI.apriRigaTabella;
+                    modGUI.intestazioneTabella('COORDINATE');
+                    modGUI.apriElementoTabella;
+                        modGUI.elementoTabella(var_Coordinate);
+                    modGUI.chiudiElementoTabella;
+                modGUI.chiudiRigaTabella;
+            modGUI.chiudiTabella;
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('ALRE OPERAZIONI');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'quintaComune');
+            modGUI.chiudiDiv;
+        modGUI.chiudiPagina;
+    end dettagliQuintaComune;
+
 end gruppo2;

@@ -11,6 +11,7 @@ create or replace package gruppo2 as
     procedure modificaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure modificaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     function queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2) return list_idaree;
+    procedure sediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number);
     procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2);
@@ -61,4 +62,8 @@ create or replace package gruppo2 as
     
     procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
+
+    procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int);
+    procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
 end gruppo2;
