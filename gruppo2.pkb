@@ -14,7 +14,7 @@ create or replace package body gruppo2 as
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.ricercaautorimessa');
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro',groupname || 'ricercaautorimessa');
             modgui.chiudidiv;
     modgui.chiudipagina;
     end autorimessanontrovata;
@@ -171,7 +171,7 @@ begin
                         modGUI.ElementoTabella(totalebigl||'€');
                         modGUI.ChiudiElementoTabella;
                         modGUI.ApriElementoTabella;
-                        modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
+                        modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                         modgui.chiudielementotabella;
                         modgui.chiudirigatabella;---------
                     end loop;         
@@ -205,7 +205,7 @@ begin
                 modGUI.ElementoTabella(totalebigl||'€');
                 modGUI.ChiudiElementoTabella;
                 modGUI.ApriElementoTabella;
-                modGUI.InserisciLente('gruppo2.visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
+                modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                 modgui.chiudielementotabella;
                 modgui.chiudirigatabella;        
                 modgui.chiuditabella;
@@ -219,7 +219,7 @@ begin
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'TORNA INDIETRO','gruppo2.introiti');
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'TORNA INDIETRO',groupname || 'introiti');
             modgui.chiudidiv;
             modgui.chiudipagina;
 end introitiparziali;
@@ -314,7 +314,7 @@ begin
         modgui.apriintestazione(2);
         modgui.inseriscitesto('VISUALIZZA INTROITI');
         modgui.chiudiintestazione(2);
-modgui.apriForm('gruppo2.introitiparziali');
+modgui.apriForm(groupname || 'introitiparziali');
 
         modgui.inserisciinputhidden('id_Sessione',id_Sessione);
         modgui.inserisciinputhidden('nome',nome);
@@ -743,7 +743,7 @@ end introiti;
                 * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                 */
                 /*modgui.apriForm(visualizzaautorimessa,idSessione,nome,ruolo,idSessione,nome,ruolo,'sede','veicolo'); */
-                modgui.apriForm('gruppo2.competentGarageSearch2');
+                modgui.apriForm(groupname || 'competentGarageSearch2');
                 modgui.inserisciinputhidden('id_Sessione',id_Sessione);
                 modgui.inserisciinputhidden('nome',nome);
                 modgui.inserisciinputhidden('ruolo',ruolo);
@@ -883,7 +883,7 @@ end introiti;
             end if;
         end classificaSediPiuRedditizie;
     
-   procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2)is 
+   procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2)is 
 maxbox integer :=0;
 var_indirizzo varchar2(100);
 var_gas varchar2(1);
@@ -940,7 +940,7 @@ when no_data_found then
 
 
 
-end statisticaalimentazione;
+end statisticaGenerale6;
 
     procedure updateArea(
         id_sessione int default 0,
@@ -1331,7 +1331,7 @@ end statisticaalimentazione;
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.ricercaautorimessa');
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro',groupname || 'ricercaautorimessa');
             modgui.chiudidiv;
     modgui.chiudipagina;
     end visualizzaAutorimessa;
@@ -1524,7 +1524,7 @@ begin
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.introiti');
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro',groupname || 'introiti');
             modgui.chiudidiv;
     modgui.chiudipagina;
      
@@ -2329,13 +2329,13 @@ begin
 
     end MaxTipoVeicolo;
     
-    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
             modGUI.inserisciTesto('DETTAGLI VEICOLI DI UN CLIENTE');
         modGUI.chiudiIntestazione(2);
-        modGUI.apriForm('resSecondaComune');
+        modGUI.apriForm('resStatisticaGenerale2');
             modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
             modGUI.inserisciInputHidden('nome', nome);
             modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -2362,9 +2362,9 @@ begin
             modGUI.inserisciBottoneForm(testo=>'RICERCA DETTAGLI');
         modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end secondaComune;
+    end statisticaGenerale2;
 
-    procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2) is
+    procedure resStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2) is
         var_nomePersona Persone.Nome%TYPE;
         var_cognomePersona Persone.Cognome%TYPE;
         var_nomeAutorimessa Autorimesse.Indirizzo%TYPE;
@@ -2421,7 +2421,7 @@ begin
                         modGUI.elementoTabella(cur_or.VM);
                     modGUI.chiudiElementoTabella;
                     modGUI.apriElementoTabella;
-                        modGUI.inserisciLente(groupname || 'dettagliVeicoloSecondaComune', id_Sessione, nome, ruolo, cur_or.VIV);
+                        modGUI.inserisciLente(groupname || 'dettagliVeicoloStatisticaGenerale2', id_Sessione, nome, ruolo, cur_or.VIV);
                     modGUI.chiudiElementoTabella;
                 modGUI.chiudiRigaTabella;
             end loop;
@@ -2467,7 +2467,7 @@ begin
                         modGUI.elementoTabella(cur_abb.VM);
                     modGUI.chiudiElementoTabella;
                     modGUI.apriElementoTabella;
-                        modGUI.inserisciLente(groupname || 'dettagliVeicoloSecondaComune', id_Sessione, nome, ruolo, cur_abb.VIV);
+                        modGUI.inserisciLente(groupname || 'dettagliVeicoloStatisticaGenerale2', id_Sessione, nome, ruolo, cur_abb.VIV);
                     modGUI.chiudiElementoTabella;
                 modGUI.chiudiRigaTabella;
             end loop;
@@ -2478,9 +2478,9 @@ begin
             modGUI.chiudiDiv;
         end if;
         modGUI.chiudiPagina;
-    end resSecondaComune;
+    end resStatisticaGenerale2;
 
-    procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure dettagliVeicoloStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
     var_idVeicolo Veicoli.idVeicolo%TYPE;
     var_targa Veicoli.Targa%TYPE;
     var_produttore Veicoli.Produttore%TYPE;
@@ -2583,7 +2583,7 @@ begin
 
         modGUI.chiudiTabella;
         modGUI.chiudiPagina;
-    end dettagliVeicoloSecondaComune;
+    end dettagliVeicoloStatisticaGenerale2;
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2) is
     begin
@@ -2826,7 +2826,7 @@ begin
         modGUI.chiudiPagina;
     end resIngressiSopraMedia;
 
-    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Classifica Clienti per Tempo Medio di Permanenza', id_sessione, nome, ruolo);
             modGUI.apriDiv;
@@ -2837,7 +2837,7 @@ begin
                         modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
                     modGUI.chiudiIntestazione(2);
                     
-                    modGUI.apriForm(groupname || 'resClassificaMediaPermanenza');
+                    modGUI.apriForm(groupname || 'resStatisticaGenerale3');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -2853,9 +2853,9 @@ begin
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end classificaMediaPermanenza;
+    end statisticaGenerale3;
 
-    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int) is
+    procedure resStatisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int) is
         cursor riga is
             with
                 TotOrari as (
@@ -2936,7 +2936,7 @@ begin
                 end if;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end resClassificaMediaPermanenza;
+    end resStatisticaGenerale3;
 
     procedure sediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
@@ -2956,13 +2956,13 @@ begin
         modGUI.chiudiPagina;
     end sediSovrappopolate;
 
-    procedure primaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Prima comune', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
             modGUI.inserisciTesto('PRIMA COMUNE');
         modGUI.chiudiIntestazione(2);
-        modGUI.apriForm(groupname || 'resPrimaComune');
+        modGUI.apriForm(groupname || 'resStatisticaGenerale1');
             modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
             modGUI.inserisciInputHidden('nome', nome);
             modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -2973,9 +2973,9 @@ begin
             modGUI.inserisciBottoneForm(testo=>'RICERCA');
         modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end primaComune;
+    end statisticaGenerale1;
 
-    procedure resPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int) is
+    procedure resStatisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int) is
         var_check1 boolean := false;
         begin
         modGUI.apriPagina('HoC | Prima comune', id_Sessione, nome, ruolo);
@@ -3090,7 +3090,7 @@ begin
                     modGUI.elementoTabella(cur.TII);
                     modGUI.chiudiElementoTabella;
                     modGUI.apriElementoTabella;
-                    modGUI.inserisciLente(groupname || 'dettagliPrimaComune', id_Sessione, nome, ruolo, cur.PIP, '&' || 'var_ning=' || cur.TITI || '&' || 'var_nmul=' || cur.TITM || '&' || 'var_impmul=' || cur.TII);
+                    modGUI.inserisciLente(groupname || 'dettagliStatisticaGenerale1', id_Sessione, nome, ruolo, cur.PIP, '&' || 'var_ning=' || cur.TITI || '&' || 'var_nmul=' || cur.TITM || '&' || 'var_impmul=' || cur.TII);
                     modGUI.chiudiElementoTabella;
                 modGUI.chiudiRigaTabella;
                 end loop;
@@ -3108,12 +3108,12 @@ begin
                 modGUI.inserisciTesto('ALTRE OPERAZIONI');
             modGUI.chiudiIntestazione(3);
             modGUI.apriDiv(centrato=>true);
-                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'primaComune');
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'statisticaGenerale1');
             modGUI.chiudiDiv;
             modGUI.chiudiPagina;
-        end resPrimaComune;
+        end resStatisticaGenerale1;
 
-    procedure dettagliPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2) is
+    procedure dettagliStatisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2) is
         var_IndirizzoAutorimessa Autorimesse.Indirizzo%TYPE;
         var_TelefonoAutorimessa Autorimesse.Telefono%TYPE;
         var_Coordinate Autorimesse.Coordinate%TYPE;
@@ -3216,18 +3216,18 @@ begin
                 modGUI.inserisciTesto('ALTRE OPERAZIONI');
             modGUI.chiudiIntestazione(2);
             modGUI.apriDiv(centrato=>true);
-                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'primaComune');
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'statisticaGenerale1');
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end dettagliPrimaComune;
+    end dettagliStatisticaGenerale1;
 
-    procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Quinta comune', id_Sessione, nome, ruolo);
             modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto('QUINTA COMUNE');
             modGUI.chiudiIntestazione(2);
-            modGUI.apriForm(groupname || 'resQuintaComune');
+            modGUI.apriForm(groupname || 'resStatisticaGenerale5');
                 modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
                 modGUI.inserisciInputHidden('nome', nome);
                 modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -3236,9 +3236,9 @@ begin
                 modGUI.inserisciBottoneForm(testo=>'RICERCA');
             modGUI.chiudiForm;
         modGUI.chiudiPagina;
-    end quintaComune;
+    end statisticaGenerale5;
 
-    procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int) is
+    procedure resStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, x int) is
     var_check1 boolean := false;
     var_check2 boolean := false;
     begin
@@ -3280,7 +3280,7 @@ begin
                             modGUI.elementoTabella(cur_abb.ARI);
                         modGUI.chiudiElementoTabella;
                         modGUI.apriElementoTabella;
-                            modGUI.inserisciLente(groupname || 'dettagliQuintaComune', id_Sessione, nome, ruolo, cur_ABB.PIP, '&' || 'id_Autorimessa=' || cur_ABB.ARIA);
+                            modGUI.inserisciLente(groupname || 'dettagliStatisticaGenerale5', id_Sessione, nome, ruolo, cur_ABB.PIP, '&' || 'id_Autorimessa=' || cur_ABB.ARIA);
                         modGUI.chiudiElementoTabella;
                     modGUI.chiudiRigaTabella;
                 end loop;
@@ -3328,7 +3328,7 @@ begin
                             modGUI.elementoTabella(cur_or.ARI);
                         modGUI.chiudiElementoTabella;
                         modGUI.apriElementoTabella;
-                            modGUI.inserisciLente(groupname || 'dettagliQuintaComune', id_Sessione, nome, ruolo, cur_or.PIP, '&' || 'id_Autorimessa=' || cur_or.ARIA);
+                            modGUI.inserisciLente(groupname || 'dettagliStatisticaGenerale5', id_Sessione, nome, ruolo, cur_or.PIP, '&' || 'id_Autorimessa=' || cur_or.ARIA);
                         modGUI.chiudiElementoTabella;
                     modGUI.chiudiRigaTabella;
                 end loop;
@@ -3347,11 +3347,11 @@ begin
             modGUI.inserisciTesto('ALTRE OPERAZIONI');
         modGUI.chiudiIntestazione(3);
         modGUI.apriDiv(centrato=>true);
-            modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'quintaComune');
+            modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', 'statisticaGenerale5');
         modGUI.chiudiDiv;
-    end resQuintaComune;
+    end resStatisticaGenerale5;
 
-procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2) is
+procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2) is
     var_IndirizzoAutorimessa Autorimesse.Indirizzo%TYPE;
     var_TelefonoAutorimessa Autorimesse.Telefono%TYPE;
     var_Coordinate Autorimesse.Coordinate%TYPE;
@@ -3473,10 +3473,10 @@ procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, i
                 modGUI.inserisciTesto('ALRE OPERAZIONI');
             modGUI.chiudiIntestazione(3);
             modGUI.apriDiv(centrato=>true);
-                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'quintaComune');
+                modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'NUOVA RICERCA', groupname || 'statisticaGenerale5');
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
-    end dettagliQuintaComune;
+    end dettagliStatisticaGenerale5;
 
     procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2) is
     begin
@@ -3701,7 +3701,152 @@ procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, i
         modGUI.chiudiPagina();
     end autorimessaMaxPostiPeriodo;
 
+    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+
+    --variabile che conterra l'autorimessa scelta per la visualizzazione
+    AlimentazioneScelta1 veicoli.alimentazione%TYPE;
+    AlimentazioneScelta2 veicoli.alimentazione%TYPE;
     
+    BEGIN
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+
+        modGUI.aCapo;
+        modGUI.apriIntestazione(3);
+        modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
+        modGUI.chiudiIntestazione(3);
+        
+        modGui.apriForm('VEICOLIPERTIPOCARBURANTE2');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);
+        
+        --PRIMA SELECT PER PRIMA ALIMENTAZIONE
+        modgui.apriSelect('tipoAlimentazione1', 'Tipologia 1');
+        --estraggo le autorimesse e le inserisco nella select
+        for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+        loop
+                AlimentazioneScelta1:=scorriCursore.alimentazione;
+                modgui.inserisciOpzioneSelect(AlimentazioneScelta1, AlimentazioneScelta1,true);
+        end loop;
+        modgui.chiudiSelect;
+        
+        
+            --SECONDA SELECT PER SECONDA ALIMENTAZIONE
+        modgui.apriSelect('tipoAlimentazione2', 'Tipologia 2');
+        --estraggo le autorimesse e le inserisco nella select
+        for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+        loop
+                AlimentazioneScelta2:=scorriCursore.alimentazione;
+                modgui.inserisciOpzioneSelect(AlimentazioneScelta2, AlimentazioneScelta2,true);
+        end loop;
+        modgui.chiudiSelect;
+        
+        
+        modgui.inserisciInput('dataInizioInserita', 'Scegli data inizio abbonamento', 'date', true);
+        modgui.inserisciInput('dataFineInserita', 'Scegli data fine abbonamento', 'date', true);
+        
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('SUBMIT');
+        modGUI.chiudiDiv;
+        modGui.chiudiForm;
+    END statisticaGenerale4;
+
+    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS 
+
+    AlimentazionePiuNumerosa veicoli.alimentazione%type;
+    NumAbbonamenti number:=0;
+        
+
+    BEGIN
+
+        modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+        
+        if(TO_DATE(dataInizioInserita,'YYYY-MM-DD') > TO_DATE(dataFineInserita,'YYYY-MM-DD'))then
+        modgui.esitoOperazione('KO','Data inserita errata');
+        else
+        
+        modGUI.apriIntestazione(3);
+        modGUI.inserisciTesto('VISUALIZZAZIONE');
+        modGUI.chiudiIntestazione(3);   
+
+
+        for scorriCursore in (
+    select veicoli.alimentazione, count(abbonamenti.idabbonamento) as codice
+            from veicoli,abbonamentiVeicoli,abbonamenti
+            where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                    abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                    abbonamenti.dataInizio>= TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                    abbonamenti.dataFine<= TO_DATE(dataFineInserita,'YYYY-MM-DD')
+            group by veicoli.alimentazione 
+
+        )
+        loop 
+            if(scorriCursore.codice > NumAbbonamenti)then
+                NumAbbonamenti:=scorriCursore.codice ;
+                AlimentazionePiuNumerosa:=scorriCursore.alimentazione;     
+                
+            end if;    
+
+            
+        end loop;
 
     
+        modGUI.apriDiv;
+        modGUI.ApriTabella;
+        modGUI.ApriRigaTabella;
+        modGUI.intestazioneTabella('Targa');
+        modGUI.intestazioneTabella('Modello');
+        modGUI.intestazioneTabella('Alimentazione');
+        modGUI.ChiudiRigaTabella;
+        
+        
+        
+        for scorriCursore in (
+                select veicoli.alimentazione, veicoli.targa, veicoli.modello
+                from veicoli,abbonamentiVeicoli,abbonamenti
+                where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                        abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                        abbonamenti.dataInizio>=TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                        abbonamenti.dataFine<=TO_DATE(dataFineInserita,'YYYY-MM-DD')  and
+                        veicoli.alimentazione=AlimentazionePiuNumerosa
+        )
+        loop 
+    
+        modGUI.ApriRigaTabella;
+
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(scorricursore.targa);
+        modGUI.ChiudiElementoTabella;
+    
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(scorricursore.modello);
+        modGUI.ChiudiElementoTabella;
+        
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(scorricursore.alimentazione);
+        modGUI.ChiudiElementoTabella;
+    
+    
+        modGUI.ChiudiRigaTabella;
+        end loop;    
+        
+        modGUI.chiudiTabella;
+        
+        IF(NumAbbonamenti=0)THEN
+        modgui.esitoOperazione('KO','Non ci sono veicoli disponibili per questo periodo');
+        end if;
+        
+    end if;  
+                --pulsante torna indietro
+            modGui.apriForm('statisticaGenerale4');
+            modGui.inserisciInputHidden('id_Sessione',id_sessione);
+            modGui.inserisciInputHidden('nome',nome);
+            modGui.inserisciInputHidden('ruolo',ruolo);        
+            
+
+            modGUI.apriDiv;
+            modGui.inserisciBottoneForm('INDIETRO');
+            modGUI.chiudiDiv;
+            modgui.chiudiForm;
+    END resStatisticaGenerale4;
 end gruppo2;

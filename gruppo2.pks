@@ -15,7 +15,7 @@ create or replace package gruppo2 as
     procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number);
     procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2);
-    procedure statisticaalimentazione(id_sessione varchar2,nome varchar2, ruolo varchar2);
+    procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2);
     procedure updateArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int, var_posti_totali Aree.PostiTotali%TYPE, var_posti_liberi Aree.PostiLiberi%TYPE, var_stato Aree.Stato%TYPE, var_gas Aree.Gas%TYPE, var_lunghezza_max Aree.LunghezzaMax%TYPE, var_larghezza_max Aree.LarghezzaMax%TYPE, var_peso_max Aree.PesoMax%TYPE, var_costo_abbonamento Aree.CostoAbbonamento%TYPE);
     procedure updateAutorimessa(
         id_sessione int default 0,
@@ -50,9 +50,12 @@ create or replace package gruppo2 as
     PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
 
-    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
-    procedure dettagliVeicoloSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
+    procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
+    procedure dettagliVeicoloStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
+
+    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
@@ -60,16 +63,16 @@ create or replace package gruppo2 as
     procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2);
     
-    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
-    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
+    procedure statisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
 
-    procedure primaComune(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure resPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int);
-    procedure dettagliPrimaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2);
+    procedure statisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2, soglia int);
+    procedure dettagliStatisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, var_ning varchar2, var_nmul varchar2, var_impmul varchar2);
     
-    procedure quintaComune(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure resQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, x int);
-    procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
+    procedure statisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, x int);
+    procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
 
     procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2);
     procedure autorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2);
