@@ -1855,6 +1855,18 @@ posti number:=0;
 
     modGUI.chiudiPagina;
 
+                --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;                                                               
 
     END MaggiorPostiRiservati;
                                                                
@@ -2068,7 +2080,18 @@ begin
 
     modGUI.chiudiPagina;
 
+                --pulsante torna indietro
+        modGui.apriForm('AlimentazioneVeicolo');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
 
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
 
     END AlimentazioneVeicolo2;                                                           
                                                                
@@ -2189,7 +2212,25 @@ BEGIN
     
     end loop;
     end if;
+
+            modgui.chiuditabella;
+        modgui.chiudidiv;
+  
+  
+            --pulsante torna indietro
+        modGui.apriForm('percentualiPostiliberi');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
     
+        modgui.chiudipagina;
 
     END PercentualePostiLiberi2;                                                           
                                                                
@@ -2324,12 +2365,592 @@ begin
 
     modGUI.ChiudiTabella;
     modGUI.chiudiDiv;
+    
+                --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;    
 
     modGUI.chiudiPagina;
 
     end MaxTipoVeicolo;
     
-    procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2) is
+   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+BEGIN
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('VISUALIZZAZIONE CLIENTI SENZA ABBONAMENTO RINNOVATO');
+    modGUI.chiudiIntestazione(3);
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    
+    
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Nome');
+    modGUI.intestazioneTabella('Cognome');
+    modGUI.ChiudiRigaTabella;
+    
+ for scorriCursore in (
+    SELECT  
+      (((abbonamenti.dataFine-
+        abbonamenti.datainizio)-1)/TipiAbbonamenti.durata) as Rinnovato,
+        persone.Nome, persone.cognome
+    FROM TipiAbbonamenti, abbonamenti, Clienti, Persone
+    where TipiAbbonamenti.idTipoabbonamento=abbonamenti.idTipoabbonamento and
+      Clienti.idcliente=abbonamenti.idcliente and
+      Clienti.idpersona=Persone.idpersona      
+ )
+ 
+ loop
+  IF(scorricursore.rinnovato<=1)then
+  
+    modGUI.ApriRigaTabella;
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.nome);
+    modGUI.ChiudiElementoTabella;
+    
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.Cognome);
+    modGUI.ChiudiElementoTabella;
+    
+  end if;
+ 
+ 
+ end loop;
+ 
+    modGUI.ChiudiTabella;
+    modGUI.chiudiDiv; 
+    
+        --pulsante torna indietro
+        modGui.apriForm('modgui.creaHome');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
+    
+ 
+END ClientiSenzaAbbonamentoRinnovato;
+
+FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as 
+
+--PARAMETRI DEL VEICOLO RICEVUTO, DI CUI DEVO TROVARE UN BOX VALIDO
+AltezzaScelta veicoli.altezza%TYPE;
+LarghezzaScelta veicoli.Larghezza%TYPE;
+LunghezzaScelta veicoli.Lunghezza%TYPE;
+PesoScelto veicoli.Peso%TYPE;
+--VARIABILI
+idBoxOttenuto box.idbox%type:=-1;
+idAreaOttenuta aree.idarea%type;
+trovato boolean:=false;
+
+--ECCEZIONE NEL CASO NON SIA DISPONIBILE NESSUN BOX
+boxnontrovatoexception EXCEPTION; 
+  PRAGMA EXCEPTION_INIT(boxnontrovatoexception, -1466);
+
+
+BEGIN
+  --OTTENGO PARAMETRI DEL VEICOLO RICEVUTO
+  select veicoli.altezza into altezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.larghezza into larghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.lunghezza into lunghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  select veicoli.peso into pesoScelto from veicoli  where veicoli.idveicolo=idveicoloScelto;
+  
+  --CERCO UN'AREA ADATTA PER DIMENSIONI
+ for scorriCursoreAree in (
+    select autorimesse.idautorimessa,aree.idarea,aree.altezzaMax as altezzaCalcolata, aree.larghezzaMax as larghezzaCalcolata, aree.lunghezzaMax as lunghezzaCalcolata, aree.pesoMax as pesoCalcolato
+    from aree,autorimesse
+    where aree.idautorimessa=autorimesse.idautorimessa and autorimesse.idautorimessa=idautorimessaScelta
+
+  )
+  loop --VERIFICO SE AREA E'ADATTA
+    
+  --PER OGNI AREA ADATTA, CERCO BOX DI QUESTE DIMENSIONI  
+  if(altezzaScelta<scorriCursoreAree.altezzaCalcolata and larghezzaScelta< scorriCursoreAree.larghezzaCalcolata and lunghezzaScelta< scorriCursoreAree.lunghezzaCalcolata and pesoScelto<scorriCursoreAree.PesoCalcolato and trovato=false)then
+     idAreaOttenuta:=scorriCursoreAree.idarea;
+    --HO TROVATO UN'AREA, VERIFICO SE C'E' UN BOX VUOTO
+     for scorriCursoreBox in(
+       select box.idbox 
+       from box,aree
+       where box.idarea=aree.idarea
+            and aree.idarea=idAreaOttenuta
+            and box.occupato='F'
+            and box.riservato='F'
+      )
+      loop 
+      if(trovato=false)then 
+        idboxOttenuto:=scorriCursoreBox.idbox;
+        
+        if(idboxOttenuto!=-1)then--BOX TROVATO, SE VALIDO SETTO TROVATO A TRUE
+          trovato:=true;
+        end if;
+        
+      end if; --if trovato
+
+      end loop; --fine loop genera box
+  end if;
+  end loop; --fine loop genera aree
+  
+  --SE NON CI SONO BOX DISPONIBILI
+  if(idboxOttenuto=-1)then 
+    raise boxnontrovatoexception;
+  end if;
+  
+  return idboxOttenuto;
+  
+END RICERCAPOSTO;
+
+     PROCEDURE VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+
+    --variabile che conterra l'autorimessa scelta per la visualizzazione
+    AlimentazioneScelta1 veicoli.alimentazione%TYPE;
+    AlimentazioneScelta2 veicoli.alimentazione%TYPE;
+    
+BEGIN
+   modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
+    modGUI.chiudiIntestazione(3);
+    
+    modGui.apriForm('VEICOLIPERTIPOCARBURANTE2');
+    modGui.inserisciInputHidden('id_Sessione',id_sessione);
+    modGui.inserisciInputHidden('nome',nome);
+    modGui.inserisciInputHidden('ruolo',ruolo);
+    
+    --PRIMA SELECT PER PRIMA ALIMENTAZIONE
+    modgui.apriSelect('tipoAlimentazione1', 'Tipologia 1');
+    --estraggo le autorimesse e le inserisco nella select
+    for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+    loop
+            AlimentazioneScelta1:=scorriCursore.alimentazione;
+            modgui.inserisciOpzioneSelect(AlimentazioneScelta1, AlimentazioneScelta1,true);
+    end loop;
+    modgui.chiudiSelect;
+    
+    
+        --SECONDA SELECT PER SECONDA ALIMENTAZIONE
+    modgui.apriSelect('tipoAlimentazione2', 'Tipologia 2');
+    --estraggo le autorimesse e le inserisco nella select
+    for scorriCursore in (select distinct veicoli.alimentazione from veicoli)
+    loop
+            AlimentazioneScelta2:=scorriCursore.alimentazione;
+            modgui.inserisciOpzioneSelect(AlimentazioneScelta2, AlimentazioneScelta2,true);
+    end loop;
+    modgui.chiudiSelect;
+    
+    
+    modgui.inserisciInput('dataInizioInserita', 'Scegli data inizio abbonamento', 'date', true);
+    modgui.inserisciInput('dataFineInserita', 'Scegli data fine abbonamento', 'date', true);
+    
+    modGUI.apriDiv;
+    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.chiudiDiv;
+    modGui.chiudiForm;
+  
+END VeicoliPerTipoCarburante;
+    
+    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS 
+
+   AlimentazionePiuNumerosa veicoli.alimentazione%type;
+   NumAbbonamenti number:=0;
+    
+
+BEGIN   
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    
+    if(TO_DATE(dataInizioInserita,'YYYY-MM-DD') > TO_DATE(dataFineInserita,'YYYY-MM-DD'))then
+      modgui.esitoOperazione('KO','Data inserita errata');
+    else
+    
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('VISUALIZZAZIONE');
+    modGUI.chiudiIntestazione(3);   
+
+
+    for scorriCursore in (
+  select veicoli.alimentazione, count(abbonamenti.idabbonamento) as codice
+        from veicoli,abbonamentiVeicoli,abbonamenti
+        where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                abbonamenti.dataInizio>= TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                abbonamenti.dataFine<= TO_DATE(dataFineInserita,'YYYY-MM-DD')
+        group by veicoli.alimentazione 
+
+    )
+    loop 
+        if(scorriCursore.codice > NumAbbonamenti)then
+            NumAbbonamenti:=scorriCursore.codice ;
+            AlimentazionePiuNumerosa:=scorriCursore.alimentazione;     
+            
+        end if;    
+
+        
+    end loop;
+
+ 
+     modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Targa');
+    modGUI.intestazioneTabella('Modello');
+    modGUI.intestazioneTabella('Alimentazione');
+    modGUI.ChiudiRigaTabella;
+    
+    
+    
+    for scorriCursore in (
+            select veicoli.alimentazione, veicoli.targa, veicoli.modello
+            from veicoli,abbonamentiVeicoli,abbonamenti
+            where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
+                    abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
+                    abbonamenti.dataInizio>=TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
+                    abbonamenti.dataFine<=TO_DATE(dataFineInserita,'YYYY-MM-DD')  and
+                    veicoli.alimentazione=AlimentazionePiuNumerosa
+    )
+    loop 
+   
+    modGUI.ApriRigaTabella;
+
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.targa);
+    modGUI.ChiudiElementoTabella;
+   
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.modello);
+    modGUI.ChiudiElementoTabella;
+    
+    modGUI.ApriElementoTabella;
+    modGUI.ElementoTabella(scorricursore.alimentazione);
+    modGUI.ChiudiElementoTabella;
+   
+   
+    modGUI.ChiudiRigaTabella;
+    end loop;    
+    
+    modGUI.chiudiTabella;
+    
+    IF(NumAbbonamenti=0)THEN
+      modgui.esitoOperazione('KO','Non ci sono veicoli disponibili per questo periodo');
+    end if;
+    
+end if;  
+            --pulsante torna indietro
+        modGui.apriForm('veicoliPerTipocarburante');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        modgui.chiudiForm;    
+
+
+END VeicoliPerTipoCarburante2;
+                                                          
+    PROCEDURE PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+    BEGIN
+   modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('SCEGLI SE VISUALIZZARE REPORT PER AUTORIMESSE O MENO');
+    modGUI.chiudiIntestazione(3);
+    
+    modGui.apriForm('PostoAreaPiuUsato2');
+    modGui.inserisciInputHidden('id_Sessione',id_sessione);
+    modGui.inserisciInputHidden('nome',nome);
+    modGui.inserisciInputHidden('ruolo',ruolo);
+    
+    --RADIO1
+    modGUI.apriDiv;
+    modGui.inserisciRadioButton('Per autorimessa', 'PerAutorimessa', '1', true);
+    modGUI.chiudiDiv;
+    
+    modgui.acapo;
+    
+    --RADIO2
+    modGUI.apriDiv;
+    modGui.inserisciRadioButton('Totale', 'PerAutorimessa', '0');
+    modGUI.chiudiDiv;
+    modgui.acapo;
+    
+    modGUI.apriDiv;
+    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.chiudiDiv;
+    modGui.chiudiForm();
+    
+END PostoAreaPiuUsato;
+                                                          
+                                                         
+   PROCEDURE PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number) AS 
+
+  --variabili usate se visualizzo per autorimesse singole
+  IdBoxPiuPresente box.idbox%type;
+  IdAreaPiuPresente aree.idArea%type;
+  ParcheggioPiuPresente autorimesse.idautorimessa%type:=0;
+  Presenze integer:=0;
+  
+  --variabili usate se visualizzo per autorimesse totali
+  PresenzeAssolutoArea integer;
+  IdAreaPiuPresenteAssolutoArea aree.idArea%type;
+  ParcheggioPiuPresenteAssolutoArea autorimesse.idautorimessa%type:=0;
+  
+  PresenzeAssolutoBox integer;
+  IdBoxPiuPresenteAssolutoBox box.idbox%type;
+  ParcheggioPiuPresenteAssolutoBox autorimesse.idautorimessa%type:=0;
+  --contatori per stampare, usate se visualizzo per autorimesse totali
+  i number:=0;
+  j number:=0;
+  
+BEGIN
+
+    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.aCapo;
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('AREE PIU USATE');
+    modGUI.chiudiIntestazione(3);
+
+    --CREO TABELLA PER AREE
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Area');
+    modGUI.intestazioneTabella('Presenze');
+    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.ChiudiRigaTabella;
+    
+
+    --CALCOLO VALORI
+    for cursoreAree in (
+    with
+        TotOrari as (
+            select AU.idAutorimessa as idAutorimessa, AR.idArea as idArea, count(*) as NumIngressi
+                from IngressiOrari IO
+                join Box B on B.idBox = IO.idBox
+                join Aree AR on AR.idArea = B.idArea
+                join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+            group by AU.idAutorimessa, AR.idArea
+        ),
+        TotAbbonamenti as (
+            select AU.idAutorimessa as idAutorimessa, AR.idArea as idArea, count(*) as NumIngressi
+                from IngressiAbbonamenti IA
+                join Box B on B.idBox = IA.idBox
+                join Aree AR on AR.idArea = B.idArea
+                join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+            group by AU.idAutorimessa, AR.idArea
+        ),
+        Totale as (
+            select idAutorimessa, idArea, sum(NumIngressi) as NumIngressi
+            from (
+                select * from TotOrari
+                union all
+                select * from TotAbbonamenti
+            )
+            group by idArea, idAutorimessa
+        )
+    select distinct *
+    from Totale T
+    where T.NumIngressi = (
+        select max(NumIngressi)
+        from Totale
+        where idAutorimessa = T.idAutorimessa
+    )
+    order by idAutorimessa )
+    
+    loop 
+        
+    --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
+    if(PerAutorimessa=1)then
+        modGUI.ApriRigaTabella;
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.idarea);
+        modGUI.ChiudiElementoTabella;
+        
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.numingressi);
+        modGUI.ChiudiElementoTabella;
+    
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(cursoreAree.idautorimessa);
+        modGUI.ChiudiElementoTabella;
+    
+        modGUI.ChiudiRigaTabella;
+    else  
+            --PER AUTORIMESSE TOTALI
+            if(i=0)then--PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
+                PresenzeAssolutoArea:=cursoreAree.numingressi;
+                IdAreaPiuPresenteAssolutoArea:=cursoreAree.idarea;
+                ParcheggioPiuPresenteAssolutoArea:=cursoreAree.idautorimessa;
+
+                modGUI.ApriRigaTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(IdAreaPiuPresenteAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(PresenzeAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ApriElementoTabella;
+                modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoArea);
+                modGUI.ChiudiElementoTabella;
+                
+                modGUI.ChiudiRigaTabella;
+                modgui.chiuditabella;
+                modgui.chiudiDiv;
+            end if;
+           
+    end if;
+    i:=i+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
+    end loop;
+    modgui.chiuditabella;
+    
+    --CREO TABELLA PER BOX 
+    modGUI.apriIntestazione(3);
+    modGUI.inserisciTesto('BOX PIU USATI');
+    modGUI.CHIUDIIntestazione(3);
+    
+    modGUI.apriDiv;
+    modGUI.ApriTabella;
+    modGUI.ApriRigaTabella;
+    modGUI.intestazioneTabella('Box');
+    modGUI.intestazioneTabella('Presenze');
+    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.ChiudiRigaTabella;
+    
+    --CALCOLO VALORI
+    for cursoreBox in (
+      with
+    TotOrari as (
+        select AU.idAutorimessa as idAutorimessa, B.idBox as idBox, count(*) as NumIngressi
+            from Box B
+            join IngressiOrari IO on IO.idBox = B.idBox
+            join Aree AR on AR.idArea = B.idArea
+            join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+        group by B.idBox, AU.idAutorimessa
+    ),
+    TotAbbonamenti as (
+        select AU.idAutorimessa as idAutorimessa, B.idBox as idBox, count(*) as NumIngressi
+            from Box B
+            join IngressiAbbonamenti IA on IA.idBox = B.idBox
+            join Aree AR on AR.idArea = B.idArea
+            join Autorimesse AU on AU.idAutorimessa = AR.idAutorimessa
+        group by B.idBox, AU.idAutorimessa
+    ),
+    Totale as (
+        select idAutorimessa, idBox, sum(NumIngressi) as NumIngressi
+        from (
+            select * from TotOrari
+            union all
+            select * from TotAbbonamenti
+        )
+        group by idBox, idAutorimessa
+    )
+select distinct *
+from Totale T
+where T.NumIngressi = (
+    select max(NumIngressi)
+    from Totale
+    where idAutorimessa = T.idAutorimessa
+)
+order by idAutorimessa,numingressi
+    )
+    loop
+    
+    --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
+    if(PerAutorimessa=1)then --ParcheggioPiuPresente=0 di default
+    
+        if(ParcheggioPiuPresente!=cursoreBox.idautorimessa)then --TRICK PER STAMPARE IL MASSIMO DI OGNI AUTORIMESSA, DATO CHE CURSORE RESTITUISCE ORDER BY AUTORIMESSE. SE CAMBIA AUTORIMESSA, COME SCORRO, STAMPO
+            ParcheggioPiuPresente:=cursoreBox.idautorimessa;--assegno
+            
+            modGUI.ApriRigaTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.idbox);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.numingressi);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ApriElementoTabella;
+            modGUI.ElementoTabella(cursoreBox.idautorimessa);
+            modGUI.ChiudiElementoTabella;
+            
+            modGUI.ChiudiRigaTabella;
+        end if;
+        
+    else --PER AUTORIMESSE TOTALI
+            
+                if(j=0)then --PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
+                    PresenzeAssolutoBox:=cursoreBox.numingressi;
+                    IdBoxPiuPresenteAssolutoBox:=cursoreBox.idbox;
+                    ParcheggioPiuPresenteAssolutoBox:=cursoreBox.idautorimessa;
+        
+                    modGUI.ApriRigaTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(IdBoxPiuPresenteAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(PresenzeAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ApriElementoTabella;
+                    modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoBox);
+                    modGUI.ChiudiElementoTabella;
+                    
+                    modGUI.ChiudiRigaTabella;
+                    modgui.chiuditabella;
+                    modgui.chiudiDiv;        
+                end if;
+    end if;
+    j:=j+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
+    end loop;
+    modgui.chiuditabella;
+
+                --pulsante torna indietro
+        modGui.apriForm('PostoAreaPiuUsato');
+        modGui.inserisciInputHidden('id_Sessione',id_sessione);
+        modGui.inserisciInputHidden('nome',nome);
+        modGui.inserisciInputHidden('ruolo',ruolo);        
+        
+        modGUI.apriDiv;
+        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.chiudiDiv;
+        
+        modgui.chiudiForm;
+    
+        modgui.chiudipagina;
+
+
+END PostoAreaPiuUsato2;    
+                                                          
+    
+    
+    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
@@ -2403,7 +3024,7 @@ begin
                 select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, Veicoli.idVeicolo VIV
                     from Veicoli
                         join VeicoliClienti VC on VC.idCliente = var_idCliente
-                        join EffettuaIngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
+                        join EffettuaI/projects/1ngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
                         join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
                         join Autorimesse AR on AR.idAutorimessa = var_autorimessa
                     where Veicoli.idVeicolo = VC.idVeicolo and

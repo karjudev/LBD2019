@@ -1,0 +1,21 @@
+# Statistiche Generali
+Statistica Generale 1 -> gruppo2.statstatisticaGenerale1(id_Sessione int, nome varchar2, ruolo varchar2);
+Statistica Generale 2 -> gruppo2.statstatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2);
+Statistica Generale 3 -> gruppo2.statstatisticaGenerale3(id_Sessione int, nome varchar2, ruolo varchar2);
+Statistica Generale 4 -> gruppo2.statstatisticaGenerale4(id_Sessione int, nome varchar2, ruolo varchar2);
+Statistica Generale 5 -> gruppo2.statstatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2);
+Statistica Generale 6 -> gruppo2.statstatisticaGenerale6(id_Sessione int, nome varchar2, ruolo varchar2);
+
+# Statistiche gruppo2
+
+Percentuale posti liberi per fascia oraria o giorno raggruppata per area -> gruppo2.percentualiPostiLiberi(id_Sessione int, nome varchar2, ruolo varchar2);
+Classifica Sedi più Redditizie -> gruppo2.classificaSediPiuRedditizie(id_Sessione int, nome varchar2, ruolo varchar2);
+Sedi sovrappopolate -> gruppo2.sediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2);
+Posto/area più utilizzato raggruppato o meno per parcheggio -> gruppo2.postoAreaPiuUsato(id_Sessione int, nome varchar2, ruolo varchar2);
+Alimentazione del veicolo più presente in una autorimessa o in tutte -> gruppo2.AlimentazioneVeicolo(id_Sessione int, nome varchar2, ruolo varchar2);
+Autorimessa con massimo numero di posti riservati in un determinato periodo -> gruppo2.formAutorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2);
+Report introiti per sede totale -> gruppo2.introiti(id_Sessione int, nome varchar2, ruolo varchar2);
+Nome autorimessa con maggior numero posti riservati -> gruppo2.maggiorPostiRiservati(id_Sessione int, nome varchar2, ruolo varchar2);
+Clienti senza abbonamento rinnovato -> gruppo2.clientiSenzaAbbonamentoRinnovato(id_Sessione int, nome varchar2, ruolo varchar2);
+Veicolo meno parcheggiato da un determinato cliente presso ciascun parcheggio -> gruppo2.veicoloMenoParcheggiato(id_Sessione int, nome varchar2, ruolo varchar2);
+Parcheggi in cui prezzo pagato per la sosta oraria superiore alla media -> gruppo2.ingressiSopraMedia(id_Sessione int, nome varchar2, ruolo varchar2);
