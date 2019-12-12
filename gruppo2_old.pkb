@@ -20,8 +20,8 @@ create or replace package body gruppo2 as
     end autorimessanontrovata;
 
     procedure competentGarageSearch2 (
-        id_Sessione varchar2, 
-        nome varchar2, 
+        id_Sessione varchar2,
+        nome varchar2,
         ruolo varchar2,
         idSedeCorrente integer,
         idVeicoloCorrente integer
@@ -35,8 +35,8 @@ create or replace package body gruppo2 as
         contatore integer :=0;
         vlunghezzamax integer   :=2147483648;
         vlarghezzamax integer   :=2147483648;
-        valtezzamax integer     :=2147483648;
-        vpesomax integer        :=2147483648;
+        valtezzamax integer 	:=2147483648;
+        vpesomax integer    	:=2147483648;
         vid integer :=0;
         arid integer :=0;
 
@@ -51,16 +51,16 @@ create or replace package body gruppo2 as
         else
                 select * into veicoloCorrente from Veicoli where Veicoli.idVeicolo=idVeicoloCorrente;
                 select * into sedeCorrente from Sedi sed where sed.idSede=idSedeCorrente;
-            
+
                 for autorimessa in (select * from Autorimesse)
                 loop
                     if(autorimessa.idSede = SedeCorrente.idsede )
                         then
-                        p:=queryricercaArea(id_Sessione, nome, ruolo, autorimessa.idautorimessa,VeicoloCorrente.idveicolo); 
+                        p:=queryricercaArea(id_Sessione, nome, ruolo, autorimessa.idautorimessa,VeicoloCorrente.idveicolo);
                         contatore:=p.count;
                         for i in 1 ..   contatore
                         loop
-                            select * into tmp from Aree where idArea=p(i) and 
+                            select * into tmp from Aree where idArea=p(i) and
                                     (
                                     (lunghezzamax<vlunghezzamax or larghezzamax<=vlarghezzamax or altezzamax<=valtezzamax or pesomax<=vpesomax) or
                                     (lunghezzamax<=vlunghezzamax or larghezzamax<vlarghezzamax or altezzamax<=valtezzamax or pesomax<=vpesomax) or
@@ -74,21 +74,21 @@ create or replace package body gruppo2 as
                             vlarghezzamax:=tmp.larghezzamax;
                             vid:=tmp.idarea;
                                 else null; end if;
-            
-            
-            
+
+
+
                         end loop;
                     else null;
                     end if;
-            
-                end loop; 
+
+                end loop;
                     if(vid=0)then autorimessanontrovata(id_sessione,nome,ruolo);
                     else
                         select aree.idautorimessa into arid from aree where aree.idarea=vid;
-            /*                update debug
+            /*            	update debug
                             set numero=vid
                             where id=1;*/
-            
+
                                 visualizzaAutorimessa(id_Sessione, nome, ruolo,arid);
                     end if;
             end if;
@@ -133,7 +133,7 @@ create or replace package body gruppo2 as
         modGUI.chiudiPagina;
     end formRicercaArea;
 
-procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2) is 
+procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2) is
 totaleabb integer :=0;
 totalebigl integer :=0;
 indirizzo varchar2 (100);
@@ -148,7 +148,7 @@ begin
         modgui.apriintestazione(2);
         modgui.inseriscitesto('INTROITI TOTALI');
         modgui.chiudiintestazione(2);
-        if(idsedecorrente=0) 
+        if(idsedecorrente=0)
             then --tutte le sedi senza periodo
                 modgui.apritabella;
                 modGUI.ApriRigaTabella;
@@ -159,8 +159,8 @@ begin
                 modgui.chiudirigatabella;
                 for i in (select * from sedi)
                     loop
-                        
-                        select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null; 
+
+                        select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null;
                         select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
                         if(totaleabb is null) then totaleabb:=0; end if;
                         if(totalebigl is null) then totalebigl:=0; end if;
@@ -174,9 +174,9 @@ begin
                         modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                         modgui.chiudielementotabella;
                         modgui.chiudirigatabella;---------
-                    end loop;         
+                    end loop;
                 modgui.chiuditabella;
-                
+
                 select sum(abb.costoeffettivo) into totaleabb from abbonamenti abb;
                 modgui.apritabella;
                 modGUI.ApriRigaTabella;
@@ -186,9 +186,9 @@ begin
                 modGUI.ChiudiElementoTabella;
                 modgui.chiudirigatabella();
                 modgui.chiuditabella;
-                
+
             else --sede specifica senza periodo
-                select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null; 
+                select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null;
                 select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
                 if(totaleabb is null) then totaleabb:=0; end if;
                 if(totalebigl is null) then totalebigl:=0; end if;
@@ -198,7 +198,7 @@ begin
                 modGUI.intestazioneTabella('INTROITI BIGLIETTI');
                 modGUI.intestazioneTabella('DETTAGLI');
                 modgui.chiudirigatabella;
-                modGUI.ApriElementoTabella; 
+                modGUI.ApriElementoTabella;
                 modGUI.ElementoTabella(indirizzo);
                 modGUI.ChiudiElementoTabella;
                 modGUI.ApriElementoTabella;
@@ -207,14 +207,17 @@ begin
                 modGUI.ApriElementoTabella;
                 modGUI.InserisciLente(groupname || 'visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare);
                 modgui.chiudielementotabella;
-                modgui.chiudirigatabella;        
+                modgui.chiudirigatabella;
                 modgui.chiuditabella;
             end if;
-            
-            else 
+
+            else
     modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
+        modGUI.apriIntestazione(2);
+            modGUI.inserisciTesto('INTROITI TOTALI');
+        modGUI.chiudiIntestazione(2);
      modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
-    end if; 
+    end if;
     modgui.apriintestazione(3);
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
@@ -296,14 +299,14 @@ end introitiparziali;
                 end loop;
                 modGUI.chiudiTabella;
                 if(headertab) then
-                    modGUI.esitoOperazione('KO', 'Non Ã¨ stata trovata nessun''area disponibile per il tuo veicolo!');
+                    modGUI.esitoOperazione('KO', 'Non è stata trovata nessun''area disponibile per il tuo veicolo!');
                 else
                     modGUI.chiudiDiv;
                 end if;
             modGUI.chiudiPagina;
         end graphicResultRicercaArea;
 
-procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
 
 begin
     if (ruolo='R') then
@@ -329,23 +332,22 @@ modgui.apriForm(groupname || 'introitiparziali');
         end loop;
 
         modGUI.chiudiSelect;
-    
-    
 
-
-
-        modGUI.inserisciBottoneReset('RESET');
-        modGUI.inserisciBottoneForm('Submit','defFormButton');
+        modGUI.inserisciBottoneReset;
+        modGUI.inserisciBottoneForm('VISUALIZZA');
 
         modgui.chiudiForm;
 
         modGUI.chiudiPagina;
 
-    else 
-    modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
-     modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
+    else
+    modGUI.apriPagina('HoC | Visualizza introiti', id_Sessione, nome, ruolo);
+    modGUI.apriIntestazione(2);
+        modGUI.inserisciTesto('VISUALIZZA INTROITI');
+    modGUI.chiudiIntestazione(2);
+        modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
     modGUI.chiudiPagina;
-    end if; 
+    end if;
 end introiti;
     procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) AS
         area Aree%ROWTYPE;
@@ -362,7 +364,7 @@ end introiti;
             when no_data_found then
                 area := null;
         end;
-        
+
         modGUI.apriPagina('HoC | Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa, id_Sessione, nome, ruolo);
             modGUI.apriDiv;
             if (ruolo <> 'A' or ruolo <> 'R' or ruolo <> 'O') then
@@ -371,7 +373,7 @@ end introiti;
                 modGUI.esitoOperazione('KO', 'Nessuna area trovata');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('MODIFICA AREA ' || area.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.apriForm(groupname || 'updateArea');
@@ -380,7 +382,6 @@ end introiti;
                     modGUI.inserisciInputHidden('ruolo', ruolo);
                     modGUI.inserisciInputHidden('idRiga', idRiga);
 
-                    /* esempi di input testo del form*/
                     modGUI.inserisciTesto('Posti Totali');
                     modGUI.inserisciInput(
                         tipo => 'number',
@@ -486,7 +487,7 @@ end introiti;
                     modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Modifica Autorimessa di ' || autorimessa.indirizzo);
+                        modGUI.inserisciTesto('MODIFICA AUTORIMESSA DI ' || autorimessa.indirizzo);
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriForm(groupname || 'updateAutorimessa');
@@ -537,21 +538,21 @@ end introiti;
           when no_data_found then
             sede := null;
         end;
-        
-        
+
+
         modGUI.apriPagina('HoC | Modifica Sede di ' || sede.indirizzo, id_Sessione, nome, ruolo);
             modGUI.aCapo;
                 modGUI.apriDiv;
+                modGUI.apriIntestazione(2);
+                        modGUI.inserisciTesto('MODIFICA SEDE DI ' || sede.indirizzo);
+                    modGUI.chiudiIntestazione(2);
                 -- Se il ruolo dell'utente non Ã¨ amministratore esce
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei un amministratore');
                 elsif (sede.idSede is null) then
                     modGUI.esitoOperazione('KO', 'Autorimessa non trovata');
                 else
-                    modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Modifica Sede di ' || sede.indirizzo);
-                    modGUI.chiudiIntestazione(2);
-                    /* 
+                    /*
                     * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
                     * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                     */
@@ -591,7 +592,7 @@ end introiti;
         modGUI.chiudiPagina;
     end modificaSede;
 
-    function queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2) 
+    function queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2)
         return list_idaree is
 
 
@@ -607,7 +608,7 @@ end introiti;
         p list_idaree := list_idaree();
         total integer;
     begin
-        
+
         --Ottengo dimensioni del veicolo--
         select Altezza, Larghezza, Lunghezza, Peso, Alimentazione, Modello, Produttore
         into altezza_veicolo, larghezza_veicolo, lunghezza_veicolo, peso_veicolo, alimentazione_veicolo, modello_veicolo, produttore_veicolo
@@ -619,7 +620,7 @@ end introiti;
         else
             checkAlimentazione := 'F';
         end if;
-        
+
         --Ottengo le aree--
         for cur in (
             select idarea, lunghezzamax, larghezzamax, pesomax, altezzamax, gas
@@ -630,7 +631,7 @@ end introiti;
             aree.larghezzamax >= larghezza_veicolo AND
             aree.pesomax >= peso_veicolo AND
             aree.gas = checkAlimentazione
-        ) loop 
+        ) loop
             p.extend;
             p(p.count) := cur.idarea;
         end loop;
@@ -652,7 +653,7 @@ end introiti;
             modGUI.apriIntestazione(3);
             modGUI.inserisciTesto('SEDI SOVRAPPOPOLATE');
             modGUI.aCapo;
-            modGUI.inserisciTesto('Giorno: ' || to_date(var_giorno, 'yyyy/mm/dd'));
+            modGUI.inserisciTesto('GIORNO: ' || to_date(var_giorno, 'yyyy/mm/dd'));
             modGUI.chiudiIntestazione(3);
 
             modGUI.apriTabella;
@@ -707,7 +708,7 @@ end introiti;
             end if;
             end loop;
             modGUI.chiudiTabella;
-            if(var_check1 = false) then 
+            if(var_check1 = false) then
                 modGUI.apriDiv(centrato=>true);
                     modGUI.inserisciTesto('NESSUN RISULTATO');
                 modGUI.chiudiDiv;
@@ -725,20 +726,20 @@ end introiti;
 
 
         END resSediSovrappopolate;
-    
+
     procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
         tmp integer;
         idses integer;
         begin
-            if(ruolo='O' or ruolo='R') then
-                modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
-                modGUI.aCapo;
+            modGUI.apriPagina('HoC | Ricerca autorimessa competente', id_Sessione, nome, ruolo);
                 modGUI.apriDiv;
                 modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto(' RICERCA AUTORIMESSA COMPETENTE ');
                 modGUI.chiudiIntestazione(2);
+            if(ruolo='O' or ruolo='R') then
+                
                 idses:=to_number(id_Sessione);
-            /* 
+            /*
                 * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
                 * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
                 */
@@ -748,13 +749,7 @@ end introiti;
                 modgui.inserisciinputhidden('nome',nome);
                 modgui.inserisciinputhidden('ruolo',ruolo);
 
-
-                /* esempi di input testo del form*/
-
-
                 /*esempio di input select del form */
-
-                modGUI.aCapo;
                 modGUI.apriSelect('idSedeCorrente', 'Seleziona Sede: ', false, 'defSelect');
 
                 for sede in (select * from sedi)
@@ -769,12 +764,12 @@ end introiti;
                 modGUI.apriSelect('idVeicoloCorrente', 'Seleziona Veicolo: ', true, 'defSelect');
 
                 select distinct count(*) into tmp from veicoli vec;
-                if(tmp=0) then 
+                if(tmp=0) then
                                 modGUI.inserisciOpzioneSelect('','Nessun veicolo disponibile',false);
                 else
                     for veicolo in (select distinct vec.* from veicoli vec)
                     loop
-                        modGUI.inserisciOpzioneSelect(veicolo.idveicolo,'Veicolo: ' ||veicolo.produttore ||' '|| veicolo.modello || '     Targa: ' ||veicolo.targa,false);
+                        modGUI.inserisciOpzioneSelect(veicolo.idveicolo,'Veicolo: ' ||veicolo.produttore ||' '|| veicolo.modello || ' 	Targa: ' ||veicolo.targa,false);
                     end loop;
             end if;
                 modGUI.chiudiSelect;
@@ -782,17 +777,16 @@ end introiti;
 
                 /*esempio inserimento del bottone di reset dei campi e bottone invio dei dati*/
 
-                modGUI.inserisciBottoneReset('RESET');
-                modGUI.inserisciBottoneForm('Submit','defFormButton');
+                modGUI.inserisciBottoneReset;
+                modGUI.inserisciBottoneForm(testo=>'RICERCA');
                 modgui.chiudiForm;
             else
-            modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
             modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per gli operatori e i responsabili');
             end if;
 
             modGUI.chiudiPagina;
         end ricercaAutorimessa;
-    
+
     procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2) is
         -- ID della sede corrente
         id_sede Sedi.idSede%TYPE;
@@ -840,21 +834,19 @@ end introiti;
                 nome => nome,
                 ruolo => ruolo
             );
-            modGUI.aCapo;
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('SEDI PIU` REDDITIZIE');
+            modGUI.chiudiIntestazione(2);
 
             if (ruolo <> 'A') then
                 modGUI.esitoOperazione('KO', 'Non sei autorizzato');
             else
-                modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('SEDI PIU` REDDITIZIE');
-                modGUI.chiudiIntestazione(3);
-
                 modGUI.ApriTabella;
                 modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('ID Sede');
-                    modGUI.intestazioneTabella('Indirizzo');
-                    modGUI.intestazioneTabella('Numero Ingressi');
-                    modGUI.intestazioneTabella('Dettagli');
+                    modGUI.intestazioneTabella('ID SEDE');
+                    modGUI.intestazioneTabella('INDIRIZZO');
+                    modGUI.intestazioneTabella('NUMERO INGRESSI');
+                    modGUI.intestazioneTabella('DETTAGLI');
                 modGUI.ChiudiRigaTabella;
                 -- Apre il cursore
                 open sediCursor;
@@ -882,8 +874,8 @@ end introiti;
                 modGUI.chiudiPagina;
             end if;
         end classificaSediPiuRedditizie;
-    
-   procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2)is 
+
+   procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2)is
 maxbox integer :=0;
 var_indirizzo varchar2(100);
 var_gas varchar2(1);
@@ -894,7 +886,6 @@ var_2 varchar2 (100);
 begin
     if(ruolo = 'A' or ruolo= 'S') then
     modGUI.apriPagina('HoC |  Statistica alimentazione', id_Sessione, nome, ruolo);
-    modgui.acapo;
     modgui.apriintestazione(2);
     modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
     modgui.chiudiintestazione(2);
@@ -903,7 +894,7 @@ select count(box.idbox) as count_box,ar.indirizzo,aree.gas from box, aree,autori
 where rownum=1;
     --if(var_gas='T') then var_risp:='a gas'; else var_risp:='a benzina'; end if;
     select DECODE(var_gas, 'T','Gas','Benzina')into var_risp from dual;
-    
+
 
     modgui.apritabella;
     modgui.apririgatabella;
@@ -925,17 +916,23 @@ where rownum=1;
     modgui.chiudielementotabella;
     modgui.chiudirigatabella;
     modgui.chiuditabella;
-    
+
 modgui.chiudipagina;
 
-else 
+else
 modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
+modgui.apriintestazione(2);
+    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
+    modgui.chiudiintestazione(2);
      modGUI.esitoOperazione('KO', 'Non hai i permessi necessari.');
      modgui.chiudipagina;
      end if;
 exception
-when no_data_found then 
+when no_data_found then
         modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
+        modgui.apriintestazione(2);
+    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
+    modgui.chiudiintestazione(2);
      modGUI.esitoOperazione('KO', 'Nessun veicolo parcheggiato');
 
 
@@ -955,7 +952,7 @@ end statisticaGenerale6;
         var_larghezza_max Aree.LarghezzaMax%TYPE,
         var_peso_max Aree.PesoMax%TYPE,
         var_costo_abbonamento Aree.CostoAbbonamento%TYPE
-    ) AS 
+    ) AS
     BEGIN
         -- Aggiorna la sede
         update Aree set
@@ -972,7 +969,7 @@ end statisticaGenerale6;
         -- Richiama la visualizzazione
         visualizzaArea(id_sessione, nome, ruolo, idRiga);
     end updateArea;
-    
+
     procedure updateAutorimessa(
         id_sessione int default 0,
         nome varchar2,
@@ -1034,7 +1031,7 @@ end statisticaGenerale6;
         var_indirizzo Sedi.Indirizzo%TYPE,
         var_telefono Sedi.Telefono%TYPE,
         var_coordinate Sedi.Coordinate%TYPE
-    ) AS 
+    ) AS
     BEGIN
         if (ruolo <> 'A') then
             modGUI.apriPagina('HoC | Update Sede', id_sessione, nome, ruolo);
@@ -1095,79 +1092,79 @@ end statisticaGenerale6;
             else
 
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('AREA ' || area.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Area');
+                        modGUI.IntestazioneTabella('ID AREA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.idArea);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Posti Totali');
+                        modGUI.IntestazioneTabella('POSTI TOTALI');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PostiTotali);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Posti Liberi');
+                        modGUI.IntestazioneTabella('POSTI LIBERI');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PostiLiberi);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Stato');
+                        modGUI.IntestazioneTabella('STATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.Stato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Gas');
+                        modGUI.IntestazioneTabella('GAS');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.Gas);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Lunghezza Massima');
+                        modGUI.IntestazioneTabella('LUNGHEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.LunghezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Larghezza Massima');
+                        modGUI.IntestazioneTabella('LARGHEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.LarghezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Altezza Massima');
+                        modGUI.IntestazioneTabella('ALTEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.AltezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Peso Massimo');
+                        modGUI.IntestazioneTabella('PESO MASSIMO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PesoMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Costo Abbonamento');
+                        modGUI.IntestazioneTabella('COSTO ABBONAMENTO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.CostoAbbonamento);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Autorimessa');
+                        modGUI.IntestazioneTabella('AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_autorimessa, 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || area.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.ApriRigaTabella;
-                            modGUI.IntestazioneTabella('Dettagli');
+                            modGUI.IntestazioneTabella('DETTAGLI');
                             modGUI.ApriElementoTabella;
                                 modGUI.InserisciPenna('modificaArea', id_sessione, nome, ruolo, idRiga);
                             modGUI.ChiudiElementoTabella;
@@ -1175,24 +1172,24 @@ end statisticaGenerale6;
                     end if;
                 modGUI.ChiudiTabella;
 
-                
+
                     modGUI.ApriTabella;
-                        
+
                     modGUI.ChiudiTabella;
-                
+
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Box');
+                    modGUI.inserisciTesto('BOX');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Box');
-                        modGUI.intestazioneTabella('Numero');
-                        modGUI.intestazioneTabella('Piano');
-                        modGUI.intestazioneTabella('Colonna');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID BOX');
+                        modGUI.intestazioneTabella('NUMERO');
+                        modGUI.intestazioneTabella('PIANO');
+                        modGUI.intestazioneTabella('COLONNA');
+                        modGUI.intestazioneTabella('DETTAGLI');
                     for box in (select * from Box where Box.idArea = idRiga)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1239,49 +1236,46 @@ end statisticaGenerale6;
         end;
         -- Crea la pagina e l'intestazione
         modGUI.apriPagina('HoC | Autorimessa di ' || autorimessa.indirizzo, id_sessione, nome, ruolo);
-            modGUI.aCapo;
-
+            modGUI.apriIntestazione(2);
+                modGUI.inserisciTesto('AUTORIMESSA ' || autorimessa.indirizzo);
+            modGUI.chiudiIntestazione(2);
             if (autorimessa.idAutorimessa is null) then
                 modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
             else
-                modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Autorimessa di ' || autorimessa.indirizzo);
-                modGUI.chiudiIntestazione(2);
-
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Autorimessa');
+                        modGUI.IntestazioneTabella('ID AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Indirizzo');
+                        modGUI.IntestazioneTabella('INDIRIZZO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Indirizzo);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Telefono');
+                        modGUI.IntestazioneTabella('TELEFONO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Telefono);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Coordinate');
+                        modGUI.IntestazioneTabella('COORDINATE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Coordinate);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Sede');
+                        modGUI.IntestazioneTabella('SEDE');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_sede, groupname || 'visualizzaSede?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || autorimessa.idSede);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('Dettagli');
+                            modGUI.intestazioneTabella('DETTAGLI');
                             modGUI.apriElementoTabella;
                                 modGUI.InserisciPenna(groupname || 'modificaAutorimessa', id_sessione, nome, ruolo, autorimessa.idAutorimessa);
                             modGUI.chiudiElementoTabella;
@@ -1291,17 +1285,17 @@ end statisticaGenerale6;
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Aree');
+                    modGUI.inserisciTesto('AREE');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Area');
-                        modGUI.intestazioneTabella('Larghezza Massima');
-                        modGUI.intestazioneTabella('Lunghezza Massima');
-                        modGUI.intestazioneTabella('Altezza Massima');
-                        modGUI.intestazioneTabella('Peso Massimo');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID AREA');
+                        modGUI.intestazioneTabella('LARGHEZZA MASSIMA');
+                        modGUI.intestazioneTabella('LUNGHEZZA MASSIMA');
+                        modGUI.intestazioneTabella('ALTEZZA MASSIMA');
+                        modGUI.intestazioneTabella('PESO MASSIMO');
+                        modGUI.intestazioneTabella('DETTAGLIO');
                     for area in (select * from Aree where Aree.idAutorimessa = idRiga)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1330,12 +1324,13 @@ end statisticaGenerale6;
             modgui.apriintestazione(3);
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
-            modgui.apridiv(true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro',groupname || 'ricercaautorimessa');
+            modgui.apridiv(centrato=>true);
+                modgui.inseriscibottone(id_sessione,nome,ruolo,'RICERCA AUTORIMESSA',groupname || 'ricercaautorimessa');
+                modgui.inseriscibottone(id_sessione,nome,ruolo,'MAX POSTI PER PERIODO',groupname || 'formAutorimessaMaxPostiPeriodo');
             modgui.chiudidiv;
     modgui.chiudipagina;
     end visualizzaAutorimessa;
-    
+
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri del box corrente
         var_box Box%ROWTYPE;
@@ -1368,58 +1363,58 @@ end statisticaGenerale6;
                 modGUI.esitoOperazione('KO', 'Nessun box trovato');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Box ' || idRiga || ' - Area ' || var_box.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('BOX ' || idRiga || ' - AREA ' || var_box.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Box');
+                        modGUI.IntestazioneTabella('ID BOX');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.idBox);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Numero');
+                        modGUI.IntestazioneTabella('NUMERO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Numero);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Piano');
+                        modGUI.IntestazioneTabella('PIANO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Piano);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Colonna');
+                        modGUI.IntestazioneTabella('COLONNA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.NumeroColonna);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Occupato');
+                        modGUI.IntestazioneTabella('OCCUPATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Occupato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Riservato');
+                        modGUI.IntestazioneTabella('RISERVATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Riservato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Area');
+                        modGUI.IntestazioneTabella('AREA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(var_box.idArea, groupname || 'visualizzaArea?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_area);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Autorimessa');
+                        modGUI.IntestazioneTabella('AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_autorimessa, groupname || 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_autorimessa);
                         modGUI.ChiudiElementoTabella;
-                    modGUI.ChiudiRigaTabella;          
+                    modGUI.ChiudiRigaTabella;
                 modGUI.ChiudiTabella;
 
                 -- Eventuale auto contenuta nel box
@@ -1433,17 +1428,17 @@ end statisticaGenerale6;
                         and IngressiOrari.OraUscita is NULL;
                     -- Stampa le informazioni del veicolo
                     modGUI.apriIntestazione(3);
-                        modGUI.inserisciTesto('Veicolo in sosta');
+                        modGUI.inserisciTesto('VEICOLO IN SOSTA');
                     modGUI.chiudiIntestazione(3);
-                    
+
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.apriIntestazione('ID Veicolo');
-                            modGUI.apriIntestazione('Targa');
-                            modGUI.apriIntestazione('Produttore');
-                            modGUI.apriIntestazione('Modello');
-                            modGUI.apriIntestazione('Colore');
-                            modGUI.apriIntestazione('Dettaglio');
+                            modGUI.apriIntestazione('ID VEICOLO');
+                            modGUI.apriIntestazione('TARGA');
+                            modGUI.apriIntestazione('PRODUTTORE');
+                            modGUI.apriIntestazione('MODELLO');
+                            modGUI.apriIntestazione('COLORE');
+                            modGUI.apriIntestazione('DETTAGLIO');
                         modGUI.chiudiRigaTabella;
                         modGUI.apriRigaTabella;
                             modGUI.apriElementoTabella;
@@ -1471,19 +1466,19 @@ end statisticaGenerale6;
         modGUI.ChiudiPagina;
     end visualizzaBox;
 
- procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as 
-begin 
+ procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as
+begin
     if(ruolo='R') then
     modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
 
     for i in (select * from autorimesse aut where aut.idsede=idriga)
     loop
     modGUI.apriIntestazione(2);
-        modGUI.inserisciTesto('Autorimessa ' || i.indirizzo);
+        modGUI.inserisciTesto('AUTORIMESSA DI ' || i.indirizzo);
     modGUI.chiudiIntestazione(2);
 
-   
-    
+
+
     modGUI.apriTabella;
 
                 modGUI.ApriRigaTabella;
@@ -1508,18 +1503,18 @@ begin
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(to_char(n.orauscita,'dd-MON-yy hh24:mi:ss'));
                         modGUI.ChiudiElementoTabella;
-                        modGUI.ChiudiRigaTabella;           
+                        modGUI.ChiudiRigaTabella;
     end loop;
     modGUI.ChiudiTabella;
 
     end loop;
 
- 
-    else 
+
+    else
     modGUI.apriPagina('HoC | Introiti', id_Sessione, nome, ruolo);
      modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per il responsabile');
     modGUI.chiudiPagina;
-    end if; 
+    end if;
        modgui.apriintestazione(3);
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
@@ -1527,7 +1522,7 @@ begin
             modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro',groupname || 'introiti');
             modgui.chiudidiv;
     modgui.chiudipagina;
-     
+
 end visualizzaintroitiparzialiabb;
 
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
@@ -1536,6 +1531,8 @@ end visualizzaintroitiparzialiabb;
         -- Nome del dipendente dirigente
         nome_dirigente Persone.Nome%TYPE;
         cognome_dirigente Persone.Cognome%TYPE;
+    -- ID del dirigente
+    id_persona Persone.idPersona%TYPE;
     begin
         begin
             -- Trova la sede
@@ -1543,7 +1540,7 @@ end visualizzaintroitiparzialiabb;
             from Sedi
             where Sedi.idSede = idRiga;
             -- Trova il nome del dirigente
-            select nome, cognome into nome_dirigente, cognome_dirigente
+            select P.idPersona, P.Nome, P.Cognome into id_persona, nome_dirigente, cognome_dirigente
             from Persone P
                 join Dipendenti D on D.idPersona = P.idPersona
                 where D.idDipendente = sede.idDipendente;
@@ -1558,43 +1555,43 @@ end visualizzaintroitiparzialiabb;
                 modGUI.esitoOperazione('KO', 'Nessuna sede trovata');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Sede di ' || sede.indirizzo);
+                    modGUI.inserisciTesto('SEDE DI ' || sede.indirizzo);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Sede');
+                        modGUI.IntestazioneTabella('ID SEDE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.idSede);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Indirizzo');
+                        modGUI.IntestazioneTabella('INDIRIZZO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.indirizzo);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Telefono');
+                        modGUI.IntestazioneTabella('TELEFONO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.telefono);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Coordinate');
+                        modGUI.IntestazioneTabella('COORDINATE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.coordinate);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Dirigente');
+                        modGUI.IntestazioneTabella('DIRIGENTE');
                         modGUI.ApriElementoTabella;
-                            modGUI.Collegamento(nome_dirigente || ' ' || cognome_dirigente, 'visualizzaDipendente?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || sede.idDipendente);
+                            modGUI.Collegamento(nome_dirigente || ' ' || cognome_dirigente, 'gruppo5.visualizzaDipendente?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_persona);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
-                        modGUI.IntestazioneTabella('Dettagli');
+                        modGUI.IntestazioneTabella('DETTAGLI');
                         modGUI.ApriElementoTabella;
                             modGUI.InserisciPenna(groupname || 'modificaSede', id_sessione, nome, ruolo, sede.idSede);
                         modGUi.ChiudiElementoTabella;
@@ -1604,16 +1601,16 @@ end visualizzaintroitiparzialiabb;
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Autorimesse');
+                    modGUI.inserisciTesto('AUTORIMESSE');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Autorimessa');
-                        modGUI.intestazioneTabella('Indirizzo');
-                        modGUI.intestazioneTabella('Telefono');
-                        modGUI.intestazioneTabella('Coordinate');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID AUTORIMESSA');
+                        modGUI.intestazioneTabella('INDIRIZZO');
+                        modGUI.intestazioneTabella('TELEFONO');
+                        modGUI.intestazioneTabella('COORDINATE');
+                        modGUI.intestazioneTabella('DETTAGLIO');
                     for autorimessa in (select * from Autorimesse where Autorimesse.idSede = sede.idSede)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1664,7 +1661,7 @@ end visualizzaintroitiparzialiabb;
             modGUI.chiudiForm;
         modGUI.chiudiPagina;
     end ricercaAuto;
-    
+
     procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int) is
     var_check1 boolean := false;
     var_check2 boolean := false;
@@ -1786,11 +1783,11 @@ end visualizzaintroitiparzialiabb;
             end if;
         modGUI.chiudiPagina;
     end resRicercaAuto;
-                                                               
-                                                               
-                                                               
-    procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
---suppongo che l'oprazione sia "con il maggior numero di posti liberi", visto che per ora 
+
+
+
+    procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+--suppongo che l'oprazione sia "con il maggior numero di posti liberi", visto che per ora
 --non esistono box riservati
 
 --CONTO QUANTI POSTI RISERVATI CI SONO PER OGNI AUTORIMESSA
@@ -1799,14 +1796,14 @@ from autorimesse,aree,box
 where autorimesse.idautorimessa=aree.idautorimessa and aree.idarea=box.idarea and box.riservato='F'
 group by autorimesse.indirizzo;
 
---VARIABILI 
+--VARIABILI
 scorriCursore MioCursore%ROWTYPE;
 nomeSede autorimesse.indirizzo%TYPE;
 posti number:=0;
 
-    
-  begin   
-  
+
+  begin
+
     open MioCursore;
     loop
     fetch MioCursore into scorriCursore;
@@ -1816,27 +1813,27 @@ posti number:=0;
         nomeSede:=scorriCursore.indirizzo;
     end if;
     exit when MioCursore%NOTFOUND;
-    
+
     end loop;
     close MioCursore;
-    
+
 --STAMPO
  modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('AUTORIMESSA CON MAGGIOR NUMERO DI POSTI RISERVATI');
-    modGUI.chiudiIntestazione(3);
+    modGUI.chiudiIntestazione(2);
     modGUI.apriDiv;
     modGUI.ApriTabella;
 
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('NomeSede');
-    modGUI.intestazioneTabella('NumPostiRiservati');
+    modGUI.intestazioneTabella('NOME SEDE');
+    modGUI.intestazioneTabella('NUMERO POSTI RISERVATI');
     modGUI.ChiudiRigaTabella;
-    
+
         modGUI.ApriRigaTabella;
-        
+
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(nomeSede);
     modGUI.ChiudiElementoTabella;
@@ -1847,103 +1844,87 @@ posti number:=0;
 
 
     modGUI.ChiudiRigaTabella;
-    
-    
+
+
 
     modGUI.ChiudiTabella;
     modGUI.chiudiDiv;
 
     modGUI.chiudiPagina;
 
-                --pulsante torna indietro
-        modGui.apriForm(groupname || 'modgui.creaHome');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
-
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
-        modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;                                                               
-
     END MaggiorPostiRiservati;
-                                                               
-                                                               
-    
-                                                               
-    PROCEDURE AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+
+    PROCEDURE AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     codiceAutorimessa autorimesse.idautorimessa%TYPE:=0;
 
 
 begin
- modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+ modGUI.apriPagina('HoC | Alimentazione veicolo più presente', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('VISUALIZZAZIONE ALIMENTAZIONE VEICOLO PIU PRESENTE');
-    modGUI.chiudiIntestazione(3);
-    
-    
+    modGUI.chiudiIntestazione(2);
+
+
     modGui.apriForm(groupname || 'AlimentazioneVeicolo2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
-    
-    
-    modgui.apriSelect('autorimessaScelta', 'Scegli autorimessa di riferimento');
+
+
+    modgui.apriSelect('autorimessaScelta', 'AUTORIMESSA DI RIFERIMENTO');
     --estraggo le autorimesse e le inserisco nella select
-    for scorriCursore in (select autorimesse.idautorimessa from autorimesse)
+    for scorriCursore in (select idautorimessa, indirizzo from autorimesse)
     loop
-            codiceAutorimessa:=scorriCursore.idautorimessa;
-                modgui.inserisciOpzioneSelect(TO_CHAR(codiceAutorimessa), TO_CHAR(codiceAutorimessa),true);
+        modgui.inserisciOpzioneSelect(scorriCursore.idAutorimessa, scorriCursore.indirizzo,true);
     end loop;
     --inserisco la possibilita di cercare il veicolo piu presente in tutte le autorimesse
     modgui.inserisciOpzioneSelect('Tutte','Tutte',true);
     modgui.chiudiSelect;
-    
+
     modGUI.apriDiv;
-    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.inserisciBottoneReset;
+    modGui.inserisciBottoneForm('RICERCA');
     modGUI.chiudiDiv;
     modGui.chiudiForm();
 
-    END AlimentazioneVeicolo;                                                              
-                        
-                                                               
-                                                               
-     PROCEDURE AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS 
+    END AlimentazioneVeicolo;
+
+
+
+     PROCEDURE AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS
     --variabili usate per controllare i veicoli acceduti in ingressi orari
    IdveicoloMaxIO number;
    PresenzeIO number:=0;
    AlimentazioneIO varchar2(10);
- 
+
    --variabili usate per controllare i veicoli acceduti in ingressi abbonamenti
    IdveicoloMaxIA number;
    PresenzeIA number:=0;
-   AlimentazioneIA varchar2(10); 
-    
-   ----variabili globali, conterranno il massimo dei valori ottenuti, quindi stampati 
+   AlimentazioneIA varchar2(10);
+
+   ----variabili globali, conterranno il massimo dei valori ottenuti, quindi stampati
    IdveicoloMax number;
    PresenzeMax number;
    Alimentazione varchar2(10);
-   
-   BEGIN 
 
-    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+   BEGIN
+
+    modGUI.apriPagina('HoC | Alimentazione veicolo più presente', id_Sessione, nome, ruolo);
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
-    
+    modGUI.apriIntestazione(2);
+
     if(autorimessaScelta='Tutte')then
-        modGUI.inserisciTesto('Visualizzazione alimentazione del veicolo piu presente in tutte le autorimesse ');
+        modGUI.inserisciTesto('VISUALIZZAZIONE ALIMENTAZIONE DEL VEICOLO PIU PRESENTE IN TUTTE LE AUTORIMESSE ');
     else
-        modGUI.inserisciTesto('Visualizzazione alimentazione del veicolo piu presente in autorimessa: '||autorimessaScelta);
+        modGUI.inserisciTesto('VISUALIZZAZIONE ALIMENTAZIONE DEL VEICOLO PIU PRESENTE IN AUTORIMESSA: '||autorimessaScelta);
     end if;
-    modGUI.chiudiIntestazione(3);
-    
-      
+    modGUI.chiudiIntestazione(2);
+
+
       if(autorimessaScelta='Tutte')then
           --ANALIZZO INGRESSI ORARI SU TUTTE LE AUTORIMESSE
           for scorriCursore in (
@@ -1954,29 +1935,29 @@ begin
           group by veicoli.idveicolo, veicoli.ALIMENTAZIONE
           order by veicoli.idveicolo, veicoli.ALIMENTAZIONE
           )
-          
+
            loop
-          
+
           if(scorriCursore.conta>PresenzeIO)then
             IdveicoloMaxIO:=scorriCursore.idveicolo;
             PresenzeIO:=scorriCursore.conta;
             AlimentazioneIO:=scorriCursore.alimentazione;
           end if;
           end loop;
-          
-          
-          
-          
+
+
+
+
           --ANALIZZO INGRESSI ABBONAMENTI SU TUTTE LE AUTORIMESSE
           for scorriCursore in (
             select  count(ingressiabbonamenti.idingressoabbonamento)as conta, veicoli.idveicolo, veicoli.ALIMENTAZIONE
             from ingressiabbonamenti, veicoli, effettuaingressiabbonamenti
             where ingressiabbonamenti.idingressoabbonamento=effettuaingressiabbonamenti.idingressoabbonamento and
-            effettuaingressiabbonamenti.idveicolo=veicoli.idveicolo 
+            effettuaingressiabbonamenti.idveicolo=veicoli.idveicolo
             group by veicoli.idveicolo, veicoli.ALIMENTAZIONE
             order by veicoli.idveicolo, veicoli.ALIMENTAZIONE
           )
-          
+
            loop
           --CALCOLO VALORI MASSIMI
           if(scorriCursore.conta>PresenzeIA)then
@@ -1985,10 +1966,10 @@ begin
             AlimentazioneIA:=scorriCursore.alimentazione;
           end if;
           end loop;
-          
+
 
       else ----CASO IN CUI VOGLIO SINGOLA AUTORIMESSA
-      
+
      --ANALIZZO INGRESSI ORARI SU SINGOLA AUTORIMESSA
         for scorriCursore in (
           select  count(ingressiorari.idingressoorario)as conta, veicoli.idveicolo, veicoli.ALIMENTAZIONE
@@ -2001,7 +1982,7 @@ begin
                autorimesse.idautorimessa=TO_NUMBER(autorimessaScelta)
          group by veicoli.idveicolo,veicoli.ALIMENTAZIONE
         )
-          
+
            loop
           --DETERMINO VALORI MASSIMI
           if(scorriCursore.conta>PresenzeIO)then
@@ -2010,9 +1991,9 @@ begin
             AlimentazioneIO:=scorriCursore.alimentazione;
           end if;
           end loop;
-          
-          
-          
+
+
+
           --ANALIZZO INGRESSI ABBONAMENTI SU SINGOLA AUTORIMESSA
           for scorriCursore in (
             select  count(ingressiabbonamenti.idingressoabbonamento)as conta, veicoli.idveicolo, veicoli.ALIMENTAZIONE
@@ -2025,7 +2006,7 @@ begin
                     autorimesse.idautorimessa=TO_NUMBER(autorimessaScelta)
             group by veicoli.idveicolo,veicoli.ALIMENTAZIONE
           )
-          
+
            loop
           --DETERMINO MASSIMI
           if(scorriCursore.conta>PresenzeIA)then
@@ -2037,7 +2018,7 @@ begin
 
 
       end if; --DISCRIMINANTE AUTORIMESSE SCELTE
-      
+
       --CONFRONTO VALORI FINALI E CALCOLO MASSIMO
         if(PresenzeIA>PresenzeIO)then
             PresenzeMax:=PresenzeIA;
@@ -2054,13 +2035,13 @@ begin
     modGUI.ApriTabella;
 
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Identificativo veicolo');
-    modGUI.intestazioneTabella('Alimentazione');
-    modGUI.intestazioneTabella('Presenze');
+    modGUI.intestazioneTabella('IDENTIFICATIVO VEICOLO');
+    modGUI.intestazioneTabella('ALIMENTAZIONE');
+    modGUI.intestazioneTabella('PRESENZE');
     modGUI.ChiudiRigaTabella;
-    
+
     modGUI.ApriRigaTabella;
-    
+
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(IdveicoloMax);
     modGUI.ChiudiElementoTabella;
@@ -2072,8 +2053,8 @@ begin
     modGUI.ChiudiElementoTabella;
       modGui.acapo;
     modGUI.ChiudiElementoTabella;
-    
-    modGUI.ChiudiRigaTabella;  
+
+    modGUI.ChiudiRigaTabella;
 
     modGUI.ChiudiTabella;
     modGUI.chiudiDiv;
@@ -2081,26 +2062,23 @@ begin
     modGUI.chiudiPagina;
 
                 --pulsante torna indietro
-        modGui.apriForm(groupname || 'AlimentazioneVeicolo');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
 
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
+
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('ALTRE OPERAZIONI');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriDiv(centrato => true);
+            modGui.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'alimentazioneVeicolo');
         modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;
 
-    END AlimentazioneVeicolo2;                                                           
-                                                               
-                                                               
-                                                               
-                                                               
-    PROCEDURE PercentualiPostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS 
-      
-      
+    END AlimentazioneVeicolo2;
+
+
+
+
+    PROCEDURE PercentualiPostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS
+
+
 --DICHIARO VARIABILI PER STAMPARE
 fasciaOraria fasceorarie.nome%TYPE;
 giorno fasceorarie.giorno%TYPE;
@@ -2109,49 +2087,50 @@ postiRiservati number;
 postiTotali number;
 percentuale number;
 
+var_check boolean := false;
+
 BEGIN
     --CALCOLO POSTI TOTALI PER L'AREA SCELTA
     select aree.postitotali into postiTotali from aree where aree.idarea=areaScelta ;
 
-    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.apriPagina('HoC | Visualizza posti liberi', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
-    modGUI.inserisciTesto('Visualizzazione posti liberi per '||modalita||', riguardo area: '||areaScelta);
-    modGUI.chiudiIntestazione(3);
-    
-    modGUI.apriDiv;
+    modGUI.apriIntestazione(2);
+    modGUI.inserisciTesto('VISUALIZZAZIONE POSTI LIBERI PER '||modalita||', RIGUARDO AREA: '||areaScelta);
+    modGUI.chiudiIntestazione(2);
+
     modGUI.ApriTabella;
     modGUI.ApriRigaTabella;
-    
-    
+
+
     if(modalita='fascia-oraria')then
-      modGUI.intestazioneTabella('Fascia oraria');
+      modGUI.intestazioneTabella('FASCIA ORARIA');
     else
-      modGUI.intestazioneTabella('Giorno');
+      modGUI.intestazioneTabella('GIORNO');
     end if;
-    modGUI.intestazioneTabella('Posti liberi');
+    modGUI.intestazioneTabella('POSTI LIBERI');
     modGUI.ChiudiRigaTabella;
-    
+
   --CASO IN CUI SCELTA VISUALIZZAZIONE PER FASCIA ORARIA
   if(modalita='fascia-oraria')then
 
     --CONTO QUANTI POSTI OCCUPATI CI SONO PER OGNI FASCIA ORARIA
     for scorriCursoreFasceOrarie in (
-        select distinct fasceorarie.nome, count(ingressiorari.idingressoorario)as postiRiservati, aree.idarea 
+        select distinct fasceorarie.nome, count(ingressiorari.idingressoorario)as postiRiservati, aree.idarea
         from ingressiorari,box,aree,areefasceorarie,fasceorarie
-        where ingressiorari.idbox=box.idbox and 
-          box.idarea=aree.idarea and 
+        where ingressiorari.idbox=box.idbox and
+          box.idarea=aree.idarea and
           aree.idarea=areefasceorarie.idarea and
           areefasceorarie.idfasciaoraria=fasceorarie.idfasciaoraria and
-          aree.idarea=areaScelta 
+          aree.idarea=areaScelta
           group by aree.idarea, fasceorarie.nome
           order by fasceorarie.nome,aree.idarea
     )
-    loop 
-    
+    loop
+    var_check := true;
     modGUI.ApriRigaTabella;
-                
+
         fasciaOraria:=scorriCursoreFasceOrarie.nome;
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(fasciaOraria);
@@ -2163,36 +2142,37 @@ BEGIN
         --CALCOLO QUANTO SONO IN PERCENTUALE
         percentuale:=((postiTotali-postiRiservati)*100)/postiTotali;
         modGUI.ApriElementoTabella;
-        
+
         if(percentuale<0)then --CASO IN CUI NEL COMPLESSO, TRA MATTINA E SERA, NON CI SONO MAI POSTI LIBERI
             modGUI.ElementoTabella(0||'%');
         else
             modGUI.ElementoTabella(TO_CHAR(percentuale,'fm90.00')||'%');
         end if;
         modGUI.ChiudiElementoTabella;
-        
+
         modGUI.ChiudiRigaTabella;
-    
-    
+
+
     end loop;
-   
-  else --CASO IN CUI SCELTA VISUALIZZAZIONE PER GIORNO 
+
+  else --CASO IN CUI SCELTA VISUALIZZAZIONE PER GIORNO
     for scorriCursoreGiorni in (
-        select distinct aree.idarea, fasceorarie.giorno , count(ingressiorari.idingressoorario) as postiRiservati  
+        select distinct aree.idarea, fasceorarie.giorno , count(ingressiorari.idingressoorario) as postiRiservati
         from ingressiorari,box,aree,areefasceorarie,fasceorarie
-        where ingressiorari.idbox=box.idbox and 
-          box.idarea=aree.idarea and 
+        where ingressiorari.idbox=box.idbox and
+          box.idarea=aree.idarea and
           aree.idarea=areefasceorarie.idarea and
           areefasceorarie.idfasciaoraria=fasceorarie.idfasciaoraria and
           aree.idarea=areaScelta
-          group by fasceorarie.giorno, aree.idarea 
+          group by fasceorarie.giorno, aree.idarea
           order by fasceorarie.giorno,aree.idarea
-    
+
     )
     loop
+        var_check := true;
         modGUI.ApriRigaTabella;
-        
-        
+
+
         giorno:=scorriCursoreGiorni.giorno;
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(giorno);
@@ -2207,69 +2187,67 @@ BEGIN
             modGUI.ElementoTabella(TO_CHAR(percentuale,'fm90.00')||'%');
         end if;
         modGUI.ChiudiElementoTabella;
-        
+
         modGUI.ChiudiRigaTabella;
-    
+
     end loop;
     end if;
 
             modgui.chiuditabella;
-        modgui.chiudidiv;
-  
-  
-            --pulsante torna indietro
-        modGui.apriForm(groupname || 'percentualiPostiliberi');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
-
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
+    if (var_check = false) then
+        modGUI.apriDiv(centrato => true);
+            modGUI.inserisciTesto('NESSUN RISULTATO');
         modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;
-    
+        modGUI.aCapo;
+        modGUI.aCapo;
+        modGUI.aCapo;
+        modGUI.aCapo;
+    end if;
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('ALTRE OPERAZIONI');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriDiv(centrato => true);
+            modGui.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'percentualiPostiLiberi');
+        modGUI.chiudiDiv;
+
         modgui.chiudipagina;
 
-    END PercentualiPostiLiberi2;                                                           
-                                                               
-                                                               
-                                                               
-                                                               
-     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+    END PercentualiPostiLiberi2;
+
+
+
+
+     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2) is
 
     --VARIABILE CONTENENTE AREA SCELTA
     codiceArea aree.idarea%TYPE;
-
-
 begin
  modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('VISUALIZZAZIONE POSTI LIBERI');
-    modGUI.chiudiIntestazione(3);
-    
-    
+    modGUI.chiudiIntestazione(2);
+
+
     modGui.apriForm(groupname || 'PercentualiPostiLiberi2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
-    
+
     --RADIO1
     modGUI.apriDiv;
     modGui.inserisciRadioButton('Per fascia oraria', 'modalita', 'fascia-oraria', true);
     modGUI.chiudiDiv;
-    
+
     modgui.acapo;
-    
+
     --RADIO2
     modGUI.apriDiv;
     modGui.inserisciRadioButton('Per giorno', 'modalita', 'giorno');
     modGUI.chiudiDiv;
     modgui.acapo;
-    
+
     --SELECT
     modgui.apriSelect('areaScelta', 'Scegli area riferimento');
     --ESTRAGGO AREE DA QUERY E LE METTO NELLA SELECT
@@ -2280,17 +2258,16 @@ begin
     end loop;
 
     modgui.chiudiSelect;
-    
-    modGUI.apriDiv;
-    modGui.inserisciBottoneForm('SUBMIT');
-    modGUI.chiudiDiv;
-    modGui.chiudiForm();
-  
-    end PercentualiPostiLiberi;                                                          
-                                                               
-                                                               
-                                                               
-    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+
+    modGUI.inserisciBottoneReset;
+    modGui.inserisciBottoneForm('VISUALIZZA');
+    modGui.chiudiForm;
+
+    end PercentualiPostiLiberi;
+
+
+
+    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
 
     --VARIABILI STAMPATE
     Lunghezza aree.lunghezzaMax%type;
@@ -2300,8 +2277,8 @@ begin
     Area aree.idarea%type;
     --VARIABILI PER CALCOLO
     media number:=0;
-    
-  begin   
+
+  begin
   --CALCOLO LA MEDIA DEI VALORI DI OGNI AREA
   for scorriCursore in (
     select (aree.lunghezzaMax+aree.larghezzaMax+aree.altezzaMax+aree.pesoMax)/4 as media,
@@ -2318,27 +2295,27 @@ begin
         Larghezza:=scorriCursore.larghezzaMax;
         Peso:=scorriCursore.pesoMax;
     end if;
-  
+
   end loop;
-   
+
 --STAMPO
- modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+ modGUI.apriPagina('HoC | Maggior tipo di veicolo ospitato da una determinata area', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('IL MAGGIOR TIPO VEICOLO E OSPITATO DALLA SEGUENTE AREA:');
-    modGUI.chiudiIntestazione(3);
-    modGUI.apriDiv;
+    modGUI.chiudiIntestazione(2);
+
     modGUI.ApriTabella;
 
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Area');
-    modGUI.intestazioneTabella('lunghezzaMax');
-    modGUI.intestazioneTabella('larghezzaMax');
-    modGUI.intestazioneTabella('pesoMax');
-    modGUI.intestazioneTabella('altezzaMax');
+    modGUI.intestazioneTabella('AREA');
+    modGUI.intestazioneTabella('LUNGHEZZA MAX');
+    modGUI.intestazioneTabella('LARGHEZZA MAX');
+    modGUI.intestazioneTabella('PESO MAX');
+    modGUI.intestazioneTabella('ALTEZZA MAX');
     modGUI.ChiudiRigaTabella;
-    
+
         modGUI.ApriRigaTabella;
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(Area);
@@ -2360,94 +2337,67 @@ begin
     modGUI.ElementoTabella(' cm');
     modGUI.ChiudiElementoTabella;
     modGUI.ChiudiRigaTabella;
-    
-    
+
+
 
     modGUI.ChiudiTabella;
-    modGUI.chiudiDiv;
-    
-                --pulsante torna indietro
-        modGui.apriForm(groupname || 'modgui.creaHome');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
-
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
-        modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;    
 
     modGUI.chiudiPagina;
 
     end MaxTipoVeicolo;
-    
-   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+
+   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
 BEGIN
 
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('VISUALIZZAZIONE CLIENTI SENZA ABBONAMENTO RINNOVATO');
-    modGUI.chiudiIntestazione(3);
+    modGUI.chiudiIntestazione(2);
     modGUI.apriDiv;
     modGUI.ApriTabella;
-    
-    
+
+
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Nome');
-    modGUI.intestazioneTabella('Cognome');
+    modGUI.intestazioneTabella('NOME');
+    modGUI.intestazioneTabella('COGNOME');
     modGUI.ChiudiRigaTabella;
-    
+
  for scorriCursore in (
-    SELECT  
+    SELECT
       (((abbonamenti.dataFine-
         abbonamenti.datainizio)-1)/TipiAbbonamenti.durata) as Rinnovato,
         persone.Nome, persone.cognome
     FROM TipiAbbonamenti, abbonamenti, Clienti, Persone
     where TipiAbbonamenti.idTipoabbonamento=abbonamenti.idTipoabbonamento and
       Clienti.idcliente=abbonamenti.idcliente and
-      Clienti.idpersona=Persone.idpersona      
+      Clienti.idpersona=Persone.idpersona
  )
- 
+
  loop
   IF(scorricursore.rinnovato<=1)then
-  
+
     modGUI.ApriRigaTabella;
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(scorricursore.nome);
     modGUI.ChiudiElementoTabella;
-    
+
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(scorricursore.Cognome);
     modGUI.ChiudiElementoTabella;
-    
-  end if;
- 
- 
- end loop;
- 
-    modGUI.ChiudiTabella;
-    modGUI.chiudiDiv; 
-    
-        --pulsante torna indietro
-        modGui.apriForm(groupname || 'modgui.creaHome');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
 
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
-        modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;
-    
- 
+  end if;
+
+
+ end loop;
+
+    modGUI.ChiudiTabella;
+    modGUI.chiudiDiv;
+
+
 END ClientiSenzaAbbonamentoRinnovato;
 
-FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as 
+FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as
 
 --PARAMETRI DEL VEICOLO RICEVUTO, DI CUI DEVO TROVARE UN BOX VALIDO
 AltezzaScelta veicoli.altezza%TYPE;
@@ -2460,7 +2410,7 @@ idAreaOttenuta aree.idarea%type;
 trovato boolean:=false;
 
 --ECCEZIONE NEL CASO NON SIA DISPONIBILE NESSUN BOX
-boxnontrovatoexception EXCEPTION; 
+boxnontrovatoexception EXCEPTION;
   PRAGMA EXCEPTION_INIT(boxnontrovatoexception, -1466);
 
 
@@ -2470,7 +2420,7 @@ BEGIN
   select veicoli.larghezza into larghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
   select veicoli.lunghezza into lunghezzaScelta from veicoli  where veicoli.idveicolo=idveicoloScelto;
   select veicoli.peso into pesoScelto from veicoli  where veicoli.idveicolo=idveicoloScelto;
-  
+
   --CERCO UN'AREA ADATTA PER DIMENSIONI
  for scorriCursoreAree in (
     select autorimesse.idautorimessa,aree.idarea,aree.altezzaMax as altezzaCalcolata, aree.larghezzaMax as larghezzaCalcolata, aree.lunghezzaMax as lunghezzaCalcolata, aree.pesoMax as pesoCalcolato
@@ -2479,61 +2429,61 @@ BEGIN
 
   )
   loop --VERIFICO SE AREA E'ADATTA
-    
-  --PER OGNI AREA ADATTA, CERCO BOX DI QUESTE DIMENSIONI  
+
+  --PER OGNI AREA ADATTA, CERCO BOX DI QUESTE DIMENSIONI
   if(altezzaScelta<scorriCursoreAree.altezzaCalcolata and larghezzaScelta< scorriCursoreAree.larghezzaCalcolata and lunghezzaScelta< scorriCursoreAree.lunghezzaCalcolata and pesoScelto<scorriCursoreAree.PesoCalcolato and trovato=false)then
      idAreaOttenuta:=scorriCursoreAree.idarea;
     --HO TROVATO UN'AREA, VERIFICO SE C'E' UN BOX VUOTO
      for scorriCursoreBox in(
-       select box.idbox 
+       select box.idbox
        from box,aree
        where box.idarea=aree.idarea
             and aree.idarea=idAreaOttenuta
             and box.occupato='F'
             and box.riservato='F'
       )
-      loop 
-      if(trovato=false)then 
+      loop
+      if(trovato=false)then
         idboxOttenuto:=scorriCursoreBox.idbox;
-        
+
         if(idboxOttenuto!=-1)then--BOX TROVATO, SE VALIDO SETTO TROVATO A TRUE
           trovato:=true;
         end if;
-        
+
       end if; --if trovato
 
       end loop; --fine loop genera box
   end if;
   end loop; --fine loop genera aree
-  
+
   --SE NON CI SONO BOX DISPONIBILI
-  if(idboxOttenuto=-1)then 
+  if(idboxOttenuto=-1)then
     raise boxnontrovatoexception;
   end if;
-  
+
   return idboxOttenuto;
-  
+
 END RICERCAPOSTO;
 
-     PROCEDURE VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+     PROCEDURE VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     AlimentazioneScelta1 veicoli.alimentazione%TYPE;
     AlimentazioneScelta2 veicoli.alimentazione%TYPE;
-    
+
 BEGIN
-   modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+   modGUI.apriPagina('HoC | Visualizza veicoli per tipo carburante', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
-    modGUI.chiudiIntestazione(3);
-    
+    modGUI.chiudiIntestazione(2);
+
     modGui.apriForm(groupname || 'VEICOLIPERTIPOCARBURANTE2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
-    
+
     --PRIMA SELECT PER PRIMA ALIMENTAZIONE
     modgui.apriSelect('tipoAlimentazione1', 'Tipologia 1');
     --estraggo le autorimesse e le inserisco nella select
@@ -2543,8 +2493,8 @@ BEGIN
             modgui.inserisciOpzioneSelect(AlimentazioneScelta1, AlimentazioneScelta1,true);
     end loop;
     modgui.chiudiSelect;
-    
-    
+
+
         --SECONDA SELECT PER SECONDA ALIMENTAZIONE
     modgui.apriSelect('tipoAlimentazione2', 'Tipologia 2');
     --estraggo le autorimesse e le inserisco nella select
@@ -2554,70 +2504,71 @@ BEGIN
             modgui.inserisciOpzioneSelect(AlimentazioneScelta2, AlimentazioneScelta2,true);
     end loop;
     modgui.chiudiSelect;
-    
-    
+
+
     modgui.inserisciInput('dataInizioInserita', 'Scegli data inizio abbonamento', 'date', true);
     modgui.inserisciInput('dataFineInserita', 'Scegli data fine abbonamento', 'date', true);
-    
+
     modGUI.apriDiv;
-    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.inserisciBottoneReset;
+    modGui.inserisciBottoneForm('VISUALIZZA');
     modGUI.chiudiDiv;
     modGui.chiudiForm;
-  
+
 END VeicoliPerTipoCarburante;
-    
-    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS 
+
+    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
 
    AlimentazionePiuNumerosa veicoli.alimentazione%type;
    NumAbbonamenti number:=0;
-    
 
-BEGIN   
+
+BEGIN
 
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
-    
+
     if(TO_DATE(dataInizioInserita,'YYYY-MM-DD') > TO_DATE(dataFineInserita,'YYYY-MM-DD'))then
       modgui.esitoOperazione('KO','Data inserita errata');
     else
-    
-    modGUI.apriIntestazione(3);
+
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('VISUALIZZAZIONE');
-    modGUI.chiudiIntestazione(3);   
+    modGUI.chiudiIntestazione(2);
 
 
     for scorriCursore in (
-  select veicoli.alimentazione, count(abbonamenti.idabbonamento) as codice
+  select distinct veicoli.alimentazione, count(abbonamenti.idabbonamento) as codice
         from veicoli,abbonamentiVeicoli,abbonamenti
         where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
                 abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
                 abbonamenti.dataInizio>= TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
                 abbonamenti.dataFine<= TO_DATE(dataFineInserita,'YYYY-MM-DD')
-        group by veicoli.alimentazione 
+        group by veicoli.alimentazione
 
     )
-    loop 
+    loop
         if(scorriCursore.codice > NumAbbonamenti)then
             NumAbbonamenti:=scorriCursore.codice ;
-            AlimentazionePiuNumerosa:=scorriCursore.alimentazione;     
-            
-        end if;    
+            AlimentazionePiuNumerosa:=scorriCursore.alimentazione;
 
-        
+        end if;
+
+
     end loop;
 
- 
+
      modGUI.apriDiv;
     modGUI.ApriTabella;
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Targa');
-    modGUI.intestazioneTabella('Modello');
-    modGUI.intestazioneTabella('Alimentazione');
+    modGUI.intestazioneTabella('TARGA');
+    modGUI.intestazioneTabella('MODELLO');
+    modGUI.intestazioneTabella('ALIMENTAZIONE');
     modGUI.ChiudiRigaTabella;
-    
-    
-    
+
+
+
     for scorriCursore in (
-            select veicoli.alimentazione, veicoli.targa, veicoli.modello
+            select distinct veicoli.alimentazione, veicoli.targa, veicoli.modello
             from veicoli,abbonamentiVeicoli,abbonamenti
             where   veicoli.idveicolo=abbonamentiVeicoli.idveicolo and
                     abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
@@ -2625,120 +2576,117 @@ BEGIN
                     abbonamenti.dataFine<=TO_DATE(dataFineInserita,'YYYY-MM-DD')  and
                     veicoli.alimentazione=AlimentazionePiuNumerosa
     )
-    loop 
-   
+    loop
+
     modGUI.ApriRigaTabella;
 
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(scorricursore.targa);
     modGUI.ChiudiElementoTabella;
-   
+
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(scorricursore.modello);
     modGUI.ChiudiElementoTabella;
-    
+
     modGUI.ApriElementoTabella;
     modGUI.ElementoTabella(scorricursore.alimentazione);
     modGUI.ChiudiElementoTabella;
-   
-   
+
+
     modGUI.ChiudiRigaTabella;
-    end loop;    
-    
+    end loop;
+
     modGUI.chiudiTabella;
-    
+
     IF(NumAbbonamenti=0)THEN
       modgui.esitoOperazione('KO','Non ci sono veicoli disponibili per questo periodo');
     end if;
-    
-end if;  
-            --pulsante torna indietro
-        modGui.apriForm(groupname || 'veicoliPerTipocarburante');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
 
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
+end if;
+            --pulsante torna indietro
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('ALTRE OPERAZIONI');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriDiv(centrato => true);
+            modGui.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'veicoliPerTipocarburante');
         modGUI.chiudiDiv;
-        modgui.chiudiForm;    
 
 
 END VeicoliPerTipoCarburante2;
-                                                          
-    PROCEDURE PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS 
+
+    PROCEDURE PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
     BEGIN
    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
 
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('SCEGLI SE VISUALIZZARE REPORT PER AUTORIMESSE O MENO');
-    modGUI.chiudiIntestazione(3);
-    
+    modGUI.chiudiIntestazione(2);
+
     modGui.apriForm(groupname || 'PostoAreaPiuUsato2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
-    
+
     --RADIO1
     modGUI.apriDiv;
     modGui.inserisciRadioButton('Per autorimessa', 'PerAutorimessa', '1', true);
     modGUI.chiudiDiv;
-    
+
     modgui.acapo;
-    
+
     --RADIO2
     modGUI.apriDiv;
     modGui.inserisciRadioButton('Totale', 'PerAutorimessa', '0');
     modGUI.chiudiDiv;
     modgui.acapo;
-    
+
     modGUI.apriDiv;
-    modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.inserisciBottoneReset;
+    modGui.inserisciBottoneForm('VISUALIZZA');
     modGUI.chiudiDiv;
-    modGui.chiudiForm();
-    
+    modGui.chiudiForm;
+
 END PostoAreaPiuUsato;
-                                                          
-                                                         
-   PROCEDURE PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number) AS 
+
+
+   PROCEDURE PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number) AS
 
   --variabili usate se visualizzo per autorimesse singole
   IdBoxPiuPresente box.idbox%type;
   IdAreaPiuPresente aree.idArea%type;
   ParcheggioPiuPresente autorimesse.idautorimessa%type:=0;
   Presenze integer:=0;
-  
+
   --variabili usate se visualizzo per autorimesse totali
   PresenzeAssolutoArea integer;
   IdAreaPiuPresenteAssolutoArea aree.idArea%type;
   ParcheggioPiuPresenteAssolutoArea autorimesse.idautorimessa%type:=0;
-  
+
   PresenzeAssolutoBox integer;
   IdBoxPiuPresenteAssolutoBox box.idbox%type;
   ParcheggioPiuPresenteAssolutoBox autorimesse.idautorimessa%type:=0;
   --contatori per stampare, usate se visualizzo per autorimesse totali
   i number:=0;
   j number:=0;
-  
+
 BEGIN
 
-    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
+    modGUI.apriPagina('HoC | Posto area più usato', id_Sessione, nome, ruolo);
     modGUI.aCapo;
-    modGUI.apriIntestazione(3);
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('AREE PIU USATE');
-    modGUI.chiudiIntestazione(3);
+    modGUI.chiudiIntestazione(2);
 
     --CREO TABELLA PER AREE
     modGUI.apriDiv;
     modGUI.ApriTabella;
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Area');
-    modGUI.intestazioneTabella('Presenze');
-    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.intestazioneTabella('AREA');
+    modGUI.intestazioneTabella('PRESENZE');
+    modGUI.intestazioneTabella('AUTORIMESSA');
     modGUI.ChiudiRigaTabella;
-    
+
 
     --CALCOLO VALORI
     for cursoreAree in (
@@ -2776,26 +2724,26 @@ BEGIN
         where idAutorimessa = T.idAutorimessa
     )
     order by idAutorimessa )
-    
-    loop 
-        
+
+    loop
+
     --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
     if(PerAutorimessa=1)then
         modGUI.ApriRigaTabella;
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(cursoreAree.idarea);
         modGUI.ChiudiElementoTabella;
-        
+
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(cursoreAree.numingressi);
         modGUI.ChiudiElementoTabella;
-    
+
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(cursoreAree.idautorimessa);
         modGUI.ChiudiElementoTabella;
-    
+
         modGUI.ChiudiRigaTabella;
-    else  
+    else
             --PER AUTORIMESSE TOTALI
             if(i=0)then--PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
                 PresenzeAssolutoArea:=cursoreAree.numingressi;
@@ -2803,42 +2751,42 @@ BEGIN
                 ParcheggioPiuPresenteAssolutoArea:=cursoreAree.idautorimessa;
 
                 modGUI.ApriRigaTabella;
-                
+
                 modGUI.ApriElementoTabella;
                 modGUI.ElementoTabella(IdAreaPiuPresenteAssolutoArea);
                 modGUI.ChiudiElementoTabella;
-                
+
                 modGUI.ApriElementoTabella;
                 modGUI.ElementoTabella(PresenzeAssolutoArea);
                 modGUI.ChiudiElementoTabella;
-                
+
                 modGUI.ApriElementoTabella;
                 modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoArea);
                 modGUI.ChiudiElementoTabella;
-                
+
                 modGUI.ChiudiRigaTabella;
                 modgui.chiuditabella;
                 modgui.chiudiDiv;
             end if;
-           
+
     end if;
     i:=i+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
     end loop;
     modgui.chiuditabella;
-    
-    --CREO TABELLA PER BOX 
-    modGUI.apriIntestazione(3);
+
+    --CREO TABELLA PER BOX
+    modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('BOX PIU USATI');
-    modGUI.CHIUDIIntestazione(3);
-    
+    modGUI.CHIUDIIntestazione(2);
+
     modGUI.apriDiv;
     modGUI.ApriTabella;
     modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('Box');
-    modGUI.intestazioneTabella('Presenze');
-    modGUI.intestazioneTabella('Autorimessa');
+    modGUI.intestazioneTabella('BOX');
+    modGUI.intestazioneTabella('PRESENZE');
+    modGUI.intestazioneTabella('AUTORIMESSA');
     modGUI.ChiudiRigaTabella;
-    
+
     --CALCOLO VALORI
     for cursoreBox in (
       with
@@ -2877,54 +2825,54 @@ where T.NumIngressi = (
 order by idAutorimessa,numingressi
     )
     loop
-    
+
     --PER AUTORIMESSA SINGOLA, STAMPO CICLICAMENTE CIO CHE RESTITUISCE LA QUERY, CONTENUTO NEL CURSORE
     if(PerAutorimessa=1)then --ParcheggioPiuPresente=0 di default
-    
+
         if(ParcheggioPiuPresente!=cursoreBox.idautorimessa)then --TRICK PER STAMPARE IL MASSIMO DI OGNI AUTORIMESSA, DATO CHE CURSORE RESTITUISCE ORDER BY AUTORIMESSE. SE CAMBIA AUTORIMESSA, COME SCORRO, STAMPO
             ParcheggioPiuPresente:=cursoreBox.idautorimessa;--assegno
-            
+
             modGUI.ApriRigaTabella;
-            
+
             modGUI.ApriElementoTabella;
             modGUI.ElementoTabella(cursoreBox.idbox);
             modGUI.ChiudiElementoTabella;
-            
+
             modGUI.ApriElementoTabella;
             modGUI.ElementoTabella(cursoreBox.numingressi);
             modGUI.ChiudiElementoTabella;
-            
+
             modGUI.ApriElementoTabella;
             modGUI.ElementoTabella(cursoreBox.idautorimessa);
             modGUI.ChiudiElementoTabella;
-            
+
             modGUI.ChiudiRigaTabella;
         end if;
-        
+
     else --PER AUTORIMESSE TOTALI
-            
+
                 if(j=0)then --PRENDO VALORI MASSIMI, CONTENUTI NELLA PRIMA RIGA, GRAZIE A ORDER BY (MAX), E LI STAMPO
                     PresenzeAssolutoBox:=cursoreBox.numingressi;
                     IdBoxPiuPresenteAssolutoBox:=cursoreBox.idbox;
                     ParcheggioPiuPresenteAssolutoBox:=cursoreBox.idautorimessa;
-        
+
                     modGUI.ApriRigaTabella;
-                    
+
                     modGUI.ApriElementoTabella;
                     modGUI.ElementoTabella(IdBoxPiuPresenteAssolutoBox);
                     modGUI.ChiudiElementoTabella;
-                    
+
                     modGUI.ApriElementoTabella;
                     modGUI.ElementoTabella(PresenzeAssolutoBox);
                     modGUI.ChiudiElementoTabella;
-                    
+
                     modGUI.ApriElementoTabella;
                     modGUI.ElementoTabella(ParcheggioPiuPresenteAssolutoBox);
                     modGUI.ChiudiElementoTabella;
-                    
+
                     modGUI.ChiudiRigaTabella;
                     modgui.chiuditabella;
-                    modgui.chiudiDiv;        
+                    modgui.chiudiDiv;
                 end if;
     end if;
     j:=j+1;--MI DICE CHE SONO DOPO LA PRIMA RIGA, CIOE IL MASSIMO
@@ -2932,24 +2880,20 @@ order by idAutorimessa,numingressi
     modgui.chiuditabella;
 
                 --pulsante torna indietro
-        modGui.apriForm(groupname || 'PostoAreaPiuUsato');
-        modGui.inserisciInputHidden('id_Sessione',id_sessione);
-        modGui.inserisciInputHidden('nome',nome);
-        modGui.inserisciInputHidden('ruolo',ruolo);        
-        
-        modGUI.apriDiv;
-        modGui.inserisciBottoneForm('INDIETRO');
+        modGUI.apriIntestazione(3);
+            modGUI.inserisciTesto('ALTRE OPERAZIONI');
+        modGUI.chiudiIntestazione(3);
+        modGUI.apriDiv(centrato => true);
+            modGui.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'PostoAreaPiuUsato');
         modGUI.chiudiDiv;
-        
-        modgui.chiudiForm;
-    
+
         modgui.chiudipagina;
 
 
-END PostoAreaPiuUsato2;    
-                                                          
-    
-    
+END PostoAreaPiuUsato2;
+
+
+
     procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
@@ -3001,7 +2945,7 @@ END PostoAreaPiuUsato2;
         into var_nomeAutorimessa
         from Autorimesse
         where Autorimesse.idAutorimessa = var_autorimessa;
-        
+
         modGUI.apriPagina('HoC | Visualizza dettagli cliente', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
             modGUI.inserisciTesto('DETTAGLI VEICOLI DI: ' || var_nomePersona || ' ' || var_cognomePersona);
@@ -3292,24 +3236,24 @@ END PostoAreaPiuUsato2;
                 if (ruolo <> 'A') then
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
-                    
+
                     select P.Nome, P.Cognome
                     into nome_cliente, cognome_cliente
                     from Clienti C
                         join Persone P on P.idPersona = C.idPersona
                     where C.idCliente = id_cliente;
-                
+
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Carburante del veicolo meno parcheggiato da ' || nome_cliente || ' ' || cognome_cliente || ' per ogni autorimessa');
+                        modGUI.inserisciTesto('CARBURANTE DEL VEICOLO MENO PARCHEGGIATO DA ' || nome_cliente || ' ' || cognome_cliente || ' per ogni autorimessa');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('ID Autorimessa');
-                            modGUI.intestazioneTabella('Indirizzo');
-                            modGUI.intestazioneTabella('Alimentazione');
-                            modGUI.intestazioneTabella('Ingressi');
-                            modGUI.intestazioneTabella('Dettagli');
+                            modGUI.intestazioneTabella('ID AUTORIMESSA');
+                            modGUI.intestazioneTabella('INDIRIZZO');
+                            modGUI.intestazioneTabella('ALIMENTAZIONE');
+                            modGUI.intestazioneTabella('INGRESSI');
+                            modGUI.intestazioneTabella('DETTAGLI');
                         modGUI.chiudiRigaTabella;
                         open cursore;
                         loop
@@ -3348,17 +3292,17 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Ingressi con costo sopra la media');
+                        modGUI.inserisciTesto('INGRESSI CON COSTO SOPRA LA MEDIA');
                     modGUI.chiudiIntestazione(2);
-                    
+
                     modGUI.apriForm(groupname || 'resIngressiSopraMedia');
                         modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
-                        
-                        modGUI.inserisciInput('Data inizio', 'date', 'var_inizio', true);
-                        modGUI.inserisciInput('Data fine', 'date', 'var_fine', false);
-                        
+
+                        modGUI.inserisciInput('var_inizio', 'Data inizio', 'date', true);
+                        modGUI.inserisciInput('var_fine', 'Data fine', 'date', false);
+
                         modGUI.inserisciBottoneReset;
                         modGUI.inserisciBottoneForm;
                     modGUI.chiudiForm;
@@ -3368,7 +3312,7 @@ END PostoAreaPiuUsato2;
     end ingressiSopraMedia;
 
     procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2) is
-        
+
         entrata_prevista IngressiOrari.EntrataPrevista%TYPE;
         ora_entrata IngressiOrari.OraEntrata%TYPE;
         ora_uscita IngressiOrari.OraUscita%TYPE;
@@ -3406,16 +3350,16 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Ingressi con costo sopra alla media del periodo ' || var_inizio || ' - ' || var_fine);
+                        modGUI.inserisciTesto('INGRESSI CON COSTO SOPRA LA MEDIA DEL PERIODO ' || var_inizio || ' - ' || var_fine);
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('Entrata Prevista');
-                            modGUI.intestazioneTabella('Ora Entrata');
-                            modGUI.intestazioneTabella('Ora Uscita');
-                            modGUI.intestazioneTabella('Costo');
-                            modGUI.intestazioneTabella('Sede');
+                            modGUI.intestazioneTabella('ENTRATA PREVISTA');
+                            modGUI.intestazioneTabella('ORA ENTRATA');
+                            modGUI.intestazioneTabella('ORA USCITA');
+                            modGUI.intestazioneTabella('COSTO');
+                            modGUI.intestazioneTabella('SEDE');
                         modGUI.chiudiRigaTabella;
 
                         open cursore;
@@ -3455,9 +3399,9 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                        modGUI.inserisciTesto('CLASSIFICA CLIENTI PER TEMPO MEDIO DI PERMANENZA');
                     modGUI.chiudiIntestazione(2);
-                    
+
                     modGUI.apriForm(groupname || 'resStatisticaGenerale3');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
@@ -3523,15 +3467,15 @@ END PostoAreaPiuUsato2;
                 else
 
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                        modGUI.inserisciTesto('CLASSIFICA CLIENTI PER TEMPO MEDIO DI PERMANENZA');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('ID Cliente');
-                            modGUI.intestazioneTabella('Nome');
-                            modGUI.intestazioneTabella('Tempo Medio');
-                            modGUI.intestazioneTabella('Dettagli');
+                            modGUI.intestazioneTabella('ID CLIENTE');
+                            modGUI.intestazioneTabella('NOME');
+                            modGUI.intestazioneTabella('TEMPO MEDIO');
+                            modGUI.intestazioneTabella('DETTAGLI');
                         modGUI.chiudiRigaTabella;
                         open riga;
                         loop
@@ -3548,7 +3492,7 @@ END PostoAreaPiuUsato2;
                                     modGUI.inserisciTesto(media);
                                 modGUI.chiudiElementoTabella;
                                 modGUI.apriElementoTabella;
-                                    modGUI.inserisciLente('visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
+                                    modGUI.inserisciLente(groupname || 'visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
                                 modGUI.chiudiElementoTabella;
                             modGUI.chiudiRigaTabella;
                         end loop;
@@ -3683,7 +3627,7 @@ END PostoAreaPiuUsato2;
                     coalesce(TotOrari.TotMulte, 0) + coalesce(TotAbbonamenti.TotMulte, 0) as TotMulte,
                     coalesce(TotOrari.Importo, 0) + coalesce(TotAbbonamenti.Importo, 0) as Importo
                 from TotOrari
-                    full outer join TotAbbonamenti on TotAbbonamenti.idCliente = TotOrari.idCliente 
+                    full outer join TotAbbonamenti on TotAbbonamenti.idCliente = TotOrari.idCliente
             )
         select P.idPersona PIP, C.idCliente CIC, P.Nome PN, P.Cognome PC, P.Indirizzo PI, TI.TotIngressi TITI, TI.TotMulte TITM, TI.Importo TII
         from Persone P
@@ -3989,16 +3933,16 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
             modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto('DETTAGLI QUINTA COMUNE');
             modGUI.chiudiIntestazione(2);
-            
+
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('DETTAGLI CLIENTE');
             modGUI.chiudiIntestazione(3);
-            
+
             select CodiceFiscale, Cognome, Nome, Indirizzo, Sesso, Email, Telefono, DataNascita
             into var_CF, var_Cognome, var_Nome, var_IndirizzoCliente, var_Sesso, var_Email, var_TelefonoCliente, var_DataNascita
             from Persone
             where idPersona = idRiga;
-            
+
             modGUI.apriTabella;
                 modGUI.apriRigaTabella;
                     modGUI.intestazioneTabella('ID CLIENTE');
@@ -4058,12 +4002,12 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
             modGUI.apriIntestazione(3);
                 modGUI.inserisciTesto('DETTAGLI AUTORIMESSA');
             modGUI.chiudiIntestazione(3);
-            
+
             select Indirizzo, Telefono, Coordinate
             into var_IndirizzoAutorimessa, var_TelefonoAutorimessa, var_Coordinate
             from Autorimesse
             where idAutorimessa = id_Autorimessa;
-            
+
             modGUI.apriTabella;
                 modGUI.apriRigaTabella;
                     modGUI.intestazioneTabella('ID AUTORIMESSA');
@@ -4101,22 +4045,34 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
 
     procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2) is
     begin
-            modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
-            modgui.acapo;
+            modGUI.apriPagina('HoC | Autorimessa con il massimo numero di posti riservati in un periodo', id_Sessione, nome, ruolo);
+            modgui.apriIntestazione(2);
+        modGUI.inserisciTesto('AUTORIMESSA CON IL MASSIMO NUMERO DI POSTI RISERVATI IN UN PERIODO');
+    modGUI.chiudiIntestazione(2);
             modgui.apriForm(groupname || 'autorimessaMaxPostiPeriodo');
             modgui.inserisciinputhidden('id_Sessione',id_Sessione);
             modgui.inserisciinputhidden('nome',nome);
             modgui.inserisciinputhidden('ruolo',ruolo);
 
-            modGUI.inserisciinput('Data inizio', 'date','x_datainiziale',true,'','defInput');
-            modGUI.inserisciinput('Data fine', 'date','y_datafinale',true,'','defInput');
+            modGUI.inserisciInput(
+                nome => 'x_datainiziale',
+                etichetta => 'Data inizio',
+                tipo => 'date',
+                richiesto => true
+            );
+            modGUI.inserisciInput(
+                nome => 'y_datafinale',
+                etichetta => 'Data fine',
+                tipo => 'date',
+                richiesto => true
+            );
 
-            modGUI.inserisciBottoneReset('RESET');
-            modGUI.inserisciBottoneForm('Submit','defFormButton');
+            modGUI.inserisciBottoneReset;
+            modGUI.inserisciBottoneForm(testo=>'RICERCA');
             modgui.chiudiform;
     end formAutorimessaMaxPostiPeriodo;
 
-    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is 
+    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is
     totaleabb integer :=0;
     totalebigl integer :=0;
     indirizzo varchar2 (100);
@@ -4137,10 +4093,10 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                     --datafinets:=TO_TIMESTAMP(datafinevar, 'yyyy-mm-dd hh24:mi:ss');
                     modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('Sede');
-                    modGUI.intestazioneTabella('Introiti Abbonamenti');
-                    modGUI.intestazioneTabella('Introiti Biglietti');
-                    modGUI.intestazioneTabella('Dettagli');
+                    modGUI.intestazioneTabella('SEDE');
+                    modGUI.intestazioneTabella('INTROITI ABBONAMENTI');
+                    modGUI.intestazioneTabella('INTROITI BIGLIETTI');
+                    modGUI.intestazioneTabella('DETTAGLI');
                     modgui.chiudirigatabella;
                     for i in (select * from sedi)
                         loop
@@ -4163,7 +4119,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                             modgui.chiudielementotabella;
                             modgui.chiudirigatabella;
 
-                            end loop;         
+                            end loop;
                         modgui.chiuditabella;
 
                     else --sede specifica con periodo
@@ -4175,10 +4131,10 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                         if(totalebigl is null) then totalebigl:=0; end if;
                         modGUI.apriTabella;
                         modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('Sede');
-                        modGUI.intestazioneTabella('Introiti Abbonamenti');
-                        modGUI.intestazioneTabella('Introiti Biglietti');
-                        modGUI.intestazioneTabella('Dettagli');
+                        modGUI.intestazioneTabella('SEDE');
+                        modGUI.intestazioneTabella('INTROITI ABBONAMENTI');
+                        modGUI.intestazioneTabella('INTROITI BIGLIETTI');
+                        modGUI.intestazioneTabella('DETTAGLI');
                         modgui.chiudirigatabella;
                         modGUI.ApriElementoTabella;
                         modGUI.ElementoTabella(indirizzo);
@@ -4192,30 +4148,30 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                         modGUI.ApriElementoTabella;
                         modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo,idsededapassare||'&periodo='||periodo||'&datainiziale='||datainiziale||'&datafinale='||datafinale);
                         modgui.chiudielementotabella;
-                        modgui.chiudirigatabella;        
+                        modgui.chiudirigatabella;
                         modgui.chiuditabella;
-                    end if;                
+                    end if;
             else
-            
+
             if((datainiziale is null or datafinale is null) and periodo=1) then
                 modGUI.apriIntestazione(2);
-                modGUI.inserisciTesto('Periodo non valido. Introiti totali');
+                modGUI.inserisciTesto('PERIODO NON VALIDO. INTROITI TOTALI');
                 modGUI.chiudiIntestazione(2);
             end if;
 
-            if(idsedecorrente=0) 
+            if(idsedecorrente=0)
                 then --tutte le sedi senza periodo
                     modgui.apritabella;
                     modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('Sede');
-                    modGUI.intestazioneTabella('Introiti Abbonamenti');
-                    modGUI.intestazioneTabella('Introiti Biglietti');
-                    modGUI.intestazioneTabella('Dettagli');
+                    modGUI.intestazioneTabella('SEDE');
+                    modGUI.intestazioneTabella('INTROITI ABBONAMENTI');
+                    modGUI.intestazioneTabella('INTROITI BIGLIETTI');
+                    modGUI.intestazioneTabella('DETTAGLI');
                     modgui.chiudirigatabella;
                     for i in (select * from sedi)
                         loop
                             select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede;
-                            select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null; 
+                            select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=i.idsede and ingora.orauscita is not null;
                             select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=i.idsede;
                             if(totaleabb is null) then totaleabb:=0; end if;
                             if(totalebigl is null) then totalebigl:=0; end if;
@@ -4232,22 +4188,22 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                             modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
                             modgui.chiudielementotabella;
                             modgui.chiudirigatabella;---------
-                        end loop;         
+                        end loop;
                     modgui.chiuditabella;
                 else --sede specifica senza periodo
                     select sum(abb.costoeffettivo) into totaleabb from box, abbonamenti abb, aree, autorimesse aut where box.idabbonamento=abb.idabbonamento and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente;
-                    select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null; 
+                    select sum(ingora.costo) into totalebigl from ingressiorari ingora,box, aree, autorimesse aut where ingora.idbox=box.idbox and box.idarea=aree.idarea and aree.idautorimessa=aut.idautorimessa and aut.idsede=idsedecorrente and ingora.orauscita is not null;
                     select sedi.indirizzo,sedi.idsede into indirizzo,idsededapassare from sedi where sedi.idsede=idsedecorrente;
                     if(totaleabb is null) then totaleabb:=0; end if;
                     if(totalebigl is null) then totalebigl:=0; end if;
                     modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('Sede');
-                    modGUI.intestazioneTabella('Introiti Abbonamenti');
-                    modGUI.intestazioneTabella('Introiti Biglietti');
-                    modGUI.intestazioneTabella('Dettagli');
+                    modGUI.intestazioneTabella('SEDE');
+                    modGUI.intestazioneTabella('INTROITI ABBONAMENTI');
+                    modGUI.intestazioneTabella('INTROITI BIGLIETTI');
+                    modGUI.intestazioneTabella('DETTAGLI');
                     modgui.chiudirigatabella;
-                    modGUI.ApriElementoTabella; 
+                    modGUI.ApriElementoTabella;
                     modGUI.ElementoTabella(indirizzo);
                     modGUI.ChiudiElementoTabella;
                     modGUI.ApriElementoTabella;
@@ -4259,9 +4215,9 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                     modGUI.ApriElementoTabella;
                     modGUI.InserisciLente('visualizzaintroitiparzialiabb', id_sessione, nome, ruolo, idsededapassare||'&periodo='||periodo||'&datainiziale='||'&datafinale=');
                     modgui.chiudielementotabella;
-                    modgui.chiudirigatabella;        
+                    modgui.chiudirigatabella;
                     modgui.chiuditabella;
-                end if;                
+                end if;
 
             end if;
 
@@ -4273,22 +4229,22 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
     maxboxoccupati integer;
     periodononvalido exception;
 
-    begin 
+    begin
 
     if(to_date(x_datainiziale,'yyyy-mm-dd')>to_date(y_datafinale,'yyyy-mm-dd')) then raise periodononvalido; end if;
     select ris1,ris2 into idautorimessacorrente, maxboxoccupati from(
     select idau as ris1, sum(tot) as ris2
         from
-        (select aree.idautorimessa as idau,count(box.idbox) as tot from box, aree, abbonamenti ab where 
-            (box.idarea=aree.idarea and box.idabbonamento=ab.idabbonamento and 
+        (select aree.idautorimessa as idau,count(box.idbox) as tot from box, aree, abbonamenti ab where
+            (box.idarea=aree.idarea and box.idabbonamento=ab.idabbonamento and
             ((ab.datainizio<to_date(x_datainiziale,'yyyy-mm-dd') and ab.datafine>to_date(x_datainiziale,'yyyy-mm-dd')) or (ab.datainizio>to_date(x_datainiziale,'yyyy-mm-dd') and ab.datainizio<to_date(y_datafinale,'yyyy-mm-dd'))))
         group by aree.idautorimessa
 
-        union 
+        union
 
-        select aree.idautorimessa as idau,count(box.idbox) as tot from box, aree, ingressiorari io  where 
+        select aree.idautorimessa as idau,count(box.idbox) as tot from box, aree, ingressiorari io  where
             (box.idarea=aree.idarea and io.idbox=box.idbox and
-            ((io.oraentrata<to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.orauscita>to_timestamp(x_datainiziale,'yyyy-mm-dd')) or (io.oraentrata>to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.oraentrata<to_timestamp(y_datafinale||' 23:59:00','yyyy-mm-dd hh24:mi:ss')))) 
+            ((io.oraentrata<to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.orauscita>to_timestamp(x_datainiziale,'yyyy-mm-dd')) or (io.oraentrata>to_timestamp(x_datainiziale,'yyyy-mm-dd') and io.oraentrata<to_timestamp(y_datafinale||' 23:59:00','yyyy-mm-dd hh24:mi:ss'))))
         group by aree.idautorimessa)
 
         group by idau
@@ -4301,46 +4257,41 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGUI.chiudiPagina();
 
         exception
-    when no_data_found then 
+    when no_data_found then
         modGUI.apripagina('HoC | Visualizza Autorimessa ', id_Sessione, nome, ruolo);
         modgui.acapo;
-        modgui.apriform('#');
         modGUI.apriIntestazione(2);
-        modgui.inseriscitesto('Nessun box riservato è stato trovato nel periodo selezionato');
+        modgui.inseriscitesto('NESSUN BOX RISERVATO È STATO TROVATO NEL PERIODO SELEZIONATO');
         modgui.chiudiintestazione(2);
-        modgui.chiudiform;
         modGUI.chiudiPagina();
 
     when periodononvalido then
         modGUI.apripagina('HoC | Eccezione ', id_Sessione, nome, ruolo);
         modgui.acapo;
-        modgui.apriform('#');
-        modGUI.apriIntestazione(2);
-        modgui.inseriscitesto('Periodo non valido');
-        modgui.chiudiintestazione(2);
-        modgui.chiudiform;
+            modgui.apriDiv;
+            modgui.esitoOperazione('KO', 'Periodo non valido');
         modGUI.chiudiPagina();
     end autorimessaMaxPostiPeriodo;
 
-    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
+    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2) is
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     AlimentazioneScelta1 veicoli.alimentazione%TYPE;
     AlimentazioneScelta2 veicoli.alimentazione%TYPE;
-    
+
     BEGIN
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
 
         modGUI.aCapo;
-        modGUI.apriIntestazione(3);
+        modGUI.apriIntestazione(2);
         modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
-        modGUI.chiudiIntestazione(3);
-        
+        modGUI.chiudiIntestazione(2);
+
         modGui.apriForm(groupname || 'VEICOLIPERTIPOCARBURANTE2');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);
-        
+
         --PRIMA SELECT PER PRIMA ALIMENTAZIONE
         modgui.apriSelect('tipoAlimentazione1', 'Tipologia 1');
         --estraggo le autorimesse e le inserisco nella select
@@ -4350,8 +4301,8 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                 modgui.inserisciOpzioneSelect(AlimentazioneScelta1, AlimentazioneScelta1,true);
         end loop;
         modgui.chiudiSelect;
-        
-        
+
+
             --SECONDA SELECT PER SECONDA ALIMENTAZIONE
         modgui.apriSelect('tipoAlimentazione2', 'Tipologia 2');
         --estraggo le autorimesse e le inserisco nella select
@@ -4361,34 +4312,35 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                 modgui.inserisciOpzioneSelect(AlimentazioneScelta2, AlimentazioneScelta2,true);
         end loop;
         modgui.chiudiSelect;
-        
-        
+
+
         modgui.inserisciInput('dataInizioInserita', 'Scegli data inizio abbonamento', 'date', true);
         modgui.inserisciInput('dataFineInserita', 'Scegli data fine abbonamento', 'date', true);
-        
+
         modGUI.apriDiv;
-        modGui.inserisciBottoneForm('SUBMIT');
+    modGUI.inserisciBottoneReset;
+        modGui.inserisciBottoneForm('RICERCA');
         modGUI.chiudiDiv;
         modGui.chiudiForm;
     END statisticaGenerale4;
 
-    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS 
+    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
 
     AlimentazionePiuNumerosa veicoli.alimentazione%type;
     NumAbbonamenti number:=0;
-        
+
 
     BEGIN
 
         modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
-        
+
         if(TO_DATE(dataInizioInserita,'YYYY-MM-DD') > TO_DATE(dataFineInserita,'YYYY-MM-DD'))then
         modgui.esitoOperazione('KO','Data inserita errata');
         else
-        
-        modGUI.apriIntestazione(3);
+
+        modGUI.apriIntestazione(2);
         modGUI.inserisciTesto('VISUALIZZAZIONE');
-        modGUI.chiudiIntestazione(3);   
+        modGUI.chiudiIntestazione(2);
 
 
         for scorriCursore in (
@@ -4398,30 +4350,30 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                     abbonamentiVeicoli.idabbonamento=abbonamenti.idabbonamento and
                     abbonamenti.dataInizio>= TO_DATE(dataInizioInserita,'YYYY-MM-DD') and
                     abbonamenti.dataFine<= TO_DATE(dataFineInserita,'YYYY-MM-DD')
-            group by veicoli.alimentazione 
+            group by veicoli.alimentazione
 
         )
-        loop 
+        loop
             if(scorriCursore.codice > NumAbbonamenti)then
                 NumAbbonamenti:=scorriCursore.codice ;
-                AlimentazionePiuNumerosa:=scorriCursore.alimentazione;     
-                
-            end if;    
+                AlimentazionePiuNumerosa:=scorriCursore.alimentazione;
 
-            
+            end if;
+
+
         end loop;
 
-    
+
         modGUI.apriDiv;
         modGUI.ApriTabella;
         modGUI.ApriRigaTabella;
-        modGUI.intestazioneTabella('Targa');
-        modGUI.intestazioneTabella('Modello');
-        modGUI.intestazioneTabella('Alimentazione');
+        modGUI.intestazioneTabella('TARGA');
+        modGUI.intestazioneTabella('MODELLO');
+        modGUI.intestazioneTabella('ALIMENTAZIONE');
         modGUI.ChiudiRigaTabella;
-        
-        
-        
+
+
+
         for scorriCursore in (
                 select veicoli.alimentazione, veicoli.targa, veicoli.modello
                 from veicoli,abbonamentiVeicoli,abbonamenti
@@ -4431,43 +4383,40 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
                         abbonamenti.dataFine<=TO_DATE(dataFineInserita,'YYYY-MM-DD')  and
                         veicoli.alimentazione=AlimentazionePiuNumerosa
         )
-        loop 
-    
+        loop
+
         modGUI.ApriRigaTabella;
 
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(scorricursore.targa);
         modGUI.ChiudiElementoTabella;
-    
+
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(scorricursore.modello);
         modGUI.ChiudiElementoTabella;
-        
+
         modGUI.ApriElementoTabella;
         modGUI.ElementoTabella(scorricursore.alimentazione);
         modGUI.ChiudiElementoTabella;
-    
-    
+
+
         modGUI.ChiudiRigaTabella;
-        end loop;    
-        
+        end loop;
+
         modGUI.chiudiTabella;
-        
+
         IF(NumAbbonamenti=0)THEN
         modgui.esitoOperazione('KO','Non ci sono veicoli disponibili per questo periodo');
         end if;
-        
-    end if;  
-                --pulsante torna indietro
-            modGui.apriForm(groupname || 'statisticaGenerale4');
-            modGui.inserisciInputHidden('id_Sessione',id_sessione);
-            modGui.inserisciInputHidden('nome',nome);
-            modGui.inserisciInputHidden('ruolo',ruolo);        
-            
 
-            modGUI.apriDiv;
-            modGui.inserisciBottoneForm('INDIETRO');
-            modGUI.chiudiDiv;
-            modgui.chiudiForm;
+    end if;
+                --pulsante torna indietro
+    modGui.apriIntestazione(3);
+        modGUI.inserisciTesto('ALTRE OPERAZIONI');
+    modGUI.chiudiIntestazione(3);
+    modGUI.apriDiv(centrato=>true);
+        modGUI.inserisciBottone(id_Sessione, nome, ruolo, 'INDIETRO', groupname || 'statisticaGenerale4');
+    modGUI.chiudiDiv;
+
     END resStatisticaGenerale4;
 end gruppo2;
