@@ -332,15 +332,6 @@ modgui.apriForm(groupname || 'introitiparziali');
         end loop;
 
         modGUI.chiudiSelect;
-<<<<<<< HEAD
-=======
-
-
->>>>>>> master
-
-
-
-
 
         modGUI.inserisciBottoneReset;
         modGUI.inserisciBottoneForm('VISUALIZZA');
@@ -382,7 +373,7 @@ end introiti;
                 modGUI.esitoOperazione('KO', 'Nessuna area trovata');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('MODIFICA AREA ' || area.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.apriForm(groupname || 'updateArea');
@@ -391,7 +382,6 @@ end introiti;
                     modGUI.inserisciInputHidden('ruolo', ruolo);
                     modGUI.inserisciInputHidden('idRiga', idRiga);
 
-                    /* esempi di input testo del form*/
                     modGUI.inserisciTesto('Posti Totali');
                     modGUI.inserisciInput(
                         tipo => 'number',
@@ -497,7 +487,7 @@ end introiti;
                     modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Modifica Autorimessa di ' || autorimessa.indirizzo);
+                        modGUI.inserisciTesto('MODIFICA AUTORIMESSA DI ' || autorimessa.indirizzo);
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriForm(groupname || 'updateAutorimessa');
@@ -554,7 +544,7 @@ end introiti;
             modGUI.aCapo;
                 modGUI.apriDiv;
                 modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Modifica Sede di ' || sede.indirizzo);
+                        modGUI.inserisciTesto('MODIFICA SEDE DI ' || sede.indirizzo);
                     modGUI.chiudiIntestazione(2);
                 -- Se il ruolo dell'utente non Ã¨ amministratore esce
                 if (ruolo <> 'A') then
@@ -562,12 +552,6 @@ end introiti;
                 elsif (sede.idSede is null) then
                     modGUI.esitoOperazione('KO', 'Autorimessa non trovata');
                 else
-<<<<<<< HEAD
-=======
-                    modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Modifica Sede di ' || sede.indirizzo);
-                    modGUI.chiudiIntestazione(2);
->>>>>>> master
                     /*
                     * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
                     * (classico esempio reindirizzamento ad una procedura che si occupa della query di inserimento degli input immessi)
@@ -669,7 +653,7 @@ end introiti;
             modGUI.apriIntestazione(3);
             modGUI.inserisciTesto('SEDI SOVRAPPOPOLATE');
             modGUI.aCapo;
-            modGUI.inserisciTesto('Giorno: ' || to_date(var_giorno, 'yyyy/mm/dd'));
+            modGUI.inserisciTesto('GIORNO: ' || to_date(var_giorno, 'yyyy/mm/dd'));
             modGUI.chiudiIntestazione(3);
 
             modGUI.apriTabella;
@@ -747,12 +731,13 @@ end introiti;
         tmp integer;
         idses integer;
         begin
-            if(ruolo='O' or ruolo='R') then
-                modGUI.apriPagina('HoC | Ricerca autorimessa competente', id_Sessione, nome, ruolo);
+            modGUI.apriPagina('HoC | Ricerca autorimessa competente', id_Sessione, nome, ruolo);
                 modGUI.apriDiv;
                 modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto(' RICERCA AUTORIMESSA COMPETENTE ');
                 modGUI.chiudiIntestazione(2);
+            if(ruolo='O' or ruolo='R') then
+                
                 idses:=to_number(id_Sessione);
             /*
                 * Il primo parametro di apriForm indica l'azione da compiere una volta cliccato il tasto di invio
@@ -796,7 +781,6 @@ end introiti;
                 modGUI.inserisciBottoneForm(testo=>'RICERCA');
                 modgui.chiudiForm;
             else
-            modGUI.apriPagina('HoC | Ricerca autorimessa competente', id_Sessione, nome, ruolo);
             modGUI.esitoOperazione('KO', 'Questa operazione è disponibile soltanto per gli operatori e i responsabili');
             end if;
 
@@ -859,10 +843,10 @@ end introiti;
             else
                 modGUI.ApriTabella;
                 modGUI.ApriRigaTabella;
-                    modGUI.intestazioneTabella('ID Sede');
-                    modGUI.intestazioneTabella('Indirizzo');
-                    modGUI.intestazioneTabella('Numero Ingressi');
-                    modGUI.intestazioneTabella('Dettagli');
+                    modGUI.intestazioneTabella('ID SEDE');
+                    modGUI.intestazioneTabella('INDIRIZZO');
+                    modGUI.intestazioneTabella('NUMERO INGRESSI');
+                    modGUI.intestazioneTabella('DETTAGLI');
                 modGUI.ChiudiRigaTabella;
                 -- Apre il cursore
                 open sediCursor;
@@ -1108,81 +1092,81 @@ end statisticaGenerale6;
             else
 
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('AREA ' || area.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Area');
+                        modGUI.IntestazioneTabella('ID AREA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.idArea);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Posti Totali');
+                        modGUI.IntestazioneTabella('POSTI TOTALI');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PostiTotali);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Posti Liberi');
+                        modGUI.IntestazioneTabella('POSTI LIBERI');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PostiLiberi);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Stato');
+                        modGUI.IntestazioneTabella('STATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.Stato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Gas');
+                        modGUI.IntestazioneTabella('GAS');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.Gas);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Lunghezza Massima');
+                        modGUI.IntestazioneTabella('LUNGHEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.LunghezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Larghezza Massima');
+                        modGUI.IntestazioneTabella('LARGHEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.LarghezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Altezza Massima');
+                        modGUI.IntestazioneTabella('ALTEZZA MASSIMA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.AltezzaMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Peso Massimo');
+                        modGUI.IntestazioneTabella('PESO MASSIMO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.PesoMax);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Costo Abbonamento');
+                        modGUI.IntestazioneTabella('COSTO ABBONAMENTO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(area.CostoAbbonamento);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Autorimessa');
+                        modGUI.IntestazioneTabella('AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_autorimessa, 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || area.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.ApriRigaTabella;
-                            modGUI.IntestazioneTabella('Dettagli');
+                            modGUI.IntestazioneTabella('DETTAGLI');
                             modGUI.ApriElementoTabella;
-                                modGUI.InserisciPenna('modificaArea', id_sessione, nome, ruolo, idRiga);
+                                modGUI.InserisciPenna(groupname || 'modificaArea', id_sessione, nome, ruolo, idRiga);
                             modGUI.ChiudiElementoTabella;
                         modGUI.ChiudiRigaTabella;
                     end if;
@@ -1196,16 +1180,16 @@ end statisticaGenerale6;
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Box');
+                    modGUI.inserisciTesto('BOX');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Box');
-                        modGUI.intestazioneTabella('Numero');
-                        modGUI.intestazioneTabella('Piano');
-                        modGUI.intestazioneTabella('Colonna');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID BOX');
+                        modGUI.intestazioneTabella('NUMERO');
+                        modGUI.intestazioneTabella('PIANO');
+                        modGUI.intestazioneTabella('COLONNA');
+                        modGUI.intestazioneTabella('DETTAGLI');
                     for box in (select * from Box where Box.idArea = idRiga)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1253,45 +1237,45 @@ end statisticaGenerale6;
         -- Crea la pagina e l'intestazione
         modGUI.apriPagina('HoC | Autorimessa di ' || autorimessa.indirizzo, id_sessione, nome, ruolo);
             modGUI.apriIntestazione(2);
-                modGUI.inserisciTesto('Autorimessa di ' || autorimessa.indirizzo);
+                modGUI.inserisciTesto('AUTORIMESSA ' || autorimessa.indirizzo);
             modGUI.chiudiIntestazione(2);
             if (autorimessa.idAutorimessa is null) then
                 modGUI.esitoOperazione('KO', 'Nessuna autorimessa trovata');
             else
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Autorimessa');
+                        modGUI.IntestazioneTabella('ID AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.idAutorimessa);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Indirizzo');
+                        modGUI.IntestazioneTabella('INDIRIZZO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Indirizzo);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Telefono');
+                        modGUI.IntestazioneTabella('TELEFONO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Telefono);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Coordinate');
+                        modGUI.IntestazioneTabella('COORDINATE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(autorimessa.Coordinate);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Sede');
+                        modGUI.IntestazioneTabella('SEDE');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_sede, groupname || 'visualizzaSede?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || autorimessa.idSede);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('Dettagli');
+                            modGUI.intestazioneTabella('DETTAGLI');
                             modGUI.apriElementoTabella;
                                 modGUI.InserisciPenna(groupname || 'modificaAutorimessa', id_sessione, nome, ruolo, autorimessa.idAutorimessa);
                             modGUI.chiudiElementoTabella;
@@ -1306,12 +1290,12 @@ end statisticaGenerale6;
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Area');
-                        modGUI.intestazioneTabella('Larghezza Massima');
-                        modGUI.intestazioneTabella('Lunghezza Massima');
-                        modGUI.intestazioneTabella('Altezza Massima');
-                        modGUI.intestazioneTabella('Peso Massimo');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID AREA');
+                        modGUI.intestazioneTabella('LARGHEZZA MASSIMA');
+                        modGUI.intestazioneTabella('LUNGHEZZA MASSIMA');
+                        modGUI.intestazioneTabella('ALTEZZA MASSIMA');
+                        modGUI.intestazioneTabella('PESO MASSIMO');
+                        modGUI.intestazioneTabella('DETTAGLIO');
                     for area in (select * from Aree where Aree.idAutorimessa = idRiga)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1341,7 +1325,8 @@ end statisticaGenerale6;
             modgui.inseriscitesto('ALTRE OPERAZIONI');
             modgui.chiudiintestazione(3);
             modgui.apridiv(centrato=>true);
-            modgui.inseriscibottone(id_sessione,nome,ruolo,'INDIETRO',groupname || 'ricercaautorimessa');
+                modgui.inseriscibottone(id_sessione,nome,ruolo,'RICERCA AUTORIMESSA',groupname || 'ricercaautorimessa');
+                modgui.inseriscibottone(id_sessione,nome,ruolo,'MAX POSTI PER PERIODO',groupname || 'formAutorimessaMaxPostiPeriodo');
             modgui.chiudidiv;
     modgui.chiudipagina;
     end visualizzaAutorimessa;
@@ -1378,54 +1363,54 @@ end statisticaGenerale6;
                 modGUI.esitoOperazione('KO', 'Nessun box trovato');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Box ' || idRiga || ' - Area ' || var_box.idArea || ' di ' || indirizzo_autorimessa);
+                    modGUI.inserisciTesto('BOX ' || idRiga || ' - AREA ' || var_box.idArea || ' DI ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Box');
+                        modGUI.IntestazioneTabella('ID BOX');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.idBox);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Numero');
+                        modGUI.IntestazioneTabella('NUMERO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Numero);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Piano');
+                        modGUI.IntestazioneTabella('PIANO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Piano);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Colonna');
+                        modGUI.IntestazioneTabella('COLONNA');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.NumeroColonna);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Occupato');
+                        modGUI.IntestazioneTabella('OCCUPATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Occupato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Riservato');
+                        modGUI.IntestazioneTabella('RISERVATO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(var_box.Riservato);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Area');
+                        modGUI.IntestazioneTabella('AREA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(var_box.idArea, groupname || 'visualizzaArea?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_area);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Autorimessa');
+                        modGUI.IntestazioneTabella('AUTORIMESSA');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(indirizzo_autorimessa, groupname || 'visualizzaAutorimessa?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_autorimessa);
                         modGUI.ChiudiElementoTabella;
@@ -1443,17 +1428,17 @@ end statisticaGenerale6;
                         and IngressiOrari.OraUscita is NULL;
                     -- Stampa le informazioni del veicolo
                     modGUI.apriIntestazione(3);
-                        modGUI.inserisciTesto('Veicolo in sosta');
+                        modGUI.inserisciTesto('VEICOLO IN SOSTA');
                     modGUI.chiudiIntestazione(3);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.apriIntestazione('ID Veicolo');
-                            modGUI.apriIntestazione('Targa');
-                            modGUI.apriIntestazione('Produttore');
-                            modGUI.apriIntestazione('Modello');
-                            modGUI.apriIntestazione('Colore');
-                            modGUI.apriIntestazione('Dettaglio');
+                            modGUI.apriIntestazione('ID VEICOLO');
+                            modGUI.apriIntestazione('TARGA');
+                            modGUI.apriIntestazione('PRODUTTORE');
+                            modGUI.apriIntestazione('MODELLO');
+                            modGUI.apriIntestazione('COLORE');
+                            modGUI.apriIntestazione('DETTAGLIO');
                         modGUI.chiudiRigaTabella;
                         modGUI.apriRigaTabella;
                             modGUI.apriElementoTabella;
@@ -1489,7 +1474,7 @@ begin
     for i in (select * from autorimesse aut where aut.idsede=idriga)
     loop
     modGUI.apriIntestazione(2);
-        modGUI.inserisciTesto('Autorimessa ' || i.indirizzo);
+        modGUI.inserisciTesto('AUTORIMESSA DI ' || i.indirizzo);
     modGUI.chiudiIntestazione(2);
 
 
@@ -1570,43 +1555,43 @@ end visualizzaintroitiparzialiabb;
                 modGUI.esitoOperazione('KO', 'Nessuna sede trovata');
             else
                 modGUI.apriIntestazione(2);
-                    modGUI.inserisciTesto('Sede di ' || sede.indirizzo);
+                    modGUI.inserisciTesto('SEDE DI ' || sede.indirizzo);
                 modGUI.chiudiIntestazione(2);
 
                 modGUI.ApriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('ID Sede');
+                        modGUI.IntestazioneTabella('ID SEDE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.idSede);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Indirizzo');
+                        modGUI.IntestazioneTabella('INDIRIZZO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.indirizzo);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Telefono');
+                        modGUI.IntestazioneTabella('TELEFONO');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.telefono);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Coordinate');
+                        modGUI.IntestazioneTabella('COORDINATE');
                         modGUI.ApriElementoTabella;
                             modGUI.ElementoTabella(sede.coordinate);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.IntestazioneTabella('Dirigente');
+                        modGUI.IntestazioneTabella('DIRIGENTE');
                         modGUI.ApriElementoTabella;
                             modGUI.Collegamento(nome_dirigente || ' ' || cognome_dirigente, 'gruppo5.visualizzaDipendente?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_persona);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
                     if (ruolo <> 'O' and ruolo <> 'C') then
-                        modGUI.IntestazioneTabella('Dettagli');
+                        modGUI.IntestazioneTabella('DETTAGLI');
                         modGUI.ApriElementoTabella;
                             modGUI.InserisciPenna(groupname || 'modificaSede', id_sessione, nome, ruolo, sede.idSede);
                         modGUi.ChiudiElementoTabella;
@@ -1616,16 +1601,16 @@ end visualizzaintroitiparzialiabb;
 
                 -- Tabella delle autorimesse collegate
                 modGUI.apriIntestazione(3);
-                    modGUI.inserisciTesto('Autorimesse');
+                    modGUI.inserisciTesto('AUTORIMESSE');
                 modGUI.chiudiIntestazione(3);
 
                 modGUI.apriTabella;
                     modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Autorimessa');
-                        modGUI.intestazioneTabella('Indirizzo');
-                        modGUI.intestazioneTabella('Telefono');
-                        modGUI.intestazioneTabella('Coordinate');
-                        modGUI.intestazioneTabella('Dettaglio');
+                        modGUI.intestazioneTabella('ID AUTORIMESSA');
+                        modGUI.intestazioneTabella('INDIRIZZO');
+                        modGUI.intestazioneTabella('TELEFONO');
+                        modGUI.intestazioneTabella('COORDINATE');
+                        modGUI.intestazioneTabella('DETTAGLIO');
                     for autorimessa in (select * from Autorimesse where Autorimesse.idSede = sede.idSede)
                     loop
                         modGUI.ApriRigaTabella;
@@ -1925,11 +1910,6 @@ begin
    IdveicoloMax number;
    PresenzeMax number;
    Alimentazione varchar2(10);
-<<<<<<< HEAD
-=======
-
-   BEGIN
->>>>>>> master
 
    BEGIN
 
@@ -3264,7 +3244,7 @@ END PostoAreaPiuUsato2;
                     where C.idCliente = id_cliente;
 
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Carburante del veicolo meno parcheggiato da ' || nome_cliente || ' ' || cognome_cliente || ' per ogni autorimessa');
+                        modGUI.inserisciTesto('CARBURANTE DEL VEICOLO MENO PARCHEGGIATO DA ' || nome_cliente || ' ' || cognome_cliente || ' per ogni autorimessa');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
@@ -3312,7 +3292,7 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Ingressi con costo sopra la media');
+                        modGUI.inserisciTesto('INGRESSI CON COSTO SOPRA LA MEDIA');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriForm(groupname || 'resIngressiSopraMedia');
@@ -3370,16 +3350,16 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Ingressi con costo sopra alla media del periodo ' || var_inizio || ' - ' || var_fine);
+                        modGUI.inserisciTesto('INGRESSI CON COSTO SOPRA LA MEDIA DEL PERIODO ' || var_inizio || ' - ' || var_fine);
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('Entrata Prevista');
-                            modGUI.intestazioneTabella('Ora Entrata');
-                            modGUI.intestazioneTabella('Ora Uscita');
-                            modGUI.intestazioneTabella('Costo');
-                            modGUI.intestazioneTabella('Sede');
+                            modGUI.intestazioneTabella('ENTRATA PREVISTA');
+                            modGUI.intestazioneTabella('ORA ENTRATA');
+                            modGUI.intestazioneTabella('ORA USCITA');
+                            modGUI.intestazioneTabella('COSTO');
+                            modGUI.intestazioneTabella('SEDE');
                         modGUI.chiudiRigaTabella;
 
                         open cursore;
@@ -3419,7 +3399,7 @@ END PostoAreaPiuUsato2;
                     modGUI.esitoOperazione('KO', 'Non sei autorizzato');
                 else
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                        modGUI.inserisciTesto('CLASSIFICA CLIENTI PER TEMPO MEDIO DI PERMANENZA');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriForm(groupname || 'resStatisticaGenerale3');
@@ -3487,15 +3467,15 @@ END PostoAreaPiuUsato2;
                 else
 
                     modGUI.apriIntestazione(2);
-                        modGUI.inserisciTesto('Classifica Clienti per Tempo Medio di Permanenza');
+                        modGUI.inserisciTesto('CLASSIFICA CLIENTI PER TEMPO MEDIO DI PERMANENZA');
                     modGUI.chiudiIntestazione(2);
 
                     modGUI.apriTabella;
                         modGUI.apriRigaTabella;
-                            modGUI.intestazioneTabella('ID Cliente');
-                            modGUI.intestazioneTabella('Nome');
-                            modGUI.intestazioneTabella('Tempo Medio');
-                            modGUI.intestazioneTabella('Dettagli');
+                            modGUI.intestazioneTabella('ID CLIENTE');
+                            modGUI.intestazioneTabella('NOME');
+                            modGUI.intestazioneTabella('TEMPO MEDIO');
+                            modGUI.intestazioneTabella('DETTAGLI');
                         modGUI.chiudiRigaTabella;
                         open riga;
                         loop
@@ -3512,7 +3492,7 @@ END PostoAreaPiuUsato2;
                                     modGUI.inserisciTesto(media);
                                 modGUI.chiudiElementoTabella;
                                 modGUI.apriElementoTabella;
-                                    modGUI.inserisciLente('visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
+                                    modGUI.inserisciLente(groupname || 'visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
                                 modGUI.chiudiElementoTabella;
                             modGUI.chiudiRigaTabella;
                         end loop;
@@ -4175,7 +4155,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
 
             if((datainiziale is null or datafinale is null) and periodo=1) then
                 modGUI.apriIntestazione(2);
-                modGUI.inserisciTesto('Periodo non valido. Introiti totali');
+                modGUI.inserisciTesto('PERIODO NON VALIDO. INTROITI TOTALI');
                 modGUI.chiudiIntestazione(2);
             end if;
 
@@ -4387,9 +4367,9 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGUI.apriDiv;
         modGUI.ApriTabella;
         modGUI.ApriRigaTabella;
-        modGUI.intestazioneTabella('Targa');
-        modGUI.intestazioneTabella('Modello');
-        modGUI.intestazioneTabella('Alimentazione');
+        modGUI.intestazioneTabella('TARGA');
+        modGUI.intestazioneTabella('MODELLO');
+        modGUI.intestazioneTabella('ALIMENTAZIONE');
         modGUI.ChiudiRigaTabella;
 
 
