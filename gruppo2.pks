@@ -70,8 +70,6 @@ create or replace package gruppo2 as
     procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2);
     
-    procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
-    procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
     procedure statisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resStatisticaGenerale3(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
 

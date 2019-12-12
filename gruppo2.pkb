@@ -2950,7 +2950,7 @@ END PostoAreaPiuUsato2;
                                                           
     
     
-    procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
         modGUI.apriPagina('HoC | Dettagli veicoli cliente', id_Sessione, nome, ruolo);
         modGUI.apriIntestazione(2);
@@ -3024,7 +3024,7 @@ END PostoAreaPiuUsato2;
                 select distinct Veicoli.Targa VT, Veicoli.Produttore VP, Veicoli.Modello VM, Veicoli.idVeicolo VIV
                     from Veicoli
                         join VeicoliClienti VC on VC.idCliente = var_idCliente
-                        join EffettuaI/projects/1ngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
+                        join EffettuaIngressiOrari EIO on EIO.idVeicolo = Veicoli.idVeicolo
                         join IngressiOrari IO on IO.idIngressoOrario = EIO.idIngressoOrario
                         join Autorimesse AR on AR.idAutorimessa = var_autorimessa
                     where Veicoli.idVeicolo = VC.idVeicolo and
