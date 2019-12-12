@@ -10,8 +10,13 @@ create or replace package body gruppo2 as
                 modGUI.inserisciTesto('IL VEICOLO SELEZIONATO NON PUO'' ESSERE PARCHEGGIATO NELLA SEDE SELEZIONATA');
             modGUI.chiudiIntestazione(2);
 
-
-        modGUI.ChiudiPagina;
+        modgui.apriintestazione(3);
+            modgui.inseriscitesto('ALTRE OPERAZIONI');
+            modgui.chiudiintestazione(3);
+            modgui.apridiv(true);
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.ricercaautorimessa');
+            modgui.chiudidiv;
+    modgui.chiudipagina;
     end autorimessanontrovata;
 
     procedure competentGarageSearch2 (
@@ -1322,7 +1327,13 @@ end statisticaalimentazione;
                     end loop;
                 modGUI.chiudiTabella;
             end if;
-        modGUI.ChiudiPagina;
+            modgui.apriintestazione(3);
+            modgui.inseriscitesto('ALTRE OPERAZIONI');
+            modgui.chiudiintestazione(3);
+            modgui.apridiv(true);
+            modgui.inseriscibottone(id_sessione,nome,ruolo,'Torna indietro','gruppo2.ricercaautorimessa');
+            modgui.chiudidiv;
+    modgui.chiudipagina;
     end visualizzaAutorimessa;
     
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
@@ -3690,87 +3701,7 @@ procedure dettagliQuintaComune(id_Sessione int, nome varchar2, ruolo varchar2, i
         modGUI.chiudiPagina();
     end autorimessaMaxPostiPeriodo;
 
-    procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is 
-
-    begin
-        modGUI.apriPagina('HoC | Visualizza Introiti', id_Sessione, nome, ruolo);
-
-        modgui.acapo;
-
-            modgui.apriintestazione(2);
-            modgui.inseriscitesto('VISUALIZZA INTROITI TOTALI');
-            modgui.chiudiintestazione(2);
-    modgui.apriForm('introitiparziali');
-
-            modgui.inserisciinputhidden('id_Sessione',id_Sessione);
-            modgui.inserisciinputhidden('nome',nome);
-            modgui.inserisciinputhidden('ruolo',ruolo);
-
-                    modGUI.apriSelect('idSedeCorrente', 'Seleziona Sede: ', false, 'defSelect');
-            modGUI.inserisciOpzioneSelect('0','Tutte le Sedi',false);
-
-            for sede in (select * from sedi)
-            loop
-            modGUI.inserisciOpzioneSelect(sede.idsede,sede.indirizzo,false);
-            end loop;
-
-            modGUI.chiudiSelect;
-                
-
-
-            modGUI.inserisciBottoneReset('RESET');
-            modGUI.inserisciBottoneForm('Submit','defFormButton');
-
-            modgui.chiudiForm;
-
-            modGUI.chiudiPagina;
-
-
-    end introiti;
-
-    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as 
-    begin 
-        modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
-
-        for i in (select * from autorimesse aut where aut.idsede=idriga)
-        loop
-        modGUI.apriIntestazione(2);
-            modGUI.inserisciTesto('Autorimessa ' || i.indirizzo);
-        modGUI.chiudiIntestazione(2);
+    
 
     
-        
-        modGUI.apriTabella;
-
-                    modGUI.ApriRigaTabella;
-                        modGUI.intestazioneTabella('ID Ingresso Orario');
-                        modGUI.intestazioneTabella('Costo effettivo');
-                        modGUI.intestazioneTabella('Data inizio');
-                        modGUI.intestazioneTabella('Data fine');
-                        modGUI.ChiudiRigaTabella;
-
-        for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and (io.oraentrata is not null or io.orauscita is not null) and io.costo is not null order by io.idingressoorario)
-        --for n in (select io.* from box, ingressiorari io, aree where box.idbox=io.idbox and box.idarea=aree.idarea and aree.idautorimessa=i.idautorimessa and io.oraentrata is not null order by io.idingressoorario)
-        loop
-                            modGUI.ApriRigaTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.idingressoorario);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(n.costo);
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(to_char(n.oraentrata,'dd-MON-yy hh24:mi:ss'));
-                            modGUI.ApriElementoTabella;
-                                modGUI.ElementoTabella(to_char(n.orauscita,'dd-MON-yy hh24:mi:ss'));
-                            modGUI.ChiudiElementoTabella;
-                            modGUI.ChiudiRigaTabella;           
-        end loop;
-        modGUI.ChiudiTabella;
-
-        end loop;
-
-
-        modgui.chiudipagina;
-    end visualizzaintroitiparzialiabb;
 end gruppo2;
