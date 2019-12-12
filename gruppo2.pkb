@@ -103,7 +103,7 @@ create or replace package body gruppo2 as
             modGUI.inserisciTesto('RICERCA AREA');
         modGUI.chiudiIntestazione(2);
 
-        modGUI.apriForm('graphicResultRicercaArea');
+        modGUI.apriForm(groupname || 'graphicResultRicercaArea');
             modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
             modGUI.inserisciInputHidden('nome', nome);
             modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -374,7 +374,7 @@ end introiti;
                     modGUI.inserisciTesto('Modifica Area ' || area.idArea || ' di ' || indirizzo_autorimessa);
                 modGUI.chiudiIntestazione(2);
 
-                modGUI.apriForm('updateArea');
+                modGUI.apriForm(groupname || 'updateArea');
                     modGUI.inserisciInputHidden('id_sessione', id_sessione);
                     modGUI.inserisciInputHidden('nome', nome);
                     modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -489,7 +489,7 @@ end introiti;
                         modGUI.inserisciTesto('Modifica Autorimessa di ' || autorimessa.indirizzo);
                     modGUI.chiudiIntestazione(2);
 
-                    modGUI.apriForm('updateAutorimessa');
+                    modGUI.apriForm(groupname || 'updateAutorimessa');
                         modGUI.inserisciInputHidden('id_sessione', id_sessione);
                         modGUI.inserisciInputHidden('nome', nome);
                         modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -1646,7 +1646,7 @@ end visualizzaintroitiparzialiabb;
             modGUI.apriIntestazione(2);
                 modGUI.inserisciTesto('RICERCA AUTO');
             modGUI.chiudiIntestazione(2);
-            modGUI.apriForm('resRicercaAuto');
+            modGUI.apriForm(groupname || 'resRicercaAuto');
                 modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
                 modGUI.inserisciInputHidden('nome', nome);
                 modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -1856,7 +1856,7 @@ posti number:=0;
     modGUI.chiudiPagina;
 
                 --pulsante torna indietro
-        modGui.apriForm('modgui.creaHome');
+        modGui.apriForm(groupname || 'modgui.creaHome');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -1888,7 +1888,7 @@ begin
     modGUI.chiudiIntestazione(3);
     
     
-    modGui.apriForm('AlimentazioneVeicolo2');
+    modGui.apriForm(groupname || 'AlimentazioneVeicolo2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
@@ -2081,7 +2081,7 @@ begin
     modGUI.chiudiPagina;
 
                 --pulsante torna indietro
-        modGui.apriForm('AlimentazioneVeicolo');
+        modGui.apriForm(groupname || 'AlimentazioneVeicolo');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2098,7 +2098,7 @@ begin
                                                                
                                                                
                                                                
-    PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS 
+    PROCEDURE PercentualiPostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS 
       
       
 --DICHIARO VARIABILI PER STAMPARE
@@ -2218,7 +2218,7 @@ BEGIN
   
   
             --pulsante torna indietro
-        modGui.apriForm('percentualiPostiliberi');
+        modGui.apriForm(groupname || 'percentualiPostiliberi');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2232,7 +2232,7 @@ BEGIN
     
         modgui.chiudipagina;
 
-    END PercentualePostiLiberi2;                                                           
+    END PercentualiPostiLiberi2;                                                           
                                                                
                                                                
                                                                
@@ -2252,7 +2252,7 @@ begin
     modGUI.chiudiIntestazione(3);
     
     
-    modGui.apriForm('PERCENTUALIPOSTILIBERI2');
+    modGui.apriForm(groupname || 'PercentualiPostiLiberi2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
@@ -2367,7 +2367,7 @@ begin
     modGUI.chiudiDiv;
     
                 --pulsante torna indietro
-        modGui.apriForm('modgui.creaHome');
+        modGui.apriForm(groupname || 'modgui.creaHome');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2432,7 +2432,7 @@ BEGIN
     modGUI.chiudiDiv; 
     
         --pulsante torna indietro
-        modGui.apriForm('modgui.creaHome');
+        modGui.apriForm(groupname || 'modgui.creaHome');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2529,7 +2529,7 @@ BEGIN
     modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
     modGUI.chiudiIntestazione(3);
     
-    modGui.apriForm('VEICOLIPERTIPOCARBURANTE2');
+    modGui.apriForm(groupname || 'VEICOLIPERTIPOCARBURANTE2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
@@ -2653,7 +2653,7 @@ BEGIN
     
 end if;  
             --pulsante torna indietro
-        modGui.apriForm('veicoliPerTipocarburante');
+        modGui.apriForm(groupname || 'veicoliPerTipocarburante');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2676,7 +2676,7 @@ END VeicoliPerTipoCarburante2;
     modGUI.inserisciTesto('SCEGLI SE VISUALIZZARE REPORT PER AUTORIMESSE O MENO');
     modGUI.chiudiIntestazione(3);
     
-    modGui.apriForm('PostoAreaPiuUsato2');
+    modGui.apriForm(groupname || 'PostoAreaPiuUsato2');
     modGui.inserisciInputHidden('id_Sessione',id_sessione);
     modGui.inserisciInputHidden('nome',nome);
     modGui.inserisciInputHidden('ruolo',ruolo);
@@ -2932,7 +2932,7 @@ order by idAutorimessa,numingressi
     modgui.chiuditabella;
 
                 --pulsante torna indietro
-        modGui.apriForm('PostoAreaPiuUsato');
+        modGui.apriForm(groupname || 'PostoAreaPiuUsato');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);        
@@ -2956,7 +2956,7 @@ END PostoAreaPiuUsato2;
         modGUI.apriIntestazione(2);
             modGUI.inserisciTesto('DETTAGLI VEICOLI DI UN CLIENTE');
         modGUI.chiudiIntestazione(2);
-        modGUI.apriForm('resStatisticaGenerale2');
+        modGUI.apriForm(groupname || 'resStatisticaGenerale2');
             modGUI.inserisciInputHidden('id_Sessione', id_Sessione);
             modGUI.inserisciInputHidden('nome', nome);
             modGUI.inserisciInputHidden('ruolo', ruolo);
@@ -4103,7 +4103,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
     begin
             modGUI.apriPagina('HoC | Inserisci dati', id_Sessione, nome, ruolo);
             modgui.acapo;
-            modgui.apriForm('autorimessaMaxPostiPeriodo');
+            modgui.apriForm(groupname || 'autorimessaMaxPostiPeriodo');
             modgui.inserisciinputhidden('id_Sessione',id_Sessione);
             modgui.inserisciinputhidden('nome',nome);
             modgui.inserisciinputhidden('ruolo',ruolo);
@@ -4336,7 +4336,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGUI.inserisciTesto('SCEGLI TIPOLOGIA DI CARBURANTI E PERIODO');
         modGUI.chiudiIntestazione(3);
         
-        modGui.apriForm('VEICOLIPERTIPOCARBURANTE2');
+        modGui.apriForm(groupname || 'VEICOLIPERTIPOCARBURANTE2');
         modGui.inserisciInputHidden('id_Sessione',id_sessione);
         modGui.inserisciInputHidden('nome',nome);
         modGui.inserisciInputHidden('ruolo',ruolo);
@@ -4459,7 +4459,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         
     end if;  
                 --pulsante torna indietro
-            modGui.apriForm('statisticaGenerale4');
+            modGui.apriForm(groupname || 'statisticaGenerale4');
             modGui.inserisciInputHidden('id_Sessione',id_sessione);
             modGui.inserisciInputHidden('nome',nome);
             modGui.inserisciInputHidden('ruolo',ruolo);        
