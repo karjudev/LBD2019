@@ -46,8 +46,15 @@ create or replace package gruppo2 as
     procedure AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    PROCEDURE PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure PercentualePostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);
+    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
     procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    function RicercaPosto( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type)return box.idbox%type;
+    procedure VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
+    procedure PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2);   
+    procedure PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number);   
 
     procedure secondaComune(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resSecondaComune(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
@@ -55,14 +62,10 @@ create or replace package gruppo2 as
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
-<<<<<<< HEAD
-    procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio date, var_fine date);
-=======
     
     procedure ingressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resIngressiSopraMedia(id_sessione int, nome varchar2, ruolo varchar2, var_inizio varchar2, var_fine varchar2);
     
     procedure classificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resClassificaMediaPermanenza(id_sessione int, nome varchar2, ruolo varchar2, var_soglia int);
->>>>>>> f26d5de647fdcfdfe0ac5eb84755344786bec33d
 end gruppo2;
