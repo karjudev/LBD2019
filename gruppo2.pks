@@ -2,20 +2,20 @@ create or replace package gruppo2 as
     groupname constant varchar2(8) := 'gruppo2.';
     TYPE list_idaree is varray(2) of number(1);
     procedure autorimessanontrovata(id_sessione int default 0, nome varchar2, ruolo varchar2);
-    procedure competentGarageSearch2 (id_Sessione varchar2, nome varchar2, ruolo varchar2, idSedeCorrente integer, idVeicoloCorrente integer);
+    procedure competentGarageSearch2 (id_Sessione int, nome varchar2, ruolo varchar2, idSedeCorrente integer, idVeicoloCorrente integer);
     procedure formRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2);
+    procedure introitiparziali(id_Sessione int, nome varchar2, ruolo varchar2, idsedecorrente varchar2);
     procedure graphicResultRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa number, veicolo varchar2);
-    procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure introiti(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure modificaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure modificaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure modificaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     function queryRicercaArea(id_Sessione int, nome varchar2, ruolo varchar2, autorimessa varchar2, veicolo varchar2) return list_idaree;
     procedure sediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2);
-    procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number);
-    procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure resSediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number);
+    procedure ricercaAutorimessa(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure classificaSediPiuRedditizie(id_sessione int default 0, nome varchar2, ruolo varchar2);
-    procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2);
+    procedure statisticaGenerale6(id_Sessione int,nome varchar2, ruolo varchar2);
     procedure updateArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int, var_posti_totali Aree.PostiTotali%TYPE, var_posti_liberi Aree.PostiLiberi%TYPE, var_stato Aree.Stato%TYPE, var_gas Aree.Gas%TYPE, var_lunghezza_max Aree.LunghezzaMax%TYPE, var_larghezza_max Aree.LarghezzaMax%TYPE, var_peso_max Aree.PesoMax%TYPE, var_costo_abbonamento Aree.CostoAbbonamento%TYPE);
     procedure updateAutorimessa(
         id_sessione int default 0,
@@ -38,31 +38,31 @@ create or replace package gruppo2 as
     procedure visualizzaArea(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure visualizzaAutorimessa(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
-    procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2);
+    procedure visualizzaintroitiparzialiabb(id_Sessione int, nome varchar2, ruolo varchar2, idriga varchar2);
     procedure visualizzaSede(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int);
     procedure ricercaAuto(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resRicercaAuto(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int);
     
     
-    procedure AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
-    procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure PercentualiPostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);
-    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2);
+    procedure AlimentazioneVeicolo(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure AlimentazioneVeicolo2(id_Sessione int, nome varchar2, ruolo varchar2, autorimessaScelta varchar2);
+    procedure PercentualiPostiLiberi (id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure PercentualiPostiLiberi2(id_Sessione int, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2);
+    procedure MaxTipoVeicolo(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure MaggiorPostiRiservati(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure ClientiSenzaAbbRinnovato(id_Sessione int, nome varchar2, ruolo varchar2);
     function RicercaPosto( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type)return box.idbox%type;
-    procedure VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
-    procedure PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2);   
-    procedure PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number);   
+    procedure VeicoliPerTipoCarburante(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure VeicoliPerTipoCarburante2(id_Sessione int, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
+    procedure PostoAreaPiuUsato(id_Sessione int, nome varchar2, ruolo varchar2);   
+    procedure PostoAreaPiuUsato2(id_Sessione int, nome varchar2, ruolo varchar2, PerAutorimessa number);   
 
     procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
     procedure dettagliVeicoloStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
 
-    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
+    procedure statisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure resStatisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2);
     procedure resVeicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2, id_cliente int);
@@ -81,7 +81,7 @@ create or replace package gruppo2 as
     procedure resStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, x int);
     procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varchar2, idRiga varchar2, id_Autorimessa varchar2);
 
-    procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2);
-    procedure autorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2);
+    procedure formAutorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2);
+    procedure autorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2);
 
 end gruppo2;

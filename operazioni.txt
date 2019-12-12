@@ -16,6 +16,6 @@ Alimentazione del veicolo più presente in una autorimessa o in tutte -> gruppo2
 Autorimessa con massimo numero di posti riservati in un determinato periodo -> gruppo2.formAutorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2);
 Report introiti per sede totale -> gruppo2.introiti(id_Sessione int, nome varchar2, ruolo varchar2);
 Nome autorimessa con maggior numero posti riservati -> gruppo2.maggiorPostiRiservati(id_Sessione int, nome varchar2, ruolo varchar2);
-Clienti senza abbonamento rinnovato -> gruppo2.clientiSenzaAbbonamentoRinnovato(id_Sessione int, nome varchar2, ruolo varchar2);
+Clienti senza abbonamento rinnovato -> gruppo2.clientiSenzaAbbRinnovato(id_Sessione int, nome varchar2, ruolo varchar2);
 Veicolo meno parcheggiato da un determinato cliente presso ciascun parcheggio -> gruppo2.veicoloMenoParcheggiato(id_Sessione int, nome varchar2, ruolo varchar2);
 Parcheggi in cui prezzo pagato per la sosta oraria superiore alla media -> gruppo2.ingressiSopraMedia(id_Sessione int, nome varchar2, ruolo varchar2);

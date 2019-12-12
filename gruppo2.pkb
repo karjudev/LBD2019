@@ -20,7 +20,7 @@ create or replace package body gruppo2 as
     end autorimessanontrovata;
 
     procedure competentGarageSearch2 (
-        id_Sessione varchar2,
+        id_Sessione int,
         nome varchar2,
         ruolo varchar2,
         idSedeCorrente integer,
@@ -133,7 +133,7 @@ create or replace package body gruppo2 as
         modGUI.chiudiPagina;
     end formRicercaArea;
 
-procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2) is
+procedure introitiparziali(id_Sessione int, nome varchar2, ruolo varchar2, idsedecorrente varchar2) is
 totaleabb integer :=0;
 totalebigl integer :=0;
 indirizzo varchar2 (100);
@@ -306,7 +306,7 @@ end introitiparziali;
             modGUI.chiudiPagina;
         end graphicResultRicercaArea;
 
-procedure introiti(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+procedure introiti(id_Sessione int, nome varchar2, ruolo varchar2) is
 
 begin
     if (ruolo='R') then
@@ -639,7 +639,7 @@ end introiti;
         return p;
     end queryRicercaArea;
 
-    procedure resSediSovrappopolate(id_Sessione varchar2, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number) AS
+    procedure resSediSovrappopolate(id_Sessione int, nome varchar2, ruolo varchar2, var_giorno varchar2, var_soglia number) AS
         var_check1 boolean := false;
         Sede number:=0;
         NumeroAttuale number:=0;
@@ -727,7 +727,7 @@ end introiti;
 
         END resSediSovrappopolate;
 
-    procedure ricercaAutorimessa(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure ricercaAutorimessa(id_Sessione int, nome varchar2, ruolo varchar2) is
         tmp integer;
         idses integer;
         begin
@@ -875,20 +875,20 @@ end introiti;
             end if;
         end classificaSediPiuRedditizie;
 
-   procedure statisticaGenerale6(id_sessione varchar2,nome varchar2, ruolo varchar2)is
-maxbox integer :=0;
-var_indirizzo varchar2(100);
-var_gas varchar2(1);
-var_risp varchar2(100);
-var_1 varchar2 (100);
-var_2 varchar2 (100);
+   procedure statisticaGenerale6(id_Sessione int,nome varchar2, ruolo varchar2)is
+    maxbox integer :=0;
+    var_indirizzo varchar2(100);
+    var_gas varchar2(1);
+    var_risp varchar2(100);
+    var_1 varchar2 (100);
+    var_2 varchar2 (100);
 
 begin
+        modGUI.apriPagina('HoC |  Statistica alimentazione', id_Sessione, nome, ruolo);
+            modgui.apriintestazione(2);
+            modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
+        modgui.chiudiintestazione(2);
     if(ruolo = 'A' or ruolo= 'S') then
-    modGUI.apriPagina('HoC |  Statistica alimentazione', id_Sessione, nome, ruolo);
-    modgui.apriintestazione(2);
-    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
-    modgui.chiudiintestazione(2);
 select tmp.count_box,tmp.indirizzo,tmp.gas into maxbox,var_indirizzo,var_gas from(
 select count(box.idbox) as count_box,ar.indirizzo,aree.gas from box, aree,autorimesse ar where box.idarea=aree.idarea and aree.idautorimessa=ar.idautorimessa and box.occupato='T' group by ar.indirizzo,aree.gas order by count_box desc) tmp
 where rownum=1;
@@ -917,26 +917,16 @@ where rownum=1;
     modgui.chiudirigatabella;
     modgui.chiuditabella;
 
-modgui.chiudipagina;
 
 else
-modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
-modgui.apriintestazione(2);
-    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
-    modgui.chiudiintestazione(2);
      modGUI.esitoOperazione('KO', 'Non hai i permessi necessari.');
-     modgui.chiudipagina;
-     end if;
+end if;
+
 exception
 when no_data_found then
-        modGUI.apriPagina('HoC | Statistica alimentazione', id_Sessione, nome, ruolo);
-        modgui.apriintestazione(2);
-    modgui.inseriscitesto('STATISTICA ALIMENTAZIONE');
-    modgui.chiudiintestazione(2);
      modGUI.esitoOperazione('KO', 'Nessun veicolo parcheggiato');
 
-
-
+modgui.chiudipagina;
 end statisticaGenerale6;
 
     procedure updateArea(
@@ -1466,7 +1456,7 @@ end statisticaGenerale6;
         modGUI.ChiudiPagina;
     end visualizzaBox;
 
- procedure visualizzaintroitiparzialiabb(id_Sessione varchar2, nome varchar2, ruolo varchar2, idriga varchar2) as
+ procedure visualizzaintroitiparzialiabb(id_Sessione int, nome varchar2, ruolo varchar2, idriga varchar2) as
 begin
     if(ruolo='R') then
     modGUI.apriPagina('HoC | Introiti ', id_Sessione, nome, ruolo);
@@ -1780,13 +1770,24 @@ end visualizzaintroitiparzialiabb;
                 modGUI.apriDiv(centrato=>true);
                     modGUI.inserisciTesto('NON CI SONO AUTO ANCORA PARCHEGGIATE');
                 modGUI.chiudiDiv;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
+                modGUI.aCapo;
             end if;
+
+            modGUI.apriIntestazione(3);
+                modGUI.inserisciTesto('ALTRE OPERAZIONI');
+            modGUI.chiudiIntestazione(3);
+            modGUI.apriDiv(centrato=>true);
+                modGUI.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'ricercaAuto');
+            modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resRicercaAuto;
 
 
 
-    procedure MaggiorPostiRiservati(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure MaggiorPostiRiservati(id_Sessione int, nome varchar2, ruolo varchar2) is
 --suppongo che l'oprazione sia "con il maggior numero di posti liberi", visto che per ora
 --non esistono box riservati
 
@@ -1854,7 +1855,7 @@ posti number:=0;
 
     END MaggiorPostiRiservati;
 
-    PROCEDURE AlimentazioneVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
+    PROCEDURE AlimentazioneVeicolo(id_Sessione int, nome varchar2, ruolo varchar2) AS
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     codiceAutorimessa autorimesse.idautorimessa%TYPE:=0;
@@ -1863,7 +1864,6 @@ posti number:=0;
 begin
  modGUI.apriPagina('HoC | Alimentazione veicolo più presente', id_Sessione, nome, ruolo);
 
-    modGUI.aCapo;
     modGUI.apriIntestazione(2);
     modGUI.inserisciTesto('VISUALIZZAZIONE ALIMENTAZIONE VEICOLO PIU PRESENTE');
     modGUI.chiudiIntestazione(2);
@@ -1895,7 +1895,7 @@ begin
 
 
 
-     PROCEDURE AlimentazioneVeicolo2(id_Sessione varchar2, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS
+     PROCEDURE AlimentazioneVeicolo2(id_Sessione int, nome varchar2, ruolo varchar2, autorimessaScelta varchar2) AS
     --variabili usate per controllare i veicoli acceduti in ingressi orari
    IdveicoloMaxIO number;
    PresenzeIO number:=0;
@@ -1914,7 +1914,6 @@ begin
    BEGIN
 
     modGUI.apriPagina('HoC | Alimentazione veicolo più presente', id_Sessione, nome, ruolo);
-    modGUI.aCapo;
     modGUI.apriIntestazione(2);
 
     if(autorimessaScelta='Tutte')then
@@ -2031,7 +2030,6 @@ begin
         end if;
 
     --STAMPO VALORI CALCOLATI
-    modGUI.apriDiv;
     modGUI.ApriTabella;
 
     modGUI.ApriRigaTabella;
@@ -2057,7 +2055,6 @@ begin
     modGUI.ChiudiRigaTabella;
 
     modGUI.ChiudiTabella;
-    modGUI.chiudiDiv;
 
     modGUI.chiudiPagina;
 
@@ -2076,7 +2073,7 @@ begin
 
 
 
-    PROCEDURE PercentualiPostiLiberi2(id_Sessione varchar2, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS
+    PROCEDURE PercentualiPostiLiberi2(id_Sessione int, nome varchar2, ruolo varchar2, modalita varchar2, areaScelta varchar2) AS
 
 
 --DICHIARO VARIABILI PER STAMPARE
@@ -2217,7 +2214,7 @@ BEGIN
 
 
 
-     procedure PercentualiPostiLiberi (id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+     procedure PercentualiPostiLiberi (id_Sessione int, nome varchar2, ruolo varchar2) is
 
     --VARIABILE CONTENENTE AREA SCELTA
     codiceArea aree.idarea%TYPE;
@@ -2267,7 +2264,7 @@ begin
 
 
 
-    procedure MaxTipoVeicolo(id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure MaxTipoVeicolo(id_Sessione int, nome varchar2, ruolo varchar2) is
 
     --VARIABILI STAMPATE
     Lunghezza aree.lunghezzaMax%type;
@@ -2303,7 +2300,7 @@ begin
 
     modGUI.aCapo;
     modGUI.apriIntestazione(2);
-    modGUI.inserisciTesto('IL MAGGIOR TIPO VEICOLO E OSPITATO DALLA SEGUENTE AREA:');
+    modGUI.inserisciTesto('IL MAGGIOR TIPO VEICOLO E OSPITATO DALLA SEGUENTE AREA: ' || Area);
     modGUI.chiudiIntestazione(2);
 
     modGUI.ApriTabella;
@@ -2346,8 +2343,8 @@ begin
 
     end MaxTipoVeicolo;
 
-   PROCEDURE ClientiSenzaAbbonamentoRinnovato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
-BEGIN
+    PROCEDURE ClientiSenzaAbbRinnovato(id_Sessione int, nome varchar2, ruolo varchar2) is
+    BEGIN
 
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
     modGUI.aCapo;
@@ -2395,7 +2392,7 @@ BEGIN
     modGUI.chiudiDiv;
 
 
-END ClientiSenzaAbbonamentoRinnovato;
+END ClientiSenzaAbbRinnovato;
 
 FUNCTION RICERCAPOSTO( idveicoloScelto veicoli.idveicolo%type, idautorimessaScelta autorimesse.idautorimessa%type) RETURN box.idbox%type as
 
@@ -2465,7 +2462,7 @@ BEGIN
 
 END RICERCAPOSTO;
 
-     PROCEDURE VeicoliPerTipoCarburante(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
+     PROCEDURE VeicoliPerTipoCarburante(id_Sessione int, nome varchar2, ruolo varchar2) AS
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     AlimentazioneScelta1 veicoli.alimentazione%TYPE;
@@ -2517,7 +2514,7 @@ BEGIN
 
 END VeicoliPerTipoCarburante;
 
-    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
+    PROCEDURE VeicoliPerTipoCarburante2(id_Sessione int, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
 
    AlimentazionePiuNumerosa veicoli.alimentazione%type;
    NumAbbonamenti number:=0;
@@ -2614,7 +2611,7 @@ end if;
 
 END VeicoliPerTipoCarburante2;
 
-    PROCEDURE PostoAreaPiuUsato(id_Sessione varchar2, nome varchar2, ruolo varchar2) AS
+    PROCEDURE PostoAreaPiuUsato(id_Sessione int, nome varchar2, ruolo varchar2) AS
     BEGIN
    modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
 
@@ -2650,7 +2647,7 @@ END VeicoliPerTipoCarburante2;
 END PostoAreaPiuUsato;
 
 
-   PROCEDURE PostoAreaPiuUsato2(id_Sessione varchar2, nome varchar2, ruolo varchar2, PerAutorimessa number) AS
+   PROCEDURE PostoAreaPiuUsato2(id_Sessione int, nome varchar2, ruolo varchar2, PerAutorimessa number) AS
 
   --variabili usate se visualizzo per autorimesse singole
   IdBoxPiuPresente box.idbox%type;
@@ -3285,6 +3282,12 @@ END PostoAreaPiuUsato2;
                         close cursore;
                     modGUI.chiudiTabella;
                 end if;
+                modGUI.apriIntestazione(3);
+                    modGUI.inserisciTesto('ALTRE OPERAZIONI');
+                modGUI.chiudiIntestazione(3);
+                modGUI.apriDiv(centrato => true);
+                    modGUI.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'veicoloMenoParcheggiato');
+                modGUI.chiudiDiv;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resVeicoloMenoParcheggiato;
@@ -3312,6 +3315,7 @@ END PostoAreaPiuUsato2;
                         modGUI.inserisciBottoneForm(testo=>'RICERCA');
                     modGUI.chiudiForm;
                 end if;
+
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end ingressiSopraMedia;
@@ -3395,6 +3399,13 @@ END PostoAreaPiuUsato2;
                         close cursore;
                     modGUI.chiudiTabella;
                 end if;
+
+                modGUI.apriIntestazione(3);
+                    modGUI.inserisciTesto('ALTRE OPERAZIONI');
+                modGUI.chiudiIntestazione(3);
+                modGUI.apriDiv(centrato => true);
+                    modGUI.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'ingressiSopraMedia');
+                modGUI.chiudiDiv;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resIngressiSopraMedia;
@@ -3507,6 +3518,12 @@ END PostoAreaPiuUsato2;
                         close riga;
                     modGUI.chiudiTabella;
                 end if;
+                modGUI.apriIntestazione(3);
+                    modGUI.inserisciTesto('ALTRE OPERAZIONI');
+                modGUI.chiudiIntestazione(3);
+                modGUI.apriDiv(centrato => true);
+                    modGUI.inserisciBottone(id_sessione, nome, ruolo, 'INDIETRO', groupname || 'statisticaGenerale3');
+                modGUI.chiudiDiv;
             modGUI.chiudiDiv;
         modGUI.chiudiPagina;
     end resStatisticaGenerale3;
@@ -4051,7 +4068,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGUI.chiudiPagina;
     end dettagliStatisticaGenerale5;
 
-    procedure formAutorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure formAutorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2) is
     begin
             modGUI.apriPagina('HoC | Autorimessa con il massimo numero di posti riservati in un periodo', id_Sessione, nome, ruolo);
             modgui.apriIntestazione(2);
@@ -4080,7 +4097,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
             modgui.chiudiform;
     end formAutorimessaMaxPostiPeriodo;
 
-    procedure introitiparziali(id_Sessione varchar2, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is
+    procedure introitiparziali(id_Sessione int, nome varchar2, ruolo varchar2, idsedecorrente varchar2, periodo varchar2, datainiziale varchar2, datafinale varchar2) is
     totaleabb integer :=0;
     totalebigl integer :=0;
     indirizzo varchar2 (100);
@@ -4232,7 +4249,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
     end introitiparziali;
 
 
-    procedure autorimessaMaxPostiPeriodo(id_sessione varchar2, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2) is
+    procedure autorimessaMaxPostiPeriodo(id_Sessione int, nome varchar2, ruolo varchar2, x_datainiziale varchar2, y_datafinale varchar2) is
     idautorimessacorrente integer;
     maxboxoccupati integer;
     periodononvalido exception;
@@ -4281,7 +4298,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGUI.chiudiPagina();
     end autorimessaMaxPostiPeriodo;
 
-    procedure statisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2) is
+    procedure statisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2) is
 
     --variabile che conterra l'autorimessa scelta per la visualizzazione
     AlimentazioneScelta1 veicoli.alimentazione%TYPE;
@@ -4332,7 +4349,7 @@ procedure dettagliStatisticaGenerale5(id_Sessione int, nome varchar2, ruolo varc
         modGui.chiudiForm;
     END statisticaGenerale4;
 
-    procedure resStatisticaGenerale4 (id_Sessione varchar2, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
+    procedure resStatisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2) AS
 
     AlimentazionePiuNumerosa veicoli.alimentazione%type;
     NumAbbonamenti number:=0;
