@@ -1324,8 +1324,6 @@ end statisticaGenerale6;
     procedure visualizzaBox(id_sessione int default 0, nome varchar2, ruolo varchar2, idRiga int) is
         -- Parametri del box corrente
         var_box Box%ROWTYPE;
-        -- Parametri di un eventuale veicolo
-        veicolo Veicoli%ROWTYPE;
         -- ID e indirizzo dell'autorimessa di riferimento
         id_autorimessa Autorimesse.idAutorimessa%TYPE;
         indirizzo_autorimessa Autorimesse.Indirizzo%TYPE;
@@ -1406,52 +1404,6 @@ end statisticaGenerale6;
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                 modGUI.ChiudiTabella;
-
-                -- Eventuale auto contenuta nel box
-                if (var_box.Occupato = 'T') then
-                    -- Trova il veicolo
-                    select Veicoli.* into veicolo
-                    from Veicoli
-                        join EffettuaIngressiOrari on EffettuaIngressiOrari.idVeicolo = Veicoli.idVeicolo
-                        join IngressiOrari on IngressiOrari.idIngressoOrario = EffettuaIngressiOrari.idIngressoOrario
-                    where IngressiOrari.idBox = idRiga
-                        and IngressiOrari.OraUscita is NULL;
-                    -- Stampa le informazioni del veicolo
-                    modGUI.apriIntestazione(3);
-                        modGUI.inserisciTesto('VEICOLO IN SOSTA');
-                    modGUI.chiudiIntestazione(3);
-
-                    modGUI.apriTabella;
-                        modGUI.apriRigaTabella;
-                            modGUI.apriIntestazione('ID VEICOLO');
-                            modGUI.apriIntestazione('TARGA');
-                            modGUI.apriIntestazione('PRODUTTORE');
-                            modGUI.apriIntestazione('MODELLO');
-                            modGUI.apriIntestazione('COLORE');
-                            modGUI.apriIntestazione('DETTAGLIO');
-                        modGUI.chiudiRigaTabella;
-                        modGUI.apriRigaTabella;
-                            modGUI.apriElementoTabella;
-                                modGUI.ElementoTabella(veicolo.idVeicolo);
-                            modGUI.chiudiElementoTabella;
-                        modGUI.ChiudiRigaTabella;
-                        modGUI.apriElementoTabella;
-                            modGUI.ElementoTabella(veicolo.Targa);
-                        modGUI.chiudiElementoTabella;
-                        modGUI.apriElementoTabella;
-                            modGUI.ElementoTabella(veicolo.Produttore);
-                        modGUI.chiudiElementoTabella;
-                        modGUI.apriElementoTabella;
-                            modGUI.ElementoTabella(veicolo.Modello);
-                        modGUI.chiudiElementoTabella;
-                        modGUI.apriElementoTabella;
-                            modGUI.ElementoTabella(veicolo.Colore);
-                        modGUI.chiudiElementoTabella;
-                        modGUI.apriElementoTabella;
-                            modGUI.InserisciLente(groupname || 'visualizzaVeicolo', id_sessione, nome, ruolo, veicolo.idVeicolo);
-                        modGUI.chiudiElementoTabella;
-                    modGUI.chiudiTabella;
-                end if;
             end if;
         modGUI.ChiudiPagina;
     end visualizzaBox;
@@ -1519,10 +1471,9 @@ end visualizzaintroitiparzialiabb;
         -- Parametri della sede corrente
         sede Sedi%ROWTYPE;
         -- Nome del dipendente dirigente
+        id_persona Persone.idPersona%TYPE;
         nome_dirigente Persone.Nome%TYPE;
-        cognome_dirigente Persone.Cognome%TYPE;
-    -- ID del dirigente
-    id_persona Persone.idPersona%TYPE;
+        cognome_dirigente Persone.Cognome%TYPE
     begin
         begin
             -- Trova la sede
@@ -1576,7 +1527,7 @@ end visualizzaintroitiparzialiabb;
                     modGUI.ApriRigaTabella;
                         modGUI.IntestazioneTabella('DIRIGENTE');
                         modGUI.ApriElementoTabella;
-                            modGUI.Collegamento(nome_dirigente || ' ' || cognome_dirigente, 'gruppo5.visualizzaDipendente?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_persona);
+                            modGUI.Collegamento(nome_dirigente || ' ' || cognome_dirigente, 'gruppo4.dettagliDipendente?id_sessione=' || id_sessione || '&nome=' || nome || '&ruolo=' || ruolo || '&idRiga=' || id_persona);
                         modGUI.ChiudiElementoTabella;
                     modGUI.ChiudiRigaTabella;
                     modGUI.ApriRigaTabella;
