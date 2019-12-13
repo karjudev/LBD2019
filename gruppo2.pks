@@ -59,7 +59,7 @@ create or replace package gruppo2 as
 
     procedure statisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, var_idCliente int, var_autorimessa int, var_inizio varchar2, var_fine varchar2);
-    procedure dettagliVeicoloStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
+    procedure dettagliStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int);
 
     procedure statisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2);
     procedure resStatisticaGenerale4 (id_Sessione int, nome varchar2, ruolo varchar2, tipoAlimentazione1 veicoli.alimentazione%type, tipoAlimentazione2 veicoli.alimentazione%type, dataInizioInserita varchar2, dataFineInserita varchar2);

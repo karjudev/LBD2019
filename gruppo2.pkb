@@ -2983,7 +2983,7 @@ END PostoAreaPiuUsato2;
                         modGUI.elementoTabella(cur_or.VM);
                     modGUI.chiudiElementoTabella;
                     modGUI.apriElementoTabella;
-                        modGUI.inserisciLente(groupname || 'dettagliVeicoloStatisticaGenerale2', id_Sessione, nome, ruolo, cur_or.VIV);
+                        modGUI.inserisciLente(groupname || 'dettagliStatisticaGenerale2', id_Sessione, nome, ruolo, cur_or.VIV);
                     modGUI.chiudiElementoTabella;
                 modGUI.chiudiRigaTabella;
             end loop;
@@ -3029,7 +3029,7 @@ END PostoAreaPiuUsato2;
                         modGUI.elementoTabella(cur_abb.VM);
                     modGUI.chiudiElementoTabella;
                     modGUI.apriElementoTabella;
-                        modGUI.inserisciLente(groupname || 'dettagliVeicoloStatisticaGenerale2', id_Sessione, nome, ruolo, cur_abb.VIV);
+                        modGUI.inserisciLente(groupname || 'dettagliStatisticaGenerale2', id_Sessione, nome, ruolo, cur_abb.VIV);
                     modGUI.chiudiElementoTabella;
                 modGUI.chiudiRigaTabella;
             end loop;
@@ -3042,7 +3042,7 @@ END PostoAreaPiuUsato2;
         modGUI.chiudiPagina;
     end resStatisticaGenerale2;
 
-    procedure dettagliVeicoloStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
+    procedure dettagliStatisticaGenerale2(id_Sessione int, nome varchar2, ruolo varchar2, idRiga int) is
     var_idVeicolo Veicoli.idVeicolo%TYPE;
     var_targa Veicoli.Targa%TYPE;
     var_produttore Veicoli.Produttore%TYPE;
@@ -3145,7 +3145,7 @@ END PostoAreaPiuUsato2;
 
         modGUI.chiudiTabella;
         modGUI.chiudiPagina;
-    end dettagliVeicoloStatisticaGenerale2;
+    end dettagliStatisticaGenerale2;
 
     procedure veicoloMenoParcheggiato(id_sessione int, nome varchar2, ruolo varchar2) is
     begin
