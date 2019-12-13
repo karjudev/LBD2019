@@ -3511,7 +3511,7 @@ END PostoAreaPiuUsato2;
                                     modGUI.inserisciTesto(media);
                                 modGUI.chiudiElementoTabella;
                                 modGUI.apriElementoTabella;
-                                    modGUI.inserisciLente(groupname || 'visualizzaCliente', id_sessione, nome, ruolo, id_cliente);
+                                    modGUI.inserisciLente('gruppo5.moreInfoClient', id_sessione, nome, ruolo, id_cliente);
                                 modGUI.chiudiElementoTabella;
                             modGUI.chiudiRigaTabella;
                         end loop;
