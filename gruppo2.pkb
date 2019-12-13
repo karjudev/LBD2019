@@ -2348,47 +2348,51 @@ begin
 
     modGUI.apriPagina('HoC | Visualizza dati', id_Sessione, nome, ruolo);
     modGUI.aCapo;
-    modGUI.apriIntestazione(2);
-    modGUI.inserisciTesto('VISUALIZZAZIONE CLIENTI SENZA ABBONAMENTO RINNOVATO');
-    modGUI.chiudiIntestazione(2);
-    modGUI.apriDiv;
-    modGUI.ApriTabella;
+    if (ruolo <> 'R') then
+        modGUI.esitoOperazione('KO', 'Non sei autorizzato');
+    else
+        modGUI.apriIntestazione(2);
+        modGUI.inserisciTesto('VISUALIZZAZIONE CLIENTI SENZA ABBONAMENTO RINNOVATO');
+        modGUI.chiudiIntestazione(2);
+        modGUI.apriDiv;
+        modGUI.ApriTabella;
 
 
-    modGUI.ApriRigaTabella;
-    modGUI.intestazioneTabella('NOME');
-    modGUI.intestazioneTabella('COGNOME');
-    modGUI.ChiudiRigaTabella;
+        modGUI.ApriRigaTabella;
+        modGUI.intestazioneTabella('NOME');
+        modGUI.intestazioneTabella('COGNOME');
+        modGUI.ChiudiRigaTabella;
 
- for scorriCursore in (
-    SELECT
-      (((abbonamenti.dataFine-
-        abbonamenti.datainizio)-1)/TipiAbbonamenti.durata) as Rinnovato,
-        persone.Nome, persone.cognome
-    FROM TipiAbbonamenti, abbonamenti, Clienti, Persone
-    where TipiAbbonamenti.idTipoabbonamento=abbonamenti.idTipoabbonamento and
-      Clienti.idcliente=abbonamenti.idcliente and
-      Clienti.idpersona=Persone.idpersona
- )
+    for scorriCursore in (
+        SELECT
+        (((abbonamenti.dataFine-
+            abbonamenti.datainizio)-1)/TipiAbbonamenti.durata) as Rinnovato,
+            persone.Nome, persone.cognome
+        FROM TipiAbbonamenti, abbonamenti, Clienti, Persone
+        where TipiAbbonamenti.idTipoabbonamento=abbonamenti.idTipoabbonamento and
+        Clienti.idcliente=abbonamenti.idcliente and
+        Clienti.idpersona=Persone.idpersona
+    )
 
- loop
-  IF(scorricursore.rinnovato<=1)then
+    loop
+    IF(scorricursore.rinnovato<=1)then
 
-    modGUI.ApriRigaTabella;
-    modGUI.ApriElementoTabella;
-    modGUI.ElementoTabella(scorricursore.nome);
-    modGUI.ChiudiElementoTabella;
+        modGUI.ApriRigaTabella;
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(scorricursore.nome);
+        modGUI.ChiudiElementoTabella;
 
-    modGUI.ApriElementoTabella;
-    modGUI.ElementoTabella(scorricursore.Cognome);
-    modGUI.ChiudiElementoTabella;
+        modGUI.ApriElementoTabella;
+        modGUI.ElementoTabella(scorricursore.Cognome);
+        modGUI.ChiudiElementoTabella;
 
-  end if;
+    end if;
 
 
- end loop;
+    end loop;
 
-    modGUI.ChiudiTabella;
+        modGUI.ChiudiTabella;
+    end if;
     modGUI.chiudiDiv;
 
 
